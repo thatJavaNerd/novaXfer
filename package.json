@@ -1,0 +1,17 @@
+{
+  "name": "novaXfer",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Matthew Dean <deanmatthew16@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "mongodb": "^2.2.11",
+    "request": "^2.78.0"
+  }
+}
