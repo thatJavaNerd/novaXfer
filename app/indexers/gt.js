@@ -17,7 +17,7 @@ const basicFormData = {
         state_in: 'VA',
         levl_in: 'US',
         term_in: 'US',
-        sbgi_in: '005515'
+        sbgi_in: '005515' // Code for NVCC Annandale (what GT uses to symbolize NVCC in general)
 }
 
 // Totally didn't copy+paste this nice one liner off StackOverflow
@@ -42,11 +42,12 @@ const gtCreditIndex = 11;
 const extraneousRowIndicatorIndex = 7;
 const extraneousRowIndicatorText = "And";
 
-// https://stackoverflow.com/questions/1495822/replacing-nbsp-from-javascript-dom-text-node
 const nbspRegex = new RegExp(regexUtil.nbspChar + regexUtil.nbspChar);
 
-function findAll(err, each, done) {
+function findAll(each, done) {
     request(requestData, function(err, response, body) {
+        if (err != null)
+            return done(err);
         var $ = cheerio.load(body);
 
         // Access the main table
@@ -60,6 +61,13 @@ function findAll(err, each, done) {
             }
 
             var vccsNumber = getCourseNumber(row, vccsNumberIndex);
+            if (vccsNumber.split(" ")[1].length < 3) {
+                // Some courses listed are malformed. Check to make sure the
+                // VCCS course number (just the number, not the subject) is an
+                // appropriate length;
+                return true;
+            }
+
             var gtNumber = getCourseNumber(row, gtNumberIndex);
             var gtCredits = parseInt(columnAtIndex(row, gtCreditIndex).text().trim());
 
@@ -72,7 +80,7 @@ function findAll(err, each, done) {
                 }
             }
 
-            each(null, new models.CourseEquivalency(
+            each(new models.CourseEquivalency(
                 new models.Course(vccsNumber, -1),
                 new models.Course(gtNumber, gtCredits),
                 institution

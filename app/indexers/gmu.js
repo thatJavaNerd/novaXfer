@@ -14,9 +14,18 @@ const nvccCreditsIndex = 2;
 const gmuNumberIndex = 3;
 const gmuCreditsIndex = 5;
 
-function findAll(err, each, done) {
+/**
+ * Finds all course equivalencies publicly listed for GMU.
+ *
+ * @param each Function that is supplied a course equivalency every time a new
+ *             one is found.
+ * @param done Function that is supplied an error if one is encountered
+ */
+function findAll(each, done) {
     request(dataUrl, function(err, response, body) {
-        assert.equal(null, err);
+        if (err)
+            return done(err);
+            
         var $ = cheerio.load(body);
 
         var $rows = $('#contentPrimary tr').slice(headerRows, 20);
@@ -31,7 +40,7 @@ function findAll(err, each, done) {
                 transformCourseNumber(vals[gmuNumberIndex]),
                 parseInt(vals[gmuCreditsIndex]));
 
-            each(null, new models.CourseEquivalency(nvcc, gmu, institution));
+            each(new models.CourseEquivalency(nvcc, gmu, institution));
         });
         return done();
     });

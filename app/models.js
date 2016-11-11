@@ -4,9 +4,9 @@ module.exports = {
         this.number = number;
         this.credits = credits;
     },
-    CourseEquivalency: function CourseEquivalency(vccs, other, otherCollegeName) {
+    CourseEquivalency: function CourseEquivalency(vccs, other, otherInstitution) {
         this.vccs = vccs;
         this.other = other;
-        this.otherCollegeName = otherCollegeName;
+        this.otherInstitution = otherInstitution;
     }
 }

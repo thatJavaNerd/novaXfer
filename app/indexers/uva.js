@@ -8,7 +8,7 @@ const dataUrl = 'http://saz-webdmz.eservices.virginia.edu/asequivs/Main1/GetEqui
 const institution = 'University of Virginia';
 const headerRows = 2;
 
-function findAll(err, each, done) {
+function findAll(each, done) {
     request(dataUrl, function(err, response, body) {
         assert.equal(null, err);
         var $ = cheerio.load(body);
@@ -24,32 +24,33 @@ function findAll(err, each, done) {
                 return true;
             }
 
-            let nvcc = new models.Course(parseNvccNumber($(this), -1));
+            var vccs = new models.Course(parseNvccNumber($(this)), -1);
 
             var uvaFullText = removeStupidWhitespace($(this).children('td:nth-child(2)').text());
 
-            if (uvaFullText.replace(String.fromCharCode(160), '').trim() == "(nocredit)") {
+            if (uvaFullText.replace(String.fromCharCode(160), '').trim() == "(no credit)") {
                 // UVA doesn't offer credit for this course, make up our own
                 // course number
-                var uva = new models.Course("NONE", 0);
+                var uva = new models.Course("NONE 000", 0);
             } else {
                 var uvaNumberColumn = $(this).children('td:nth-child(2)');
+                // Split the <td> by whitespace: [SUBJ, NUM, CREDITS]
                 var uvaCourseParts = removeStupidWhitespace(uvaNumberColumn.text())
-                        .split(String.fromCharCode(160));
+                        .split(' ');
                 var uva = new models.Course(
                     uvaCourseParts[0] + " " + uvaCourseParts[1],
                     parseInt(uvaCourseParts[2])
                 );
             }
 
-            let eq = new models.CourseEquivalency(nvcc, uva, institution);
+            let eq = new models.CourseEquivalency(vccs, uva, institution);
 
             if (index + 1 < rows.length && isAdditionalCourseRow($(rows[index + 1]))) {
                 // Add a supplement
                 eq.other.supplement = parseNvccNumber($(rows[index + 1]));
             }
 
-            return each(null, eq);
+            return each(eq);
         });
 
         // Since $.each is synchronous we can call done() when outside that block
@@ -59,12 +60,21 @@ function findAll(err, each, done) {
 
 /** Parses the first column in the given row as a course number string */
 function parseNvccNumber($tr) {
-    var base = removeStupidWhitespace($tr.children('td:nth-child(1)').text());
-    return base.substring(0, base.length - 1);
+    return removeStupidWhitespace($tr.children('td:nth-child(1)').text());
 }
 
 function removeStupidWhitespace(text) {
-    return text.replace(regexUtil.newline, '').replace(/ /g, '');
+    /*
+    text.trim() with newlines removed will be something like this:
+
+        "ACC&nbsp;                211"
+
+    Note that &nbsp; is a special whitespace character that ISN'T EQUAL TO A
+    NORMAL SPACE, so we have to work some magic on this string. First, we remove
+    all normal spaces ("ACC&nbsp;211") and then we replace &nbsp; with a normal
+    space so we can get our formatting correct.
+    */
+    return text.trim().replace(regexUtil.newline, '').replace(/ /g, '').replace(new RegExp(regexUtil.nbspChar, 'g'), ' ');
 }
 
 /**

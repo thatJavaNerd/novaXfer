@@ -10,6 +10,7 @@ router.get('/courses/subject/:subject', function(req, res, next) {
         res.json(new ApiError('Invalid parameter', subj, 'subject'));
     } else {
         var coll = req.app.get('db').collection('courses');
+        // INJECTION WARNING
         coll.find({number: new RegExp("^" + subj, 'i')})
             .sort({number: 1})
             .toArray(function(err, docs) {

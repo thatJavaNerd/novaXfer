@@ -78,6 +78,7 @@ mongodb.MongoClient.connect(mongoUrl, function(err, db) {
 
     if (doIndex) {
         // Index all our institutions before we start serving
+        console.log("Indexing...");
         indexers.index(function(equivalency) {
             courses.updateOne({number: equivalency.vccs.number},
                 {
@@ -94,9 +95,13 @@ mongodb.MongoClient.connect(mongoUrl, function(err, db) {
                     assert.equal(null, err);
                 }
             );
-        }, start);
+        }, function(err, report) {
+            assert.equal(null, err);
+            console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)
+            start();
+        });
     } else {
-        console.log('Skipping re-indexing. Courses may not be up to date.');
+        console.log('Skipping index step. Courses may not be up to date.');
         start();
     }
 });
