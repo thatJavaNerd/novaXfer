@@ -28,16 +28,17 @@ function findAll(each, done) {
 
             var uvaFullText = removeStupidWhitespace($(this).children('td:nth-child(2)').text());
 
+            var uva = null;
             if (uvaFullText.replace(String.fromCharCode(160), '').trim() == "(no credit)") {
                 // UVA doesn't offer credit for this course, make up our own
                 // course number
-                var uva = new models.Course("NONE 000", 0);
+                uva = new models.Course("NONE 000", 0);
             } else {
                 var uvaNumberColumn = $(this).children('td:nth-child(2)');
                 // Split the <td> by whitespace: [SUBJ, NUM, CREDITS]
                 var uvaCourseParts = removeStupidWhitespace(uvaNumberColumn.text())
                         .split(' ');
-                var uva = new models.Course(
+                uva = new models.Course(
                     uvaCourseParts[0] + " " + uvaCourseParts[1],
                     parseInt(uvaCourseParts[2])
                 );
@@ -54,7 +55,7 @@ function findAll(each, done) {
         });
 
         // Since $.each is synchronous we can call done() when outside that block
-        return done();
+        return done(null);
     });
 }
 

@@ -79,7 +79,9 @@ mongodb.MongoClient.connect(mongoUrl, function(err, db) {
     if (doIndex) {
         // Index all our institutions before we start serving
         console.log("Indexing...");
-        indexers.index(function(equivalency) {
+        indexers.index(function(equivalency, institution) {
+            // Add property for our schema
+            equivalency.other.institution = equivalency.otherInstitution;
             courses.updateOne({number: equivalency.vccs.number},
                 {
                     $setOnInsert: {

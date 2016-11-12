@@ -25,12 +25,12 @@ function findAll(each, done) {
     request(dataUrl, function(err, response, body) {
         if (err)
             return done(err);
-            
+
         var $ = cheerio.load(body);
 
-        var $rows = $('#contentPrimary tr').slice(headerRows, 20);
+        var $rows = $('#contentPrimary tr').slice(headerRows);
         $rows.each(function() {
-            var vals = $(this).children('td').map(function() { return $(this).text() });
+            var vals = $(this).children('td').map(function() { return $(this).text(); });
 
             var nvcc = new models.Course(
                 transformCourseNumber(vals[nvccNumberIndex]),
@@ -42,7 +42,7 @@ function findAll(each, done) {
 
             each(new models.CourseEquivalency(nvcc, gmu, institution));
         });
-        return done();
+        return done(null);
     });
 }
 

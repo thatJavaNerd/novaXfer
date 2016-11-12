@@ -21,7 +21,7 @@ module.exports.findIndexers = function(done) {
 
         done(null, indexers);
     });
-}
+};
 
 module.exports.index = function(each, done) {
     // Find all our university course equivalency indexers
@@ -37,11 +37,11 @@ module.exports.index = function(each, done) {
 
         for (let i = 0; i < indexers.length; i++) {
             var indexer = indexers[i];
-            indexer.findAll(function(err, equivalency) {
+            indexer.findAll(function(equivalency) {
                 each(equivalency, indexer.institution);
                 courseCount++;
             }, function(err) {
-                if (err != null) {
+                if (err !== null) {
                     return done(err);
                 }
 
@@ -49,10 +49,10 @@ module.exports.index = function(each, done) {
                     var report = {
                         institutionsIndexed: indexers.length,
                         coursesIndexed: courseCount
-                    }
+                    };
                     return done(null, report);
                 }
             });
         }
     });
-}
+};

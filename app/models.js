@@ -9,4 +9,4 @@ module.exports = {
         this.other = other;
         this.otherInstitution = otherInstitution;
     }
-}
+};

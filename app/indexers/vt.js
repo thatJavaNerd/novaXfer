@@ -1,8 +1,7 @@
 const request = require('request');
-const models = require('../models.js')
+const models = require('../models.js');
 
-const dataUrl = "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json"
-const institution = "Virginia Tech"
+const dataUrl = "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json";
 
 function findAll(each, done) {
     request(dataUrl, function(err, response, body) {
@@ -17,21 +16,21 @@ function findAll(each, done) {
             // Some classes that don't have direct equivalents will be listed
             // as either '2xxx' or '2XXX' (2 could be any number), make sure
             // our input is uniform
-            var vtNumber = entry["gsx$vtcoursenumber"]["$t"].toUpperCase();
+            var vtNumber = entry.gsx$vtcoursenumber.$t.toUpperCase();
             // No credit awarded or only in special circumstances
             if (vtNumber === '')
                 vtNumber = 'NONE 000';
 
-            var vtCredits = parseCredits(entry["gsx$vtcredits"]["$t"]);
+            var vtCredits = parseCredits(entry.gsx$vtcredits.$t);
             var vt = new models.Course(vtNumber, vtCredits);
 
-            var vccsNumber = entry["gsx$vccscoursenumber"]["$t"];
-            var vccsCredits = parseCredits(entry["gsx$vccscredits"]["$t"]);
+            var vccsNumber = entry.gsx$vccscoursenumber.$t;
+            var vccsCredits = parseCredits(entry.gsx$vccscredits.$t);
 
             // There is a very specific entry which tells the reader to refer
             // to another site for ENGE equivalents. Ignore this entry.
-            if (entry["gsx$vccscoursetitle"]["$t"] === '' &&
-                    entry["gsx$vtcoursetitle"]["$t"] === '')
+            if (entry.gsx$vccscoursetitle.$t === '' &&
+                    entry.gsx$vtcoursetitle.$t === '')
                 continue;
 
             // The VT transfer site lists entire subjects ("MTH"), specific
@@ -43,10 +42,10 @@ function findAll(each, done) {
                 continue;
 
             var vccs = new models.Course(vccsNumber, vccsCredits);
-            each(new models.CourseEquivalency(vccs, vt, institution));
+            each(new models.CourseEquivalency(vccs, vt, module.exports.institution));
         }
 
-        return done();
+        return done(null);
     });
 }
 
@@ -64,5 +63,5 @@ function parseCredits(str) {
     };
 }
 
-module.exports.findAll = findAll
-module.exports.institution = institution
+module.exports.findAll = findAll;
+module.exports.institution = "Virginia Tech";

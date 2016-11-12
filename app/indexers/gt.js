@@ -5,7 +5,6 @@ const models = require('../models.js');
 const regexUtil = require('../util/regex.js');
 
 const dataUrl = 'https://oscar.gatech.edu/pls/bprod/wwsktrna.P_find_subj_levl_classes';
-const institution = 'Georgia Tech';
 
 const subjects = ["ACC", "ARA", "ART", "BIO", "BIOL", "BUS", "CHEM", "CHM",
     "CSC", "CST", "ECO", "EGR", "ENG", "ENGL", "ESL", "GENL", "GOL", "HIS",
@@ -18,10 +17,10 @@ const basicFormData = {
         levl_in: 'US',
         term_in: 'US',
         sbgi_in: '005515' // Code for NVCC Annandale (what GT uses to symbolize NVCC in general)
-}
+};
 
 // Totally didn't copy+paste this nice one liner off StackOverflow
-var formQuery = Object.keys(basicFormData).reduce(function(a,k){a.push(k+'='+encodeURIComponent(basicFormData[k]));return a},[]).join('&');
+var formQuery = Object.keys(basicFormData).reduce(function(a,k){a.push(k+'='+encodeURIComponent(basicFormData[k]));return a;},[]).join('&');
 
 // Append our subjects to the query
 for (var i = 0; i < subjects.length; i++) {
@@ -33,7 +32,7 @@ const requestData = {
     method: 'POST',
     // GT loves complex data
     form: formQuery
-}
+};
 
 const headerRows = 2;
 const vccsNumberIndex = 2;
@@ -46,7 +45,7 @@ const nbspRegex = new RegExp(regexUtil.nbspChar + regexUtil.nbspChar);
 
 function findAll(each, done) {
     request(requestData, function(err, response, body) {
-        if (err != null)
+        if (err !== null)
             return done(err);
         var $ = cheerio.load(body);
 
@@ -83,12 +82,12 @@ function findAll(each, done) {
             each(new models.CourseEquivalency(
                 new models.Course(vccsNumber, -1),
                 new models.Course(gtNumber, gtCredits),
-                institution
+                module.exports.institution
             ));
         });
 
         // Since $.each is synchronous we can call done() when outside that block
-        return done();
+        return done(null);
     });
 
 }
@@ -108,5 +107,5 @@ function isExtraneousRow(tr) {
     return columnAtIndex(tr, extraneousRowIndicatorIndex).text() == extraneousRowIndicatorText;
 }
 
-module.exports.findAll = findAll
-module.exports.institution = institution
+module.exports.findAll = findAll;
+module.exports.institution = "Georgia Tech";

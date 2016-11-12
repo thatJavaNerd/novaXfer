@@ -7,7 +7,11 @@ module.exports = function(grunt) {
             }
         },
         jshint: {
-            all: ['app/**/*.js']
+            all: ['app/**/*.js'],
+            options: {
+                // ECMAScript version 6
+                esversion: 6
+            }
         }
     });
 
