@@ -1,22 +1,36 @@
 // Base: course
 {
-    "number": "XYZ 123",
+    "subject": "XYZ",
+    "number": "123",
     "credits": 3
+}
+
+// Course with variable credits
+{
+    "subject": "XYZ",
+    "number": "123",
+    "credits": {
+        "min": 3,
+        "max": 4
+    }
 }
 
 // NVCC class that has equivalencies at VT and UVA
 {
-    "number": "ECO 202",
+    "subject": "ECO",
+    "number": "202",
     "credits": 3,
     "equivalencies": [
         {
-            "college_name": "Virginia Tech",
-            "number": "ECON 2005",
+            "institution": "Virginia Tech",
+            "subject": "ECON",
+            "number": "2005",
             "credits": 3
         },
         {
-            "college_name": "University of Virginia",
-            "number": "ECON 2010",
+            "institution": "University of Virginia",
+            "number": "2010",
+            "subject": "ECON",
             "credits": 3,
         }
     ]
@@ -25,42 +39,45 @@
 // NVCC class that when taken with another class grants additional credit at UVA
 // ex: ACC 211 taken alone grants 3 credits, ACC 211 + ACC 213 grants 4
 {
-    "number": "ACC 211",
+    "subject": "ACC",
+    "number": "211",
     "credits": 3,
     "equivalencies": [
         {
-            "college_name": "University of Virginia",
-            "number": "COMM 2010",
+            "institution": "University of Virginia",
+            "subject": "COMM",
+            "number": "2010",
             "credits": 3
         },
         {
-            "college_name": "University of Virginia",
-            "number": "COMM 2010",
+            "institution": "University of Virginia",
+            "subject": "COMM",
+            "number": "2010",
             "credits": 4,
-            "supplement": "ACC 213"
+            "supplement": {
+                "subject": "ACC",
+                "number": "213"
+            }
         }
     ]
 }
 
-// TODO: "insights"
-
+// NVCC class that grants credit for two classes
 {
-    "number": "ACC 211",
-    "credits": 3,
+    "subject": "CSC",
+    "number": "201",
+    "credits": 4,
     "equivalencies": [
         {
-            "college_name": "George Mason University",
-            "number": "ACCT---",
+            "institution": "Georgia Tech",
+            "subject": "CS",
+            "number": "1301",
             "credits": 3,
-            "insights": [
-                "Taking ACC 212 would give more credit"
-            ]
-        },
-        {
-            "college_name": "George Mason University",
-            "number": "ACCT 203 + ACCT 2---",
-            "supplement": "ACC 212",
-            "credits": 6,
+            "freebie": {
+                "subject": "FREE",
+                "number": "1XXX",
+                "credits": 1
+            }
         }
     ]
 }

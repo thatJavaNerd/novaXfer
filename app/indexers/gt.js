@@ -60,15 +60,21 @@ function findAll(each, done) {
             }
 
             var vccsNumber = getCourseNumber(row, vccsNumberIndex);
-            if (vccsNumber.split(" ")[1].length < 3) {
+            if (vccsNumber[1].length < 3) {
                 // Some courses listed are malformed. Check to make sure the
                 // VCCS course number (just the number, not the subject) is an
-                // appropriate length;
+                // appropriate length. Example: "MATH 6", "EXL 12"
                 return true;
             }
 
             var gtNumber = getCourseNumber(row, gtNumberIndex);
             var gtCredits = parseInt(columnAtIndex(row, gtCreditIndex).text().trim());
+
+            var equiv = new models.CourseEquivalency(
+                new models.Course(vccsNumber[0], vccsNumber[1], -1),
+                new models.Course(gtNumber[0], gtNumber[1], gtCredits),
+                module.exports.institution
+            );
 
             // Check for the possibility of additional row
             if (index < tableRows.length - 1) {
@@ -79,11 +85,7 @@ function findAll(each, done) {
                 }
             }
 
-            each(new models.CourseEquivalency(
-                new models.Course(vccsNumber, -1),
-                new models.Course(gtNumber, gtCredits),
-                module.exports.institution
-            ));
+            each(equiv);
         });
 
         // Since $.each is synchronous we can call done() when outside that block
@@ -100,7 +102,7 @@ function getCourseNumber(tr, colIndex) {
     // The textual representation of course names are
     // {SUBJECT}&nbsp;&nbsp;{NUMBER}, so we replace the two special
     // spaces with one normal one.
-    return columnAtIndex(tr, colIndex).text().replace(nbspRegex, " ");
+    return columnAtIndex(tr, colIndex).text().split(nbspRegex);
 }
 
 function isExtraneousRow(tr) {

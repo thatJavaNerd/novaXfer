@@ -7,61 +7,77 @@ const regexUtil = require('../util/regex.js');
 const dataUrl = 'http://saz-webdmz.eservices.virginia.edu/asequivs/Main1/GetEquivsGivenSchool?schoolDropDownList=Northern+Virginia+Cmty+College+Annandale';
 const institution = 'University of Virginia';
 const headerRows = 2;
+const nvccIndex = 1; // CSS queries are 1-indexed
+const uvaIndex = 2;
 
 function findAll(each, done) {
     request(dataUrl, function(err, response, body) {
         assert.equal(null, err);
         var $ = cheerio.load(body);
 
-        var rows = $('table tr').slice(headerRows, 16);
+        var error = null;
+        var rows = $('table tr').slice(headerRows);
         rows.each(function(index, element) {
-            if ($(this).text().trim() === '') {
-                // This is a row to separate courses, skip
-                return true;
-            }
-            if (isAdditionalCourseRow($(this))) {
-                // We just handled this row in a previous iteration
-                return true;
-            }
+            var rowType = getRowType($(this));
 
-            var vccs = new models.Course(parseNvccNumber($(this)), -1);
-
-            var uvaFullText = removeStupidWhitespace($(this).children('td:nth-child(2)').text());
-
-            var uva = null;
-            if (uvaFullText.replace(String.fromCharCode(160), '').trim() == "(no credit)") {
-                // UVA doesn't offer credit for this course, make up our own
-                // course number
-                uva = new models.Course("NONE 000", 0);
-            } else {
-                var uvaNumberColumn = $(this).children('td:nth-child(2)');
-                // Split the <td> by whitespace: [SUBJ, NUM, CREDITS]
-                var uvaCourseParts = removeStupidWhitespace(uvaNumberColumn.text())
-                        .split(' ');
-                uva = new models.Course(
-                    uvaCourseParts[0] + " " + uvaCourseParts[1],
-                    parseInt(uvaCourseParts[2])
-                );
+            switch (getRowType($(this))) {
+                case 'unknown':
+                    error = "Found row with type 'unknown'";
+                    return false;
+                case 'empty':// This is a row to separate courses, skip
+                case 'supplement':
+                case 'freebie':
+                    // We handle supplement and freebie rows when their base
+                    // courses are found
+                    return true;
             }
 
-            let eq = new models.CourseEquivalency(vccs, uva, institution);
+            var vccs = parseCourse($(this), 1);
+            var uva = parseCourse($(this), uvaIndex);
 
-            if (index + 1 < rows.length && isAdditionalCourseRow($(rows[index + 1]))) {
-                // Add a supplement
-                eq.other.supplement = parseNvccNumber($(rows[index + 1]));
+            var eq = new models.CourseEquivalency(vccs, uva, institution);
+
+
+            if (index + 1 < rows.length) {
+                // Possibility of extraneous row
+                var nextRowType = getRowType($(rows[index + 1]));
+                if (nextRowType === 'unknown') {
+                    error = "Found row with type 'unknown'";
+                    return false;
+                }
+                if (nextRowType === 'supplement' || nextRowType === 'freebie') {
+                    // Add a supplement
+                    var columnIndex = nvccIndex; // Assume supplement
+                    if (nextRowType === 'freebie')
+                        index = uvaIndex;
+                    eq.other[nextRowType] = parseCourse($(this), columnIndex);
+                }
             }
 
             return each(eq);
         });
 
         // Since $.each is synchronous we can call done() when outside that block
-        return done(null);
+        return done(error);
     });
 }
 
-/** Parses the first column in the given row as a course number string */
-function parseNvccNumber($tr) {
-    return removeStupidWhitespace($tr.children('td:nth-child(1)').text());
+function parseCourse($tr, index) {
+    var baseStr = removeStupidWhitespace($tr.children(`td:nth-child(${index})`)
+            .text());
+    if (baseStr === '(no credit)') {
+        // UVA doesn't offer credit for this course, make up our own
+        // course number
+        return new models.Course("NONE", "000", 0);
+    }
+
+    // Business as usual
+    var parts = baseStr.split(' ');
+
+    var credits = -1;
+    if (parts.length >= 3)
+        credits = parseInt(parts[2]);
+    return new models.Course(parts[0], parts[1], credits);
 }
 
 function removeStupidWhitespace(text) {
@@ -79,14 +95,32 @@ function removeStupidWhitespace(text) {
 }
 
 /**
- * Returns true if this row is used to specify an additional class that can be
- * taken with the class specified at the row above for more credit.
+ * Identifies the type of data present in the given row.
+ *
+ * Returns:
+ *   'normal' => NVCC and UVA course present
+ *   'supplement' => Specifies extra NVCC course to take to get credit for
+ *                   the UVA course in the above row.
+ *   'freebie' => Specifies extra UVA course one would get credit for if they
+ *                also got credit for the NVCC course specified in the above
+ *                row.
+ *   'empty' => This row is used to visually separate other course equivalencies
+ *   'unknown' => Logically shouldn't be returned so if you see this you know
+ *                something's wrong.
  */
-function isAdditionalCourseRow($tr) {
-    // The first column should specify the NVCC course, the second should be
-    // empty.
-    return $tr.children('td:nth-child(2)').text().trim() === '' &&
-            $tr.children('td:nth-child(1)').text().trim() !== '';
+function getRowType($tr) {
+    var nvccColumn = $tr.children('td:nth-child(1)').text().trim();
+    var uvaColumn = $tr.children('td:nth-child(2)').text().trim();
+
+    if (nvccColumn !== '' && uvaColumn !== '')
+        return 'normal';
+    if (nvccColumn === '' && uvaColumn === '')
+        return 'empty';
+    if (nvccColumn !== '' && uvaColumn === '')
+        return 'supplement';
+    if (nvccColumn === '' && uvaColumn !== '')
+        return 'freebie';
+    return 'unknown';
 }
 
 module.exports.findAll = findAll;

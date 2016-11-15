@@ -16,14 +16,23 @@ function findAll(each, done) {
             // Some classes that don't have direct equivalents will be listed
             // as either '2xxx' or '2XXX' (2 could be any number), make sure
             // our input is uniform
-            var vtNumber = entry.gsx$vtcoursenumber.$t.toUpperCase();
+            var vtCourseStr = entry.gsx$vtcoursenumber.$t.toUpperCase();
+            var vtCourse = null;
+            var vtNumber = null;
             // No credit awarded or only in special circumstances
-            if (vtNumber === '')
-                vtNumber = 'NONE 000';
+            if (vtCourseStr === '') {
+                vtCourse = 'NONE';
+                vtNumber = '000';
+            } else {
+                var parts = vtCourseStr.split(' ');
+                vtCourse = parts[0];
+                vtNumber = parts[1];
+            }
 
             var vtCredits = parseCredits(entry.gsx$vtcredits.$t);
-            var vt = new models.Course(vtNumber, vtCredits);
+            var vt = new models.Course(vtCourse, vtNumber, vtCredits);
 
+            var vccsCourseStr = entry.gsx$vccscoursenumber.$t;
             var vccsNumber = entry.gsx$vccscoursenumber.$t;
             var vccsCredits = parseCredits(entry.gsx$vccscredits.$t);
 
@@ -33,15 +42,17 @@ function findAll(each, done) {
                     entry.gsx$vtcoursetitle.$t === '')
                 continue;
 
+            // TODO add supplement to equivalency
             // The VT transfer site lists entire subjects ("MTH"), specific
             // courses ("MTH 173"), and courses that must be taken together that
             // have a different equivalency than if they were taken
             // individually ("MTH 175 + 176"). For right now, we only care about
             // specific courses.
-            if (vccsNumber.indexOf("+") != -1 || /^[a-zA-Z]+$/.test(vccsNumber))
+            if (vccsCourseStr.indexOf("+") != -1 || /^[a-zA-Z]+$/.test(vccsNumber))
                 continue;
 
-            var vccs = new models.Course(vccsNumber, vccsCredits);
+            var vccsParts = vccsCourseStr.split(' ');
+            var vccs = new models.Course(vccsParts[0], vccsParts[1], vccsCredits);
             each(new models.CourseEquivalency(vccs, vt, module.exports.institution));
         }
 

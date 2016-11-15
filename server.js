@@ -82,7 +82,7 @@ mongodb.MongoClient.connect(mongoUrl, function(err, db) {
         indexers.index(function(equivalency, institution) {
             // Add property for our schema
             equivalency.other.institution = equivalency.otherInstitution;
-            courses.updateOne({number: equivalency.vccs.number},
+            courses.updateOne({number: equivalency.vccs.number, subject: equivalency.vccs.subject},
                 {
                     $setOnInsert: {
                         credits: equivalency.vccs.credits,

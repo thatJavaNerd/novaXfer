@@ -49,9 +49,12 @@ describe('indexers', function() {
 });
 
 // Match 2 to 5 alpha characters followed by a space, plus 2 to 4
-// alphanumeric (including hyphen) characters
-var courseRegex = /[A-Z]{2,5} [A-Z0-9-]{2,4}/
+// alphanumeric (including hyphen and pound) characters
+var courseNumberRegex = /[A-Z0-9-#]{2,4}/
+var courseSubjectRegex = /[A-Z]{2,5}/
 function testIndexer(indexer, mochaDone) {
+    const minEquivalencies = 100;
+    var equivCounter = 0;
     assert.notEqual(undefined, indexer.institution);
     assert.notEqual(undefined, indexer.findAll);
 
@@ -59,22 +62,54 @@ function testIndexer(indexer, mochaDone) {
         // Test each equivalency
         var equivStr = JSON.stringify(equiv);
         assert.notEqual(null, equiv, "Equivalency was null: " + equiv);
-        assert.notEqual(null, equiv.vccs, "VCCS course was null: " + equivStr);
-        assert.ok(courseRegex.test(equiv.vccs.number), "VCCS course didn't match regex: " + equivStr);
-        assert.ok(courseRegex.test(equiv.other.number), indexer.institution + " course didn't match regex: " + equivStr);
-        assert.notEqual(null, equiv.other, equivStr);
-        assert.notEqual(null, equiv.otherInstitution, equivStr);
+        assert.notEqual(null, equiv.otherInstitution, "Missing otherInstitution: " + equivStr);
 
-        // Assert that the course's `credit` property is valid
-        var creditErr = validateCreditRange(equiv.vccs);
-        assert.equal(null, creditErr, creditErr + ": " + equivStr);
-        creditErr = validateCreditRange(equiv.other);
-        assert.equal(null, creditErr, creditErr + ": " + equivStr);
+        validateCourse(equiv.vccs, "VCCS", equivStr);
+        validateCourse(equiv.other, equiv.otherInstitution, equivStr);
+        equivCounter++;
     }, function done(err) {
         assert.equal(null, err);
+        assert.ok(equivCounter >= minEquivalencies,
+            `Indexer only provided ${equivCounter} equivalencies (expected min ${minEquivalencies})`);
         // The indexer is done, let mocha know
         mochaDone();
     });
+}
+
+function validateCourse(course, institution, json) {
+    assert.notEqual(null, course, institution + " course was null: " + json);
+
+    // Validate subject and number
+    validateCourseCore(course, institution, json);
+
+    // Validate credit property
+    var creditErr = validateCreditRange(course);
+    assert.equal(null, creditErr, creditErr + ": " + json);
+
+    // Validate optional supplementary course
+    if (course.supplement !== undefined) {
+        validateCourseCore(course.supplement, institution, json, "supplement");
+    }
+
+    // Validate optional freebie course
+    if (course.freebie !== undefined) {
+        validateCourseCore(course.freebie, institution, json, "freebie");
+        validateCreditRange(course.freebie.credits);
+    }
+}
+
+function validateCourseCore(course, institution, json, specifier) {
+    if (specifier !== undefined) {
+        specifier = ' ' + specifier + ' ';
+    } else {
+        specifier = '';
+    }
+
+    assert.ok(courseNumberRegex.test(course.number),
+        institution + specifier + " course number didn't conform: " + json)
+    assert.ok(courseSubjectRegex.test(course.subject),
+        institution + specifier +  " course subject didn't conform: " + json);
+
 }
 
 function validateCreditRange(course) {

@@ -2,7 +2,6 @@ const request = require('request');
 const assert = require('assert');
 const models = require('../models.js');
 const cheerio = require('cheerio');
-
 const fs = require('fs');
 
 const dataUrl = 'http://admissions.gmu.edu/transfer/transfercreditsearch.asp?state=VA&school=USVCCS&course=View+All';
@@ -32,13 +31,8 @@ function findAll(each, done) {
         $rows.each(function() {
             var vals = $(this).children('td').map(function() { return $(this).text(); });
 
-            var nvcc = new models.Course(
-                transformCourseNumber(vals[nvccNumberIndex]),
-                parseInt(vals[nvccCreditsIndex]));
-
-            var gmu = new models.Course(
-                transformCourseNumber(vals[gmuNumberIndex]),
-                parseInt(vals[gmuCreditsIndex]));
+            var nvcc = parseCourse(vals, nvccNumberIndex, nvccCreditsIndex);
+            var gmu = parseCourse(vals, gmuNumberIndex, gmuCreditsIndex);
 
             each(new models.CourseEquivalency(nvcc, gmu, institution));
         });
@@ -46,11 +40,12 @@ function findAll(each, done) {
     });
 }
 
-/**
- * Replaces the first instance of '-' with a space. Ex: "ACC-212" -> "ACC 212"
- */
-function transformCourseNumber(number) {
-    return number.replace(/-/, ' ');
+function parseCourse(vals, numberIndex, creditsIndex) {
+    // Course will sometimes look something like this: "ACCT-----", where the
+    // subject is "ACCT" and the number is "----", replace first hyphen with a
+    // space and then split.
+    var parts = vals[numberIndex].replace('-', ' ').split(' ');
+    return new models.Course(parts[0], parts[1], parseInt(vals[creditsIndex]));
 }
 
 

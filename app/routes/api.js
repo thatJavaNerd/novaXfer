@@ -11,7 +11,7 @@ router.get('/courses/subject/:subject', function(req, res, next) {
     } else {
         var coll = req.app.get('db').collection('courses');
         // INJECTION WARNING
-        coll.find({number: new RegExp("^" + subj, 'i')})
+        coll.find({subject: new RegExp(subj, 'i')})
             .sort({number: 1})
             .toArray(function(err, docs) {
                 assert.equal(null, err);

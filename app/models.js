@@ -1,6 +1,7 @@
 
 module.exports = {
-    Course: function Course(number, credits) {
+    Course: function Course(subject, number, credits) {
+        this.subject = subject;
         this.number = number;
         this.credits = credits;
     },
