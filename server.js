@@ -1,4 +1,3 @@
-const assert = require('assert');
 const bodyParser = require('body-parser');
 const express = require('express');
 const indexers = require('./app/indexers');
@@ -65,7 +64,9 @@ app.use(function(err, req, res, next) {
 ///////////////////////// START /////////////////////////
 // Connect to MongoDB
 mongodb.MongoClient.connect(mongoUrl, function(err, db) {
-    assert.equal(null, err);
+    if (err !== null)
+        throw err;
+
     var courses = db.collection('courses');
 
     var start = function() {
@@ -94,11 +95,13 @@ mongodb.MongoClient.connect(mongoUrl, function(err, db) {
                 },
                 {upsert: true},
                 function(err, result) {
-                    assert.equal(null, err);
+                    if (err !== null)
+                        throw err;
                 }
             );
         }, function(err, report) {
-            assert.equal(null, err);
+            if (err !== null)
+                throw err;
             console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)
             start();
         });

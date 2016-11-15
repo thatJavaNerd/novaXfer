@@ -1,5 +1,4 @@
 const request = require('request');
-const assert = require('assert');
 const models = require('../models.js');
 const cheerio = require('cheerio');
 const fs = require('fs');

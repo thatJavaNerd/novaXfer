@@ -1,5 +1,4 @@
 const request = require('request');
-const assert = require('assert');
 const cheerio = require('cheerio');
 const models = require('../models.js');
 const regexUtil = require('../util/regex.js');

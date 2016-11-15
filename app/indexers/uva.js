@@ -1,5 +1,4 @@
 const request = require('request');
-const assert = require('assert');
 const cheerio = require('cheerio');
 const models = require('../models.js');
 const regexUtil = require('../util/regex.js');
@@ -12,7 +11,9 @@ const uvaIndex = 2;
 
 function findAll(each, done) {
     request(dataUrl, function(err, response, body) {
-        assert.equal(null, err);
+        if (err !== null)
+            return done(err);
+            
         var $ = cheerio.load(body);
 
         var error = null;

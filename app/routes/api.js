@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var assert = require('assert');
 
 router.get('/courses/subject/:subject', function(req, res, next) {
     var findObj = {};
@@ -14,8 +13,12 @@ router.get('/courses/subject/:subject', function(req, res, next) {
         coll.find({subject: new RegExp(subj, 'i')})
             .sort({number: 1})
             .toArray(function(err, docs) {
-                assert.equal(null, err);
-                res.json(docs);
+                if (err !== null) {
+                    res.sendStatus(500);
+                    res.json({"reason": "unable to process request"})
+                } else {
+                    res.json(docs);
+                }
             });
     }
 });
