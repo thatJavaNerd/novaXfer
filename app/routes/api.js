@@ -3,19 +3,20 @@ var router = express.Router();
 
 router.get('/courses/subject/:subject', function(req, res, next) {
     var findObj = {};
-    var subj = req.params.subject.trim();
-    if (subj.trim() === '' || !validateSubject(subj)) {
+    var subj = req.params.subject;
+    if (!validateSubject(subj)) {
         // Validate the subject
-        res.json(new ApiError('Invalid parameter', subj, 'subject'));
+        res.json(new ApiError('Invalid parameter', 'subject', subj));
+        res.sendStatus(400);
     } else {
         var coll = req.app.get('db').collection('courses');
         // INJECTION WARNING
-        coll.find({subject: new RegExp(subj, 'i')})
+        coll.find({subject: new RegExp('^' + subj + '$', 'i')})
             .sort({number: 1})
             .toArray(function(err, docs) {
                 if (err !== null) {
+                    res.json({"reason": "unable to process request"});
                     res.sendStatus(500);
-                    res.json({"reason": "unable to process request"})
                 } else {
                     res.json(docs);
                 }
@@ -24,7 +25,7 @@ router.get('/courses/subject/:subject', function(req, res, next) {
 });
 
 function validateSubject(subj) {
-    return /[A-Z]+/i.test(subj);
+    return /^[A-Z]+$/i.test(subj);
 }
 
 function ApiError(reason, parameter, value) {
