@@ -32,9 +32,9 @@ function findAll(each, done) {
             var vtCredits = parseCredits(entry.gsx$vtcredits.$t);
             var vt = new models.Course(vtCourse, vtNumber, vtCredits);
 
-            var vccsCourseStr = entry.gsx$vccscoursenumber.$t;
-            var vccsNumber = entry.gsx$vccscoursenumber.$t;
-            var vccsCredits = parseCredits(entry.gsx$vccscredits.$t);
+            var nvccCourseStr = entry.gsx$vccscoursenumber.$t;
+            var nvccNumber = entry.gsx$vccscoursenumber.$t;
+            var nvccCredits = parseCredits(entry.gsx$vccscredits.$t);
 
             // There is a very specific entry which tells the reader to refer
             // to another site for ENGE equivalents. Ignore this entry.
@@ -48,12 +48,12 @@ function findAll(each, done) {
             // have a different equivalency than if they were taken
             // individually ("MTH 175 + 176"). For right now, we only care about
             // specific courses.
-            if (vccsCourseStr.indexOf("+") != -1 || /^[a-zA-Z]+$/.test(vccsNumber))
+            if (nvccCourseStr.indexOf("+") != -1 || /^[a-zA-Z]+$/.test(nvccNumber))
                 continue;
 
-            var vccsParts = vccsCourseStr.split(' ');
-            var vccs = new models.Course(vccsParts[0], vccsParts[1], vccsCredits);
-            each(new models.CourseEquivalency(vccs, vt, module.exports.institution));
+            var nvccParts = nvccCourseStr.split(' ');
+            var nvcc = new models.Course(nvccParts[0], nvccParts[1], nvccCredits);
+            each(new models.CourseEquivalency(nvcc, vt, module.exports.institution));
         }
 
         return done(null);

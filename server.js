@@ -83,10 +83,10 @@ mongodb.MongoClient.connect(mongoUrl, function(err, db) {
         indexers.index(function(equivalency, institution) {
             // Add property for our schema
             equivalency.other.institution = equivalency.otherInstitution;
-            courses.updateOne({number: equivalency.vccs.number, subject: equivalency.vccs.subject},
+            courses.updateOne({number: equivalency.nvcc.number, subject: equivalency.nvcc.subject},
                 {
                     $setOnInsert: {
-                        credits: equivalency.vccs.credits,
+                        credits: equivalency.nvcc.credits,
                     },
                     // Add to equivalencies array if data already exists
                     $addToSet: {

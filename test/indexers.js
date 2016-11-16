@@ -64,7 +64,7 @@ function testIndexer(indexer, mochaDone) {
         assert.notEqual(null, equiv, "Equivalency was null: " + equiv);
         assert.notEqual(null, equiv.otherInstitution, "Missing otherInstitution: " + equivStr);
 
-        validateCourse(equiv.vccs, "VCCS", equivStr);
+        validateCourse(equiv.nvcc, "NVCC", equivStr);
         validateCourse(equiv.other, equiv.otherInstitution, equivStr);
         equivCounter++;
     }, function done(err) {

@@ -13,7 +13,7 @@ function findAll(each, done) {
     request(dataUrl, function(err, response, body) {
         if (err !== null)
             return done(err);
-            
+
         var $ = cheerio.load(body);
 
         var error = null;
@@ -33,10 +33,10 @@ function findAll(each, done) {
                     return true;
             }
 
-            var vccs = parseCourse($(this), 1);
+            var nvcc = parseCourse($(this), 1);
             var uva = parseCourse($(this), uvaIndex);
 
-            var eq = new models.CourseEquivalency(vccs, uva, institution);
+            var eq = new models.CourseEquivalency(nvcc, uva, institution);
 
 
             if (index + 1 < rows.length) {

@@ -34,7 +34,7 @@ const requestData = {
 };
 
 const headerRows = 2;
-const vccsNumberIndex = 2;
+const nvccNumberIndex = 2;
 const gtNumberIndex = 9;
 const gtCreditIndex = 11;
 const extraneousRowIndicatorIndex = 7;
@@ -58,10 +58,10 @@ function findAll(each, done) {
                 return true;
             }
 
-            var vccsNumber = getCourseNumber(row, vccsNumberIndex);
-            if (vccsNumber[1].length < 3) {
+            var nvccNumber = getCourseNumber(row, nvccNumberIndex);
+            if (nvccNumber[1].length < 3) {
                 // Some courses listed are malformed. Check to make sure the
-                // VCCS course number (just the number, not the subject) is an
+                // NVCC course number (just the number, not the subject) is an
                 // appropriate length. Example: "MATH 6", "EXL 12"
                 return true;
             }
@@ -70,7 +70,7 @@ function findAll(each, done) {
             var gtCredits = parseInt(columnAtIndex(row, gtCreditIndex).text().trim());
 
             var equiv = new models.CourseEquivalency(
-                new models.Course(vccsNumber[0], vccsNumber[1], -1),
+                new models.Course(nvccNumber[0], nvccNumber[1], -1),
                 new models.Course(gtNumber[0], gtNumber[1], gtCredits),
                 module.exports.institution
             );
