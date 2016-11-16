@@ -4,25 +4,26 @@ var router = express.Router();
 router.get('/courses/subject/:subject', function(req, res, next) {
     var findObj = {};
     var subj = req.params.subject;
-    if (!validateSubject(subj)) {
-        // Validate the subject
-        res.json(new ApiError('Invalid parameter', 'subject', subj));
-        res.sendStatus(400);
-    } else {
-        var coll = req.app.get('db').collection('courses');
-        // INJECTION WARNING
-        coll.find({subject: new RegExp('^' + subj + '$', 'i')})
-            .sort({number: 1})
-            .toArray(function(err, docs) {
-                if (err !== null) {
-                    res.json({"reason": "unable to process request"});
-                    res.sendStatus(500);
-                } else {
-                    res.json(docs);
-                }
-            });
-    }
+    if (!validateSubject(subj))
+        return next(new ApiError('Invalid parameter', 'subject', subj));
+
+    var coll = req.app.get('db').collection('courses');
+    // INJECTION WARNING
+    coll.find({subject: new RegExp('^' + subj + '$', 'i')})
+        .sort({number: 1})
+        .toArray(function(err, docs) {
+            if (err !== null)
+                return next('Unable to process request');
+
+            res.json(docs);
+        });
 });
+
+// Error handling
+router.use('/', function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.send(err);
+})
 
 function validateSubject(subj) {
     return /^[A-Z]+$/i.test(subj);
