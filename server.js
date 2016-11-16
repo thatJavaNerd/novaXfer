@@ -1,5 +1,6 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const helmet = require('helmet');
 const indexers = require('./app/indexers');
 const logger = require('morgan');
 const mongodb = require('mongodb')
@@ -11,6 +12,7 @@ const api = require('./app/routes/api');
 ///////////////////// CONFIGURATION /////////////////////
 app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'pug');
+app.use(helmet());
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
