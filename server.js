@@ -1,10 +1,10 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const helmet = require('helmet');
-const indexers = require('./app/indexers');
 const logger = require('morgan');
 const mongodb = require('mongodb')
 const path = require('path');
+const queries = require('./app/queries');
 
 const app = express();
 const api = require('./app/routes/api');
@@ -82,26 +82,7 @@ mongodb.MongoClient.connect(mongoUrl, function(err, db) {
     if (doIndex) {
         // Index all our institutions before we start serving
         console.log("Indexing...");
-        indexers.index(function(equivalency, institution) {
-            // Add property for our schema
-            equivalency.other.institution = equivalency.otherInstitution;
-            courses.updateOne({number: equivalency.nvcc.number, subject: equivalency.nvcc.subject},
-                {
-                    $setOnInsert: {
-                        credits: equivalency.nvcc.credits,
-                    },
-                    // Add to equivalencies array if data already exists
-                    $addToSet: {
-                        equivalencies: equivalency.other
-                    }
-                },
-                {upsert: true},
-                function(err, result) {
-                    if (err !== null)
-                        throw err;
-                }
-            );
-        }, function(err, report) {
+        queries.indexInstitutions(db, function(err, report) {
             if (err !== null)
                 throw err;
             console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)

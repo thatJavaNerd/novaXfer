@@ -1,3 +1,4 @@
+var indexers = require('./indexers');
 
 /**
  * Retrieves all courses in a given subject
@@ -43,3 +44,27 @@ module.exports.equivalenciesForCourse = function(db, courseSubject, courseNumber
             return done(null, docs[0]);
     });
 };
+
+module.exports.indexInstitutions = function(db, done) {
+    var courses = db.collection('courses');
+    indexers.index(function(equivalency, institution) {
+        // Add property for our schema
+        equivalency.other.institution = equivalency.otherInstitution;
+        courses.updateOne({number: equivalency.nvcc.number, subject: equivalency.nvcc.subject},
+            {
+                $setOnInsert: {
+                    credits: equivalency.nvcc.credits,
+                },
+                // Add to equivalencies array if data already exists
+                $addToSet: {
+                    equivalencies: equivalency.other
+                }
+            },
+            {upsert: true},
+            function(err, result) {
+                if (err !== null)
+                    done(err);
+            }
+        );
+    }, done);
+}
