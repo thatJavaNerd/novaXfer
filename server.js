@@ -5,6 +5,7 @@ const logger = require('morgan');
 const mongodb = require('mongodb')
 const path = require('path');
 const queries = require('./app/queries');
+const db = require('./app/database.js');
 
 const app = express();
 const api = require('./app/routes/api');
@@ -19,7 +20,6 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'app/public')));
 
 const port = process.env.PORT || 8080;
-const mongoUrl = 'mongodb://localhost:27017/novaXfer';
 
 //////////////// COMMAND LINE ARGUMENTS /////////////////
 var doIndex = true;
@@ -65,16 +65,11 @@ app.use(function(err, req, res, next) {
 
 ///////////////////////// START /////////////////////////
 // Connect to MongoDB
-mongodb.MongoClient.connect(mongoUrl, function(err, db) {
-    if (err !== null)
-        throw err;
-
-    var courses = db.collection('courses');
+db.connect(db.MODE_PRODUCTION, function(err) {
+    if (err) throw err;
 
     var start = function() {
         // Finished initializing, start up
-        app.set('db', db);
-
         app.listen(port);
         console.log('Magic is happening on port ' + port);
     }
@@ -82,7 +77,7 @@ mongodb.MongoClient.connect(mongoUrl, function(err, db) {
     if (doIndex) {
         // Index all our institutions before we start serving
         console.log("Indexing...");
-        queries.indexInstitutions(db, function(err, report) {
+        queries.indexInstitutions(function(err, report) {
             if (err !== null)
                 throw err;
             console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)

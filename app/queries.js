@@ -1,10 +1,11 @@
 var indexers = require('./indexers');
+var db = require('./database.js');
 
 /**
  * Retrieves all courses in a given subject
  */
-module.exports.coursesInSubject = function(db, subject, done) {
-    var col = db.collection('courses');
+module.exports.coursesInSubject = function(subject, done) {
+    var col = db.mongo().collection('courses');
     // INJECTION WARNING
     col.find({subject: new RegExp('^' + subject + '$', 'i')})
         .sort({number: 1})
@@ -15,12 +16,12 @@ module.exports.coursesInSubject = function(db, subject, done) {
  * Gets a document representing the given course data, including only the
  * equivalencies belonging to the given institutions.
  */
-module.exports.equivalenciesForCourse = function(db, courseSubject, courseNumber, institutions, done) {
+module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, institutions, done) {
     var matchEquivalencies = [];
     for (var i = 0; i < institutions.length; i++) {
         matchEquivalencies.push({"equivalencies.institution": institutions[i]});
     }
-    db.collection('courses').aggregate([
+    db.mongo().collection('courses').aggregate([
         // Match first document with the given subject and number
         { $match: { subject: courseSubject, number: courseNumber} },
         { $limit: 1 },
@@ -45,8 +46,8 @@ module.exports.equivalenciesForCourse = function(db, courseSubject, courseNumber
     });
 };
 
-module.exports.indexInstitutions = function(db, done) {
-    var courses = db.collection('courses');
+module.exports.indexInstitutions = function(done) {
+    var courses = db.mongo().collection('courses');
     indexers.index(function(equivalency, institution) {
         // Add property for our schema
         equivalency.other.institution = equivalency.otherInstitution;

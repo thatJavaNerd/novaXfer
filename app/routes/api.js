@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var db = require('../database.js');
 var queries = require('../queries.js');
 
 router.get('/subject/:subject', function(req, res, next) {
@@ -8,7 +9,7 @@ router.get('/subject/:subject', function(req, res, next) {
     if (!validateSubject(subj))
         return next(new ApiError('Invalid parameter', 'subject', subj));
 
-    queries.coursesInSubject(req.app.get('db'), subj, function(err, docs) {
+    queries.coursesInSubject(subj, function(err, docs) {
         if (err !== null)
             return next(err);
         res.json(docs);
@@ -30,7 +31,7 @@ router.get('/course/:course/:institutions', function(req, res, next) {
 
     var institutions = institutionsRaw.split(',');
 
-    queries.equivalenciesForCourse(req.app.get('db'), subject, number, institutions, function(err, doc) {
+    queries.equivalenciesForCourse(subject, number, institutions, function(err, doc) {
         if (err !== null)
             return next(new ApiError('Invalid course', 'subject|number', subject + '|' + number));
         res.json(doc);
