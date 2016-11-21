@@ -9,6 +9,8 @@
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
   "license": "MIT",
+  "repository": "thatJavaNerd/novaXfer",
+  "description": "Quick and easy NVCC course equivalencies",
   "dependencies": {
     "body-parser": "^1.15.2",
     "cheerio": "^0.22.0",
