@@ -31,7 +31,11 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
         { $match: { $or: matchEquivalencies } },
         // Recombine the documents with only the required equivalencies
         { $group: {
-            "_id": "$_id",
+            _id: "$_id",
+            // Is there a better way to include these fields?
+            subject: { $first: "$subject" },
+            number: { $first: "$number" },
+            credits: { $first: "$credits" },
             equivalencies: {$push: "$equivalencies"}
         } }
     ]).toArray(function(err, docs) {
