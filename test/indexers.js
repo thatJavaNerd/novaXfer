@@ -94,7 +94,6 @@ function validateCourse(course, institution, json) {
     // Validate optional freebie course
     if (course.freebie !== undefined) {
         validateCourseCore(course.freebie, institution, json, "freebie");
-        validateCreditRange(course.freebie.credits);
     }
 }
 
