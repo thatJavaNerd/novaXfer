@@ -3,7 +3,7 @@ var MongoClient = require('mongodb').MongoClient;
 var state = {
     db: null,
     mode: null
-}
+};
 
 // https://www.terlici.com/2014/09/15/node-testing.html
 
@@ -25,8 +25,8 @@ module.exports.connect = function(mode, done) {
         state.mode = mode;
         done();
     });
-}
+};
 
 module.exports.mongo = function() {
     return state.db;
-}
+};

@@ -72,4 +72,4 @@ module.exports.indexInstitutions = function(done) {
             }
         );
     }, done);
-}
+};
