@@ -10,10 +10,6 @@ describe('database queries', function() {
         db.connect(db.MODE_TEST, function(err) {
             assert.equal(null, err);
             db.mongo().dropCollection('courses', function(err, result) {
-                assert.equal(null, err);
-                // `result` === true when collection was dropped, false if else
-                assert.ok(result);
-
                 queries.indexInstitutions(function(err, report) {
                     assert.equal(null, err);
                     assert.ok(report.institutionsIndexed > 0);
