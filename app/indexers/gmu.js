@@ -30,23 +30,44 @@ function findAll(each, done) {
         $rows.each(function() {
             var vals = $(this).children('td').map(function() { return $(this).text(); });
 
-            var nvcc = parseCourse(vals, nvccNumberIndex, nvccCreditsIndex);
-            var gmu = parseCourse(vals, gmuNumberIndex, gmuCreditsIndex);
+            var nvccCourses = parseCourses(vals, nvccNumberIndex, nvccCreditsIndex);
+            var gmuCourses = parseCourses(vals, gmuNumberIndex, gmuCreditsIndex);
 
-            each(new models.CourseEquivalency(nvcc, gmu, institution));
+            var equiv = new models.CourseEquivalency(
+                nvccCourses[0], gmuCourses[0], institution);
+
+            if (nvccCourses.length > 1)
+                equiv.other.supplement = nvccCourses[1];
+            if (gmuCourses.length > 1)
+                equiv.other.freebie = gmuCourses[1];
+
+            each(equiv);
         });
         return done(null);
     });
 }
 
-function parseCourse(vals, numberIndex, creditsIndex) {
-    // Course will sometimes look something like this: "ACCT-----", where the
-    // subject is "ACCT" and the number is "----", replace first hyphen with a
-    // space and then split.
-    var parts = vals[numberIndex].replace('-', ' ').split(' ');
-    return new models.Course(parts[0], parts[1], parseInt(vals[creditsIndex]));
+function parseCourses(vals, numberIndex, creditsIndex) {
+    // Courses will either be listed as a single course equivalency or an
+    // equivalency with a supplement/freebie. The extra class is separated by
+    // an ampersand.
+    var rawCourses = vals[numberIndex].split(' & ');
+
+    var courses = [ parseCourse(rawCourses[0], vals[creditsIndex]) ];
+    if (rawCourses.length > 1)
+        courses.push(parseCourse(rawCourses[1]));
+
+    return courses;
 }
 
+function parseCourse(courseStr, creditsStr) {
+    // Course will sometimes look something like this: "ACCT-----", where
+    // the subject is "ACCT" and the number is "----", replace first hyphen
+    // with a space and then split.
+    var parts = courseStr.replace('-', ' ').split(' ');
+    var credits = creditsStr === undefined ? undefined : parseInt(creditsStr);
+    return new models.Course(parts[0], parts[1], credits);
+}
 
 module.exports.findAll = findAll;
 module.exports.institution = institution;
