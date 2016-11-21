@@ -14,7 +14,7 @@ describe('database queries', function() {
                 // `result` === true when collection was dropped, false if else
                 assert.ok(result);
 
-                queries.indexInstitutions(db.mongo(), function(err, report) {
+                queries.indexInstitutions(function(err, report) {
                     assert.equal(null, err);
                     assert.ok(report.institutionsIndexed > 0);
                     // Usually around ~800 courses for every institution, having
@@ -30,7 +30,7 @@ describe('database queries', function() {
     describe('#coursesInSubject', function(done) {
         it('should return courses in only one subject', function(done) {
             var subj = 'acc';
-            queries.coursesInSubject(db.mongo(), subj, function(err, docs) {
+            queries.coursesInSubject(subj, function(err, docs) {
                 for (var i = 0; i < docs.length; i++) {
                     assert.equal(docs[i].subject, subj.toUpperCase());
                 }
