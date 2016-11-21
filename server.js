@@ -77,11 +77,16 @@ db.connect(db.MODE_PRODUCTION, function(err) {
     if (doIndex) {
         // Index all our institutions before we start serving
         console.log("Indexing...");
-        queries.indexInstitutions(function(err, report) {
-            if (err !== null)
-                throw err;
-            console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)
-            start();
+        db.mongo().dropCollection('courses', function(err, success) {
+            if (!success)
+                throw success;
+
+            queries.indexInstitutions(function(err, report) {
+                if (err !== null)
+                    throw err;
+                console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)
+                start();
+            });
         });
     } else {
         console.log('Skipping index step. Courses may not be up to date.');
