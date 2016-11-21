@@ -78,9 +78,6 @@ db.connect(db.MODE_PRODUCTION, function(err) {
         // Index all our institutions before we start serving
         console.log("Indexing...");
         db.mongo().dropCollection('courses', function(err, success) {
-            if (!success)
-                throw success;
-
             queries.indexInstitutions(function(err, report) {
                 if (err !== null)
                     throw err;

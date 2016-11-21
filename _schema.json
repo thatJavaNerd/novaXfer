@@ -54,10 +54,12 @@
             "subject": "COMM",
             "number": "2010",
             "credits": 4,
-            "supplement": {
-                "subject": "ACC",
-                "number": "213"
-            }
+            "supplements": [
+                {
+                    "subject": "ACC",
+                    "number": "213"
+                }
+            ]
         }
     ]
 }
@@ -72,12 +74,48 @@
             "institution": "Georgia Tech",
             "subject": "CS",
             "number": "1301",
-            "credits": 3,
-            "freebie": {
-                "subject": "FREE",
-                "number": "1XXX",
-                "credits": 1
-            }
+            "credits": 4,
+            "freebies": [
+                {
+                    "subject": "FREE",
+                    "number": "1XXX",
+                }
+            ]
+        }
+    ]
+}
+
+// Four NVCC classes that grants credit for two classes
+{
+    "subject": "BLD",
+    "number": "231",
+    "credits": 12,
+    "equivlaencies": [
+        {
+            "institution": "Virginia Tech",
+            "subject": "BC",
+            "number": "2014",
+            "credits": 6,
+            "supplements": [
+                {
+                    "subject": "BLD",
+                    "number": "232"
+                },
+                {
+                    "subject": "BLD",
+                    "number": "242"
+                },
+                {
+                    "subject": "BLD",
+                    "number": "247"
+                }
+            ],
+            "freebies": [
+                {
+                    "subject": "BC",
+                    "number": "2024"
+                }
+            ]
         }
     ]
 }
