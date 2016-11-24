@@ -52,7 +52,7 @@ function findAll(each, done) {
         var cssQuery = 'table.datadisplaytable tr';
         var tableRows = $(cssQuery).slice(headerRows);
         tableRows.each(function(index, element) {
-            let row = $(tableRows[index]);
+            var row = $(tableRows[index]);
             if (isExtraneousRow(row)) {
                 // Skip this row, it's been handled by the row previous
                 return true;
@@ -69,20 +69,27 @@ function findAll(each, done) {
             var gtNumber = getCourseNumber(row, gtNumberIndex);
             var gtCredits = parseInt(columnAtIndex(row, gtCreditIndex).text().trim());
 
-            var equiv = new models.CourseEquivalency(
-                new models.Course(nvccNumber[0], nvccNumber[1], -1),
-                new models.Course(gtNumber[0], gtNumber[1], gtCredits),
-                module.exports.institution
-            );
+            var nvccCourses = [ new models.Course(nvccNumber[0], nvccNumber[1], -1) ];
+            var gtCourses = [ new models.Course(gtNumber[0], gtNumber[1], gtCredits) ];
 
             // Check for the possibility of additional row
             if (index < tableRows.length - 1) {
                 var nextRow = $(tableRows[index + 1]);
                 if (isExtraneousRow(nextRow)) {
-                    gtNumber += ', ' + getCourseNumber(nextRow, gtNumberIndex);
-                    gtCredits += parseInt(columnAtIndex(nextRow, gtCreditIndex).text().trim());
+                    var numberParts = getCourseNumber(nextRow, gtNumberIndex);
+                    gtCourses.push(new models.Course(
+                        numberParts[0],
+                        numberParts[1],
+                        parseInt(columnAtIndex(nextRow, gtCreditIndex).text().trim())
+                    ));
                 }
             }
+
+            var equiv = new models.CourseEquivalency(
+                nvccCourses,
+                gtCourses,
+                module.exports.institution
+            );
 
             each(equiv);
         });
@@ -90,7 +97,6 @@ function findAll(each, done) {
         // Since $.each is synchronous we can call done() when outside that block
         return done(null);
     });
-
 }
 
 function columnAtIndex(tr, index) {

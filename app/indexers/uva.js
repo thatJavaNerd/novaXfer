@@ -26,18 +26,17 @@ function findAll(each, done) {
                     error = "Found row with type 'unknown'";
                     return false;
                 case 'empty':// This is a row to separate courses, skip
-                case 'supplement':
-                case 'freebie':
+                case 'input':
+                case 'output':
                     // We handle supplement and freebie rows when their base
                     // courses are found
                     return true;
             }
 
-            var nvcc = parseCourse($(this), 1);
-            var uva = parseCourse($(this), uvaIndex);
+            var nvccCourses = [ parseCourse($(this), nvccIndex) ];
+            var uvaCourses = [ parseCourse($(this), uvaIndex) ];
 
-            var eq = new models.CourseEquivalency(nvcc, uva, institution);
-
+            var eq = new models.CourseEquivalency(nvccCourses, uvaCourses, institution);
 
             if (index + 1 < rows.length) {
                 // Possibility of extraneous row
@@ -46,12 +45,12 @@ function findAll(each, done) {
                     error = "Found row with type 'unknown'";
                     return false;
                 }
-                if (nextRowType === 'supplement' || nextRowType === 'freebie') {
+                if (nextRowType === 'input' || nextRowType === 'output') {
                     // Add a supplement
-                    var columnIndex = nvccIndex; // Assume supplement
-                    if (nextRowType === 'freebie')
+                    var columnIndex = nvccIndex; // Assume input course
+                    if (nextRowType === 'output')
                         index = uvaIndex;
-                    eq.other[nextRowType] = parseCourse($(this), columnIndex);
+                    eq[nextRowType].push(parseCourse($(rows[index + 1]), columnIndex));
                 }
             }
 
@@ -100,11 +99,11 @@ function removeStupidWhitespace(text) {
  *
  * Returns:
  *   'normal' => NVCC and UVA course present
- *   'supplement' => Specifies extra NVCC course to take to get credit for
- *                   the UVA course in the above row.
- *   'freebie' => Specifies extra UVA course one would get credit for if they
- *                also got credit for the NVCC course specified in the above
- *                row.
+ *   'input' => Specifies extra NVCC course to take to get credit for the UVA
+ *              course in the above row.
+ *   'output' => Specifies extra UVA course one would get credit for if they
+ *               also got credit for the NVCC course specified in the above
+ *               row.
  *   'empty' => This row is used to visually separate other course equivalencies
  *   'unknown' => Logically shouldn't be returned so if you see this you know
  *                something's wrong.
@@ -118,9 +117,9 @@ function getRowType($tr) {
     if (nvccColumn === '' && uvaColumn === '')
         return 'empty';
     if (nvccColumn !== '' && uvaColumn === '')
-        return 'supplement';
+        return 'input';
     if (nvccColumn === '' && uvaColumn !== '')
-        return 'freebie';
+        return 'output';
     return 'unknown';
 }
 

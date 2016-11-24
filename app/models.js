@@ -5,10 +5,23 @@ module.exports = {
         this.number = number;
         if (credits !== undefined)
             this.credits = credits;
+
+        this.stripCredits = function() {
+            return new Course(subject, number);
+        }
     },
-    CourseEquivalency: function CourseEquivalency(nvcc, other, otherInstitution) {
-        this.nvcc = nvcc;
-        this.other = other;
-        this.otherInstitution = otherInstitution;
+    /**
+     * Creates a new CourseEquivalency.
+     *
+     * @param keyCourse Course to perform lookups on. Created with only subject
+     *                  and number, no credits
+     * @param input Array of courses from NVCC
+     * @param output Array of ocurses from `institutionName`
+     */
+    CourseEquivalency: function CourseEquivalency(input, output, institutionName) {
+        this.keyCourse = input[0].stripCredits();
+        this.input = input;
+        this.output = output;
+        this.institutionName = institutionName;
     }
 };

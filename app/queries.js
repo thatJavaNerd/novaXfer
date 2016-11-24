@@ -35,7 +35,6 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
             // Is there a better way to include these fields?
             subject: { $first: "$subject" },
             number: { $first: "$number" },
-            credits: { $first: "$credits" },
             equivalencies: {$push: "$equivalencies"}
         } }
     ]).toArray(function(err, docs) {
@@ -52,17 +51,16 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
 
 module.exports.indexInstitutions = function(done) {
     var courses = db.mongo().collection('courses');
-    indexers.index(function(equivalency, institution) {
-        // Add property for our schema
-        equivalency.other.institution = equivalency.otherInstitution;
-        courses.updateOne({number: equivalency.nvcc.number, subject: equivalency.nvcc.subject},
+    indexers.index(function(eq, institution) {
+        courses.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
             {
-                $setOnInsert: {
-                    credits: equivalency.nvcc.credits,
-                },
-                // Add to equivalencies array if data already exists
+                // Add to equivalencies array if it doesn't already exist
                 $addToSet: {
-                    equivalencies: equivalency.other
+                    equivalencies: {
+                        "institution": eq.institutionName,
+                        "input": eq.input,
+                        "output": eq.output
+                    }
                 }
             },
             {upsert: true},

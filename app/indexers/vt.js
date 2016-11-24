@@ -4,6 +4,10 @@ const regex = require('../util/regex.js');
 
 const dataUrl = "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json";
 
+// Detect if a course is "evaluated on an individual basis." One of the entries
+// is misspelled, hence the optional second 'i'.
+const individualRegex = /indivi?dual/i;
+
 function findAll(each, done) {
     request(dataUrl, function(err, response, body) {
         if (err)
@@ -19,7 +23,7 @@ function findAll(each, done) {
             // have a different equivalency than if they were taken
             // individually ("MTH 175 + 176"). Skip entries dedicated to entire
             // subjects.
-            if (entry.gsx$vccscredits.$t == "")
+            if (entry.gsx$vccscredits.$t == "" || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
                 continue;
 
             // There is a very specific entry which tells the reader to refer
@@ -35,20 +39,21 @@ function findAll(each, done) {
                 entry.gsx$vtcoursenumber.$t.toUpperCase(),
                 entry.gsx$vtcredits.$t
             );
+
+            if (vtCourses.length == 0 &&
+                individualRegex.test(entry.gsx$vtcoursetitle.$t) ||
+                individualRegex.test(entry.gsx$vtcoursenumber.$t))
+                vtCourses = [ new models.Course("VT", "XXXX", -1) ];
+
             var nvccCourses = parseCourses(
                 entry.gsx$vccscoursenumber.$t,
                 entry.gsx$vccscredits.$t
             );
 
             var equiv = new models.CourseEquivalency(
-                nvccCourses[0],
-                vtCourses[0],
+                nvccCourses,
+                vtCourses,
                 module.exports.institution);
-
-            if (nvccCourses.length > 1)
-                equiv.other.supplements = nvccCourses.slice(1);
-            if (vtCourses.length > 1)
-                equiv.other.freebies = vtCourses.slice(1);
 
             each(equiv);
         }
@@ -77,65 +82,53 @@ function parseCourses(courseStr, creditsStr) {
     // Replace all non course numbers/subjects with whitespace, normalize, and split
     var parts = regex.normalizeWhitespace(courseStr).replace(normalizationRegex, ' ').split(' ');
 
+    var creditsArray = parseCreditsArray(creditsStr);
+
     // Add all identified courses here. Assume there will be at least one course
-    var courses = [ new models.Course(parts[0], parts[1], parseCredits(creditsStr)) ];
+    var courses = [];
 
     // Append additional courses to the array
     var subject = parts[0];
-    for (var i = 2; i < parts.length; i++) {
-        if (/[a-z]/i.test(parts[i][0])) {
+    for (var i = 1; i < parts.length; i++) {
+        if (/[0-9X]{2,4}/i.test(parts[i])) {
+            // First letter is numeric, assume course number
+            var credits = courses.length >= creditsArray.length ? -1 : creditsArray[courses.length];
+            courses.push(new models.Course(subject, parts[i], credits));
+        } else if (/[a-z]/i.test(parts[i][0])) {
             // First letter is alphabetic, assume subject
             subject = parts[i];
-        } else if (parts[i][0].match(/[0-9]/i)) {
-            // First letter is numeric, assume course number
-            courses.push(new models.Course(subject, parts[i]));
         } else {
-            console.log(courseStr);
-            console.log(creditsStr);
-            console.log(parts);
-            throw "Invalid course segment: i=" + i + ", parts[i]=" + parts[i];
+            throw new Error("Invalid course segment: i=" + i + ", parts[i]=" + parts[i]);
         }
     }
 
     return courses;
 }
 
-// function parseVtCourses(courseStr, creditsStr) {
-//     // courseStr can be "SUBJ NUM" or "SUBJ NUM + SUBJ2 NUM2"
-//     // (ex: "ART 1XXX + ART 1XXX")
-//     var parts = courseStr.split(' ');
-//     var courses = [ new models.Course(parts[0], parts[1], parseCredits(creditsStr)) ];
-//
-//     if (parts.length > 4) {
-//         courses.push(new models.Course(parts[3], parts[4]));
-//     }
-//
-//     return courses;
-// }
-
 // Sometimes credits will be listed in a range ("3-4")
-function parseCredits(str) {
+function parseCreditsArray(str) {
     // Unknown amount of credits
     if (str === '')
         return -1;
 
-    // A hyphen indicates that the credit is a range (ex: "3-4")
-    if (str.indexOf('-') != -1) {
-        var creditSegments = str.split('-');
-        return {
-            min: parseInt(creditSegments[0]),
-            max: parseInt(creditSegments[1])
-        };
+    var parts = str.replace(' ', '').split(',');
+    var credits = [];
+
+    for (var i = 0; i < parts.length; i++) {
+        // A hyphen indicates that the credit is a range (ex: "3-4")
+        var segment = parts[i];
+        if (segment.indexOf('-') != -1) {
+            var creditSegments = segment.split('-');
+            credits.push({
+                min: parseInt(creditSegments[0]),
+                max: parseInt(creditSegments[1])
+            });
+        } else {
+            credits.push(parseInt(segment));
+        }
     }
 
-    // List of credits (ex: "3,3", "3+3", "3,3,3"), sum up and return
-    var sum = 0;
-    // Remove all non numberical characters and sum up every digit
-    var creditsStr = str.replace(/[^0-9]/g, '');
-    for (var i = 0; i < creditsStr.length; i++)
-        sum += parseInt(creditsStr[i], 10);
-
-    return sum;
+    return credits;
 }
 
 module.exports.findAll = findAll;

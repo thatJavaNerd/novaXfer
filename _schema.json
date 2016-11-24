@@ -1,17 +1,17 @@
-// Base: course
+// Struct: Course
 {
     "subject": "XYZ",
     "number": "123",
     "credits": 3
 }
 
-// Course with variable credits
+// Struct: Course (variable credits)
 {
     "subject": "XYZ",
     "number": "123",
     "credits": {
-        "min": 3,
-        "max": 4
+        "min": 1,
+        "max": 5
     }
 }
 
@@ -19,19 +19,40 @@
 {
     "subject": "ECO",
     "number": "202",
-    "credits": 3,
     "equivalencies": [
         {
             "institution": "Virginia Tech",
-            "subject": "ECON",
-            "number": "2005",
-            "credits": 3
+            "input": [
+                {
+                    "subject": "ECO",
+                    "number": "202",
+                    "credits": 3
+                },
+            ],
+            "output": [
+                {
+                    "subject": "ECON",
+                    "number": "2005",
+                    "credits": 3
+                }
+            ]
         },
         {
             "institution": "University of Virginia",
-            "number": "2010",
-            "subject": "ECON",
-            "credits": 3,
+            "input": [
+                {
+                    "subject": "ECO",
+                    "number": "202",
+                    "credits": 3
+                }
+            ],
+            "output": [
+                {
+                    "number": "2010",
+                    "subject": "ECON",
+                    "credits": 3,
+                }
+            ]
         }
     ]
 }
@@ -41,23 +62,43 @@
 {
     "subject": "ACC",
     "number": "211",
-    "credits": 3,
     "equivalencies": [
         {
             "institution": "University of Virginia",
-            "subject": "COMM",
-            "number": "2010",
-            "credits": 3
+            "input": [
+                {
+                    "subject": "ACC",
+                    "number": "211",
+                    "credits": 3
+                }
+            ],
+            "output": [
+                {
+                    "subject": "COMM",
+                    "number": "2010",
+                    "credits": 3
+                }
+            ]
         },
         {
             "institution": "University of Virginia",
-            "subject": "COMM",
-            "number": "2010",
-            "credits": 4,
-            "supplements": [
+            "input": [
                 {
                     "subject": "ACC",
-                    "number": "213"
+                    "number": "211",
+                    "credits": 3
+                },
+                {
+                    "subject": "ACC",
+                    "number": "213",
+                    "credits": 3
+                }
+            ],
+            "output": [
+                {
+                    "subject": "COMM",
+                    "number": "2010",
+                    "credits": 4
                 }
             ]
         }
@@ -68,52 +109,71 @@
 {
     "subject": "CSC",
     "number": "201",
-    "credits": 4,
     "equivalencies": [
         {
             "institution": "Georgia Tech",
-            "subject": "CS",
-            "number": "1301",
-            "credits": 4,
-            "freebies": [
+            "input": [
+                {
+                    "subject": "CSC",
+                    "number": "201",
+                    "credits": 4,
+                }
+            ],
+            "output": [
+                {
+                    "subject": "CS",
+                    "number": "1301",
+                    "credits": 3,
+                },
                 {
                     "subject": "FREE",
                     "number": "1XXX",
+                    "credits": 1
                 }
             ]
         }
     ]
 }
 
-// Four NVCC classes that grants credit for two classes
+// Four NVCC classes that grants credit for two classes at VT
 {
     "subject": "BLD",
     "number": "231",
-    "credits": 12,
-    "equivlaencies": [
+    "equivalencies": [
         {
-            "institution": "Virginia Tech",
-            "subject": "BC",
-            "number": "2014",
-            "credits": 6,
-            "supplements": [
+            "institution": "Virgnia Tech",
+            "input": [
                 {
                     "subject": "BLD",
-                    "number": "232"
+                    "number": "231",
+                    "credits": 3
+                }
+                {
+                    "subject": "BLD",
+                    "number": "232",
+                    "credits": 3
                 },
                 {
                     "subject": "BLD",
-                    "number": "242"
+                    "number": "242",
+                    "credits": 3
                 },
                 {
                     "subject": "BLD",
-                    "number": "247"
+                    "number": "247",
+                    "credits": 3
                 }
             ],
-            "freebies": [
+            "output": [
                 {
                     "subject": "BC",
-                    "number": "2024"
+                    "number": "2014",
+                    "credits": 3,
+                },
+                {
+                    "subject": "BC",
+                    "number": "2024",
+                    "credits": 3
                 }
             ]
         }

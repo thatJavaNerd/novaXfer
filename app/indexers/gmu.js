@@ -34,12 +34,7 @@ function findAll(each, done) {
             var gmuCourses = parseCourses(vals, gmuNumberIndex, gmuCreditsIndex);
 
             var equiv = new models.CourseEquivalency(
-                nvccCourses[0], gmuCourses[0], institution);
-
-            if (nvccCourses.length > 1)
-                equiv.other.supplement = nvccCourses[1];
-            if (gmuCourses.length > 1)
-                equiv.other.freebie = gmuCourses[1];
+                nvccCourses, gmuCourses, institution);
 
             each(equiv);
         });
@@ -49,8 +44,8 @@ function findAll(each, done) {
 
 function parseCourses(vals, numberIndex, creditsIndex) {
     // Courses will either be listed as a single course equivalency or an
-    // equivalency with a supplement/freebie. The extra class is separated by
-    // an ampersand.
+    // equivalency with an additional input/output. The extra class is separated
+    // by an ampersand.
     var rawCourses = vals[numberIndex].split(' & ');
 
     var courses = [ parseCourse(rawCourses[0], vals[creditsIndex]) ];
@@ -65,7 +60,7 @@ function parseCourse(courseStr, creditsStr) {
     // the subject is "ACCT" and the number is "----", replace first hyphen
     // with a space and then split.
     var parts = courseStr.replace('-', ' ').split(' ');
-    var credits = creditsStr === undefined ? undefined : parseInt(creditsStr);
+    var credits = creditsStr === undefined ? -1 : parseInt(creditsStr);
     return new models.Course(parts[0], parts[1], credits);
 }
 

@@ -20,10 +20,10 @@ describe('indexers', function() {
         });
     });
 
+    // Increase timeout to 30 seconds because findAll() can be a long-running
+    // function
     this.timeout(30000);
     describe('gt#findAll', function() {
-        // Increase timeout to 30 seconds because findAll() can be a long-running
-        // function
         it('should call each() with valid courses', function(done) {
             testIndexer(require('../app/indexers/gt.js'), done);
         });
@@ -48,10 +48,11 @@ describe('indexers', function() {
     });
 });
 
-// Match 2 to 5 alpha characters followed by a space, plus 2 to 4
-// alphanumeric (including hyphen and pound) characters
-var courseNumberRegex = /[A-Z0-9-#]{2,4}/
-var courseSubjectRegex = /[A-Z]{2,5}/
+// Match 2 to 4 alphabetic characters (including hyphen and pound)
+var courseNumberRegex = /[A-Z0-9-#]{2,4}/;
+// Match 2 to 5 alphabeit characters
+var courseSubjectRegex = /[A-Z]{2,5}/;
+
 function testIndexer(indexer, mochaDone) {
     const minEquivalencies = 100;
     var equivCounter = 0;
@@ -61,11 +62,11 @@ function testIndexer(indexer, mochaDone) {
     indexer.findAll(function each(equiv) {
         // Test each equivalency
         var equivStr = JSON.stringify(equiv);
-        assert.notEqual(null, equiv, "Equivalency was null: " + equiv);
-        assert.notEqual(null, equiv.otherInstitution, "Missing otherInstitution: " + equivStr);
+        assert.notEqual(null, equiv, "Equivalency was null: " + equivStr);
+        assert.notEqual(null, equiv.institutionName, "Missing institutionName: " + equivStr);
 
-        validateCourse(equiv.nvcc, "NVCC", equivStr);
-        validateCourse(equiv.other, equiv.otherInstitution, equivStr);
+        validateCourseArray(equiv.input, "input", equivStr);
+        validateCourseArray(equiv.output, "output", equivStr);
         equivCounter++;
     }, function done(err) {
         assert.equal(null, err);
@@ -76,56 +77,42 @@ function testIndexer(indexer, mochaDone) {
     });
 }
 
-function validateCourse(course, institution, json) {
-    assert.notEqual(null, course, institution + " course was null: " + json);
+function validateCourseArray(array, arrayName, json) {
+    assert.ok(Array.isArray(array), arrayName + " was expected to be an array: " + json);
+    assert.ok(array.length > 0, arrayName + " length must be > 0: " + json);
 
-    // Validate subject and number
-    validateCourseCore(course, institution, json);
+    for (var i = 0; i < array.length; i++) {
+        var course = array[i];
+        var courseSpecifier = `${arrayName}[${i}]`;
+        assert.notEqual(null, course, courseSpecifier + " was null: " + json);
 
-    // Validate credit property
-    var creditErr = validateCreditRange(course);
-    assert.equal(null, creditErr, creditErr + ": " + json);
+        // Validate subject and number
+        assert.ok(courseNumberRegex.test(course.number),
+            courseSpecifier + " course number didn't conform: " + json)
+        assert.ok(courseSubjectRegex.test(course.subject),
+            courseSpecifier + " course subject didn't conform: " + json);
 
-    // Validate optional supplementary course
-    if (course.supplement !== undefined) {
-        validateCourseCore(course.supplement, institution, json, "supplement");
-    }
-
-    // Validate optional freebie course
-    if (course.freebie !== undefined) {
-        validateCourseCore(course.freebie, institution, json, "freebie");
+        // Validate credit property
+        var creditErr = validateCreditRange(course, courseSpecifier);
+        assert.equal(null, creditErr, creditErr + ": " + json);
     }
 }
 
-function validateCourseCore(course, institution, json, specifier) {
-    if (specifier !== undefined) {
-        specifier = ' ' + specifier + ' ';
-    } else {
-        specifier = '';
-    }
-
-    assert.ok(courseNumberRegex.test(course.number),
-        institution + specifier + " course number didn't conform: " + json)
-    assert.ok(courseSubjectRegex.test(course.subject),
-        institution + specifier +  " course subject didn't conform: " + json);
-
-}
-
-function validateCreditRange(course) {
+function validateCreditRange(course, courseSpecifier) {
     var type = typeof course.credits;
     if (type === 'object') {
         if (course.credits.min === undefined)
-            return "course.credits.min was undefined";
+            return courseSpecifier + ".credits.min was undefined";
         if (course.credits.max === undefined)
-            return "course.credits.max was undefined";
+            return courseSpecifier + ".credits.max was undefined";
         if (typeof course.credits.min !== 'number' || typeof course.credits.max !== 'number')
-            return "Expecting course.credits.[min,max] to be Numbers";
+            return "Expecting " + courseSpecifier + ".credits.[min,max] to be Numbers";
         if (course.credits.min === course.credits.max)
-            return "min === max, course.credits should be a Number";
+            return "min === max, " + courseSpecifier + ".credits should be a Number";
         if (course.credits.max < course.credits.min)
             return "min > max";
     } else if (type !== 'number') {
-        return "Expecting course.credits to be an Object or a Number, was " + type;
+        return "Expecting " + courseSpecifier + ".credits to be an Object or a Number, was " + type;
     }
 
     // All well and good
