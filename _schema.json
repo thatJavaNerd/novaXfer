@@ -21,7 +21,7 @@
     "number": "202",
     "equivalencies": [
         {
-            "institution": "Virginia Tech",
+            "institution": "VT",
             "input": [
                 {
                     "subject": "ECO",
@@ -38,7 +38,7 @@
             ]
         },
         {
-            "institution": "University of Virginia",
+            "institution": "UVA",
             "input": [
                 {
                     "subject": "ECO",
@@ -64,7 +64,7 @@
     "number": "211",
     "equivalencies": [
         {
-            "institution": "University of Virginia",
+            "institution": "UVA",
             "input": [
                 {
                     "subject": "ACC",
@@ -81,7 +81,7 @@
             ]
         },
         {
-            "institution": "University of Virginia",
+            "institution": "UVA",
             "input": [
                 {
                     "subject": "ACC",
@@ -111,7 +111,7 @@
     "number": "201",
     "equivalencies": [
         {
-            "institution": "Georgia Tech",
+            "institution": "GT",
             "input": [
                 {
                     "subject": "CSC",
@@ -141,7 +141,7 @@
     "number": "231",
     "equivalencies": [
         {
-            "institution": "Virgnia Tech",
+            "institution": "VT",
             "input": [
                 {
                     "subject": "BLD",

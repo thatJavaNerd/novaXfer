@@ -115,4 +115,4 @@ function isExtraneousRow(tr) {
 }
 
 module.exports.findAll = findAll;
-module.exports.institution = "Georgia Tech";
+module.exports.institution = new models.Institution("GT", "Georgia Tech");

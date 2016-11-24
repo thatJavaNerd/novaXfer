@@ -132,4 +132,4 @@ function parseCreditsArray(str) {
 }
 
 module.exports.findAll = findAll;
-module.exports.institution = "Virginia Tech";
+module.exports.institution = new models.Institution('VT', 'Virginia Tech');

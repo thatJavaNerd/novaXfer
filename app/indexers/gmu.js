@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 
 const dataUrl = 'http://admissions.gmu.edu/transfer/transfercreditsearch.asp?state=VA&school=USVCCS&course=View+All';
-const institution = 'George Mason University';
+const institution = new models.Institution('GMU', 'George Mason University');
 const headerRows = 8;
 
 const nvccNumberIndex = 0;

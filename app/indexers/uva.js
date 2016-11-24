@@ -4,7 +4,7 @@ const models = require('../models.js');
 const regexUtil = require('../util/regex.js');
 
 const dataUrl = 'http://saz-webdmz.eservices.virginia.edu/asequivs/Main1/GetEquivsGivenSchool?schoolDropDownList=Northern+Virginia+Cmty+College+Annandale';
-const institution = 'University of Virginia';
+const institution = new models.Institution('UVA', 'University of Virginia');
 const headerRows = 2;
 const nvccIndex = 1; // CSS queries are 1-indexed
 const uvaIndex = 2;

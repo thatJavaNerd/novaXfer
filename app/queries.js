@@ -49,6 +49,14 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
     });
 };
 
+module.exports.listInstitutions = function(done) {
+    indexers.findIndexers(function(err, indexers) {
+        if (err)
+            return done(err);
+        return done(null, indexers.map( indexer => require(indexer).institution ));
+    });
+}
+
 module.exports.indexInstitutions = function(done) {
     var courses = db.mongo().collection('courses');
     indexers.index(function(eq, institution) {
@@ -57,7 +65,7 @@ module.exports.indexInstitutions = function(done) {
                 // Add to equivalencies array if it doesn't already exist
                 $addToSet: {
                     equivalencies: {
-                        "institution": eq.institutionName,
+                        "institution": eq.institution.acronym,
                         "input": eq.input,
                         "output": eq.output
                     }

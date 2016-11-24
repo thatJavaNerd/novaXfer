@@ -16,12 +16,16 @@ module.exports = {
      * @param keyCourse Course to perform lookups on. Created with only subject
      *                  and number, no credits
      * @param input Array of courses from NVCC
-     * @param output Array of ocurses from `institutionName`
+     * @param output Array of ocurses from `institution`
      */
-    CourseEquivalency: function CourseEquivalency(input, output, institutionName) {
+    CourseEquivalency: function CourseEquivalency(input, output, institution) {
         this.keyCourse = input[0].stripCredits();
         this.input = input;
         this.output = output;
-        this.institutionName = institutionName;
+        this.institution = institution;
+    },
+    Institution: function(acronym, fullName) {
+        this.acronym = acronym;
+        this.fullName = fullName;
     }
 };

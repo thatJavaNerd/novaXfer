@@ -38,6 +38,14 @@ router.get('/course/:course/:institutions', function(req, res, next) {
     });
 });
 
+router.get('/institutions', function(req, res, next) {
+    queries.listInstitutions(function(err, institutions) {
+        if (err)
+            return next(new ApiError('Something went wrong', '', '', 500));
+        res.json(institutions);
+    });
+});
+
 // Error handling
 router.use('/', function(err, req, res, next) {
     res.status(err.status || 500);
@@ -48,11 +56,10 @@ function validateSubject(subj) {
     return /^[A-Z]+$/i.test(subj);
 }
 
-function ApiError(reason, parameter, value) {
+function ApiError(reason, parameter, value, status = 400) {
     this.reason = reason;
     this.parameter = parameter;
     this.value = value;
-    this.status = 400;
 }
 
 module.exports = router;
