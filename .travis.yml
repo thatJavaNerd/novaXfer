@@ -5,7 +5,7 @@ node_js:
   - 6
 services:
   - mongodb
-
+after_success: grunt jshint
 addons:
   apt:
     sources:
