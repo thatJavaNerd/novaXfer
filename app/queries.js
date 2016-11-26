@@ -1,11 +1,14 @@
 var indexers = require('./indexers');
 var db = require('./database.js');
 
+const COLL_COURSES = 'courses';
+const COLL_INSTITUTIONS = 'institutions';
+
 /**
  * Retrieves all courses in a given subject
  */
 module.exports.coursesInSubject = function(subject, done) {
-    var col = db.mongo().collection('courses');
+    var col = db.mongo().collection(COLL_COURSES);
     // INJECTION WARNING
     col.find({subject: new RegExp('^' + subject + '$', 'i')})
         .sort({number: 1})
@@ -21,7 +24,7 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
     for (var i = 0; i < institutions.length; i++) {
         matchEquivalencies.push({"equivalencies.institution": institutions[i]});
     }
-    db.mongo().collection('courses').aggregate([
+    db.mongo().collection(COLL_COURSES).aggregate([
         // Match first document with the given subject and number
         { $match: { subject: courseSubject, number: courseNumber} },
         { $limit: 1 },
@@ -50,7 +53,7 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
 };
 
 module.exports.listInstitutions = function(done) {
-    db.mongo().collection('institutions').find().sort({ acronym: 1 }).toArray(done);
+    db.mongo().collection(COLL_INSTITUTIONS).find().sort({ acronym: 1 }).toArray(done);
 }
 
 module.exports.indexInstitutions = function(done) {
@@ -67,7 +70,7 @@ module.exports.indexInstitutions = function(done) {
 };
 
 function upsertEquivalency(eq) {
-    var coll = db.mongo().collection('courses');
+    var coll = db.mongo().collection(exports.COLL_COURSES);
     coll.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
         {
             // Add to equivalencies array if it doesn't already exist
@@ -88,8 +91,8 @@ function upsertEquivalency(eq) {
 }
 
 function upsertInstitutions(institutions, done) {
-    db.mongo().dropCollection('institutions', function(err, result) {
-        db.mongo().collection('institutions').insertMany(institutions, function(err2, r) {
+    db.mongo().dropCollection(COLL_INSTITUTIONS, function(err, result) {
+        db.mongo().collection(COLL_INSTITUTIONS).insertMany(institutions, function(err2, r) {
             if (err)
                 return done(err2);
             done(null, result);
