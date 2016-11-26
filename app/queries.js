@@ -50,32 +50,49 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
 };
 
 module.exports.listInstitutions = function(done) {
-    indexers.findIndexers(function(err, indexers) {
-        if (err)
-            return done(err);
-        return done(null, indexers.map( indexer => require(indexer).institution ));
-    });
+    db.mongo().collection('institutions').find().sort({ acronym: 1 }).toArray(done);
 }
 
 module.exports.indexInstitutions = function(done) {
     var courses = db.mongo().collection('courses');
-    indexers.index(function(eq, institution) {
-        courses.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
-            {
-                // Add to equivalencies array if it doesn't already exist
-                $addToSet: {
-                    equivalencies: {
-                        "institution": eq.institution.acronym,
-                        "input": eq.input,
-                        "output": eq.output
-                    }
-                }
-            },
-            {upsert: true},
-            function(err, result) {
-                if (err !== null)
-                    done(err);
-            }
-        );
-    }, done);
+    indexers.findIndexers(function(err, inds) {
+        if (err)
+            return done(err);
+
+        var institutions = inds.map( indexer => require(indexer).institution );
+        upsertInstitutions(institutions, function finished(err) {
+            indexers.index(upsertEquivalency, done);
+        });
+    });
 };
+
+function upsertEquivalency(eq) {
+    var coll = db.mongo().collection('courses');
+    coll.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
+        {
+            // Add to equivalencies array if it doesn't already exist
+            $addToSet: {
+                equivalencies: {
+                    "institution": eq.institution.acronym,
+                    "input": eq.input,
+                    "output": eq.output
+                }
+            }
+        },
+        {upsert: true},
+        function(err, result) {
+            if (err !== null)
+                done(err);
+        }
+    );
+}
+
+function upsertInstitutions(institutions, done) {
+    db.mongo().dropCollection('institutions', function(err, result) {
+        db.mongo().collection('institutions').insertMany(institutions, function(err2, r) {
+            if (err)
+                return done(err2);
+            done(null, result);
+        });
+    });
+}
