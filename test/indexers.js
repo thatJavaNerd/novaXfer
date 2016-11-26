@@ -63,8 +63,8 @@ function testIndexer(indexer, mochaDone) {
         // Test each equivalency
         var equivStr = JSON.stringify(equiv);
         assert.notEqual(null, equiv, "Equivalency was null: " + equivStr);
-        assert.notEqual(null, equiv.institutionName, "Missing institutionName: " + equivStr);
 
+        validateInstitution(equiv.institution, equivStr);
         validateCourseArray(equiv.input, "input", equivStr);
         validateCourseArray(equiv.output, "output", equivStr);
         equivCounter++;
@@ -75,6 +75,19 @@ function testIndexer(indexer, mochaDone) {
         // The indexer is done, let mocha know
         mochaDone();
     });
+}
+
+// Match only uppercase letters throughout the entire string
+const acronymRegex = /^[A-Z]+$/;
+// Match [at least one letter with an optional space] one ore more times
+// thorughout the entire string
+const fullNameRegex = /^([A-Z]+ ?)+$/i;
+
+function validateInstitution(inst, json) {
+    assert.notEqual(null, inst.acronym);
+    assert.notEqual(null, inst.fullName);
+    assert.ok(acronymRegex.test(inst.acronym));
+    assert.ok(fullNameRegex.test(inst.fullName));
 }
 
 function validateCourseArray(array, arrayName, json) {
