@@ -1,6 +1,6 @@
 const request = require('request');
 const models = require('../models.js');
-const regex = require('../util/regex.js');
+const normalizeWhitespace = require('../util.js').normalizeWhitespace;
 
 const dataUrl = "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json";
 
@@ -80,7 +80,7 @@ function parseCourses(courseStr, creditsStr) {
     var normalizationRegex = /(, | [&+] | or )/ig;
 
     // Replace all non course numbers/subjects with whitespace, normalize, and split
-    var parts = regex.normalizeWhitespace(courseStr).replace(normalizationRegex, ' ').split(' ');
+    var parts = normalizeWhitespace(courseStr).replace(normalizationRegex, ' ').split(' ');
 
     var creditsArray = parseCreditsArray(creditsStr);
 

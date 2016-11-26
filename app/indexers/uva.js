@@ -1,7 +1,7 @@
 const request = require('request');
 const cheerio = require('cheerio');
 const models = require('../models.js');
-const regexUtil = require('../util/regex.js');
+var normalizeWhitespace = require('../util.js').normalizeWhitespace;
 
 const dataUrl = 'http://saz-webdmz.eservices.virginia.edu/asequivs/Main1/GetEquivsGivenSchool?schoolDropDownList=Northern+Virginia+Cmty+College+Annandale';
 const institution = new models.Institution('UVA', 'University of Virginia');
@@ -54,7 +54,7 @@ function findAll(each, done) {
                 }
             }
 
-            return each(eq);
+            each(eq);
         });
 
         // Since $.each is synchronous we can call done() when outside that block
@@ -63,7 +63,7 @@ function findAll(each, done) {
 }
 
 function parseCourse($tr, index) {
-    var baseStr = removeStupidWhitespace($tr.children(`td:nth-child(${index})`)
+    var baseStr = normalizeWhitespace($tr.children(`td:nth-child(${index})`)
             .text());
     if (baseStr === '(no credit)') {
         // UVA doesn't offer credit for this course, make up our own
@@ -78,20 +78,6 @@ function parseCourse($tr, index) {
     if (parts.length >= 3)
         credits = parseInt(parts[2]);
     return new models.Course(parts[0], parts[1], credits);
-}
-
-function removeStupidWhitespace(text) {
-    /*
-    text.trim() with newlines removed will be something like this:
-
-        "ACC&nbsp;                211"
-
-    Note that &nbsp; is a special whitespace character that ISN'T EQUAL TO A
-    NORMAL SPACE, so we have to work some magic on this string. First, we remove
-    all normal spaces ("ACC&nbsp;211") and then we replace &nbsp; with a normal
-    space so we can get our formatting correct.
-    */
-    return text.trim().replace(regexUtil.newline, '').replace(/ /g, '').replace(new RegExp(regexUtil.nbspChar, 'g'), ' ');
 }
 
 /**

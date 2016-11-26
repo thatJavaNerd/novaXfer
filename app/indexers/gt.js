@@ -1,7 +1,7 @@
 const request = require('request');
 const cheerio = require('cheerio');
 const models = require('../models.js');
-const regexUtil = require('../util/regex.js');
+const normalizeWhitespace = require('../util.js').normalizeWhitespace;
 
 const dataUrl = 'https://oscar.gatech.edu/pls/bprod/wwsktrna.P_find_subj_levl_classes';
 
@@ -39,8 +39,6 @@ const gtNumberIndex = 9;
 const gtCreditIndex = 11;
 const extraneousRowIndicatorIndex = 7;
 const extraneousRowIndicatorText = "And";
-
-const nbspRegex = new RegExp(regexUtil.nbspChar + regexUtil.nbspChar);
 
 function findAll(each, done) {
     request(requestData, function(err, response, body) {
@@ -107,7 +105,7 @@ function getCourseNumber(tr, colIndex) {
     // The textual representation of course names are
     // {SUBJECT}&nbsp;&nbsp;{NUMBER}, so we replace the two special
     // spaces with one normal one.
-    return columnAtIndex(tr, colIndex).text().split(nbspRegex);
+    return normalizeWhitespace(columnAtIndex(tr, colIndex).text()).split(' ');
 }
 
 function isExtraneousRow(tr) {
