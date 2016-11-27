@@ -1,7 +1,7 @@
 {
   "name": "novaXfer",
   "version": "0.0.0",
-  "description": "",
+  "description": "Quick and easy NVCC course equivalencies",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -9,7 +9,6 @@
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
   "license": "MIT",
   "repository": "thatJavaNerd/novaXfer",
-  "description": "Quick and easy NVCC course equivalencies",
   "dependencies": {
     "body-parser": "^1.15.2",
     "cheerio": "^0.22.0",
@@ -24,6 +23,7 @@
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-mocha-test": "^0.13.2",
+    "grunt-run": "^0.6.0",
     "mocha": "^3.1.2"
   }
 }
