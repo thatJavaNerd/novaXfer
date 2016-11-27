@@ -70,7 +70,7 @@ module.exports.indexInstitutions = function(done) {
 };
 
 function upsertEquivalency(eq) {
-    var coll = db.mongo().collection(exports.COLL_COURSES);
+    var coll = db.mongo().collection(COLL_COURSES);
     coll.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
         {
             // Add to equivalencies array if it doesn't already exist
