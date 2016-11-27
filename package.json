@@ -4,8 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "./node_modules/mocha/bin/mocha"
+    "start": "node server.js"
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
   "license": "MIT",

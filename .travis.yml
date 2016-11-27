@@ -5,6 +5,7 @@ node_js:
   - 6
 services:
   - mongodb
+script: grunt mochaTest
 after_success: grunt jshint
 addons:
   apt:
