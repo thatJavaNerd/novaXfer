@@ -7,24 +7,25 @@ const COLL_INSTITUTIONS = 'institutions';
 /**
  * Retrieves all courses in a given subject
  */
-module.exports.coursesInSubject = function(subject, done) {
+module.exports.coursesInSubject = function(subject) {
     var col = db.mongo().collection(COLL_COURSES);
     // INJECTION WARNING
-    col.find({subject: new RegExp('^' + subject + '$', 'i')})
+    return col.find({subject: new RegExp('^' + subject + '$', 'i')})
         .sort({number: 1})
-        .toArray(done);
+        .toArray();
 };
 
 /**
  * Gets a document representing the given course data, including only the
  * equivalencies belonging to the given institutions.
  */
-module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, institutions, done) {
+module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, institutions) {
     var matchEquivalencies = [];
     for (var i = 0; i < institutions.length; i++) {
         matchEquivalencies.push({"equivalencies.institution": institutions[i]});
     }
-    db.mongo().collection(COLL_COURSES).aggregate([
+
+    return db.mongo().collection(COLL_COURSES).aggregate([
         // Match first document with the given subject and number
         { $match: { subject: courseSubject, number: courseNumber} },
         { $limit: 1 },
@@ -40,62 +41,69 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
             number: { $first: "$number" },
             equivalencies: {$push: "$equivalencies"}
         } }
-    ]).toArray(function(err, docs) {
-        if (err !== null)
-            return done(err);
-
-        // Aggregation returns maximum of one document
-        if (docs.length === 0)
-            return done(`No such course: subject=${courseSubject}, number=${courseNumber}`);
-        else
-            return done(null, docs[0]);
-    });
+    ]).toArray().then(requireOne);
 };
 
-module.exports.listInstitutions = function(done) {
-    db.mongo().collection(COLL_INSTITUTIONS).find().sort({ acronym: 1 }).toArray(done);
+module.exports.listInstitutions = function() {
+    return db.mongo().collection(COLL_INSTITUTIONS).find().sort({ acronym: 1 }).toArray();
 }
 
-module.exports.indexInstitutions = function(done) {
-    var courses = db.mongo().collection('courses');
-    indexers.findIndexers(function(err, inds) {
-        if (err)
-            return done(err);
+module.exports.indexInstitutions = function() {
+    // Super sketch way of making this Promise chain return the result from
+    // indexers.index() but it works
+    var indexReport = null;
 
-        var institutions = inds.map( indexer => require(indexer).institution );
-        upsertInstitutions(institutions, function finished(err) {
-            indexers.index(upsertEquivalency, done);
-        });
+    // First find all of our institutions
+    return indexers.findIndexers().then(function(inds) {
+        var institutions = inds.map(indexer => require(indexer).institution);
+        // Then add all of them to the database
+        return upsertInstitutions(institutions);
+    }).then(function() {
+        // Then index all of the course equivalencies
+        return indexers.index();
+    }).then(function(result) {
+        indexReport = result;
+        // Then add those equivalencies to the database
+        return Promise.all(result.equivalencies.map(equivs => equivs.map(eq => upsertEquivalency(eq))));
+    }).then(function(result) {
+        return indexReport;
     });
 };
 
+function requireOne(docs) {
+    return new Promise(function(fulfill, reject) {
+        if (docs.length !== 1)
+            return reject(new Error(`Expecting 1 result, got ${docs.length}`));
+
+        return fulfill(docs[0]);
+    });
+}
+
 function upsertEquivalency(eq) {
-    var coll = db.mongo().collection(COLL_COURSES);
-    coll.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
-        {
-            // Add to equivalencies array if it doesn't already exist
-            $addToSet: {
-                equivalencies: {
-                    "institution": eq.institution.acronym,
-                    "input": eq.input,
-                    "output": eq.output
+    return new Promise(function(fulfill, reject) {
+        var coll = db.mongo().collection(COLL_COURSES);
+        coll.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
+            {
+                // Add to equivalencies array if it doesn't already exist
+                $addToSet: {
+                    equivalencies: {
+                        "institution": eq.institution.acronym,
+                        "input": eq.input,
+                        "output": eq.output
+                    }
                 }
+            },
+            {upsert: true},
+            function(err, result) {
+                if (err) reject(err);
+                else fulfill(result);
             }
-        },
-        {upsert: true},
-        function(err, result) {
-            if (err !== null)
-                done(err);
-        }
-    );
+        );
+    });
 }
 
 function upsertInstitutions(institutions, done) {
-    db.mongo().dropCollection(COLL_INSTITUTIONS, function(err, result) {
-        db.mongo().collection(COLL_INSTITUTIONS).insertMany(institutions, function(err2, r) {
-            if (err)
-                return done(err2);
-            done(null, result);
-        });
+    return db.mongo().dropCollection(COLL_INSTITUTIONS).then(function() {
+        return db.mongo().collection(COLL_INSTITUTIONS).insertMany(institutions);
     });
 }

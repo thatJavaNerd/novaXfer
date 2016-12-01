@@ -1,4 +1,4 @@
-const request = require('request');
+const request = require('../util.js').request;
 const models = require('../models.js');
 const normalizeWhitespace = require('../util.js').normalizeWhitespace;
 
@@ -9,9 +9,11 @@ const dataUrl = "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8R
 const individualRegex = /indivi?dual/i;
 
 function findAll(each, done) {
-    request(dataUrl, function(err, response, body) {
-        if (err)
-            return done(err);
+    return request(dataUrl).then(parseEquivalencies);
+}
+
+function parseEquivalencies(body) {
+    return new Promise(function(fulfill, reject) {
 
         var equivalencies = [];
         var entries = JSON.parse(body).feed.entry;
@@ -55,10 +57,10 @@ function findAll(each, done) {
                 vtCourses,
                 module.exports.institution);
 
-            each(equiv);
+            equivalencies.push(equiv);
         }
 
-        return done(null);
+        return fulfill(equivalencies);
     });
 }
 

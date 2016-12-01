@@ -1,4 +1,4 @@
-const request = require('request');
+const request = require('../util.js').request;
 const cheerio = require('cheerio');
 const models = require('../models.js');
 const normalizeWhitespace = require('../util.js').normalizeWhitespace;
@@ -41,10 +41,13 @@ const extraneousRowIndicatorIndex = 7;
 const extraneousRowIndicatorText = "And";
 
 function findAll(each, done) {
-    request(requestData, function(err, response, body) {
-        if (err !== null)
-            return done(err);
+    return request(requestData).then(parseEquivalencies);
+}
+
+function parseEquivalencies(body) {
+    return new Promise(function(fulfill, reject) {
         var $ = cheerio.load(body);
+        var equivalencies = [];
 
         // Access the main table
         var cssQuery = 'table.datadisplaytable tr';
@@ -89,11 +92,11 @@ function findAll(each, done) {
                 module.exports.institution
             );
 
-            each(equiv);
+            equivalencies.push(equiv);
         });
 
         // Since $.each is synchronous we can call done() when outside that block
-        return done(null);
+        return fulfill(equivalencies);
     });
 }
 

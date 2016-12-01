@@ -1,4 +1,4 @@
-const request = require('request');
+const request = require('../util.js').request;
 const models = require('../models.js');
 const cheerio = require('cheerio');
 const fs = require('fs');
@@ -19,12 +19,14 @@ const gmuCreditsIndex = 5;
  *             one is found.
  * @param done Function that is supplied an error if one is encountered
  */
-function findAll(each, done) {
-    request(dataUrl, function(err, response, body) {
-        if (err)
-            return done(err);
+function findAll() {
+    return request(dataUrl).then(parseEquivalencies);
+}
 
+function parseEquivalencies(body) {
+    return new Promise(function(fulfill, reject) {
         var $ = cheerio.load(body);
+        var equivalencies = [];
 
         var $rows = $('#contentPrimary tr').slice(headerRows);
         $rows.each(function() {
@@ -36,9 +38,10 @@ function findAll(each, done) {
             var equiv = new models.CourseEquivalency(
                 nvccCourses, gmuCourses, institution);
 
-            each(equiv);
+            equivalencies.push(equiv);
         });
-        return done(null);
+
+        return fulfill(equivalencies);
     });
 }
 

@@ -27,6 +27,18 @@ module.exports.connect = function(mode, done) {
     });
 };
 
+module.exports.connect = function(mode) {
+    return new Promise(function(fulfill, reject) {
+        if (state.db) return reject('Already connected');
+
+        fulfill(mode === exports.MODE_TEST ? TEST_URI : PRODUCTION_URI);
+    }).then(MongoClient.connect)
+    .then(function(result) {
+        state.db = result;
+        state.mode = mode;
+    });
+}
+
 module.exports.mongo = function() {
     return state.db;
 };
