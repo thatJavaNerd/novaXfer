@@ -1,4 +1,5 @@
-const request = require('../util.js').request;
+const util = require('../util.js');
+const request = util.request;
 const models = require('../models.js');
 const cheerio = require('cheerio');
 const fs = require('fs');
@@ -20,7 +21,7 @@ const gmuCreditsIndex = 5;
  * @param done Function that is supplied an error if one is encountered
  */
 function findAll() {
-    return request(dataUrl).then(parseEquivalencies);
+    return request(dataUrl, institution).then(parseEquivalencies);
 }
 
 function parseEquivalencies(body) {

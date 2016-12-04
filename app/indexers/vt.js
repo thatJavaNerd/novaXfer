@@ -9,7 +9,7 @@ const dataUrl = "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8R
 const individualRegex = /indivi?dual/i;
 
 function findAll(each, done) {
-    return request(dataUrl).then(parseEquivalencies);
+    return request(dataUrl, module.exports.institution).then(parseEquivalencies);
 }
 
 function parseEquivalencies(body) {

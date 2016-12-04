@@ -42,3 +42,7 @@ module.exports.connect = function(mode) {
 module.exports.mongo = function() {
     return state.db;
 };
+
+module.exports.mode = function() {
+    return state.mode;
+}

@@ -41,7 +41,7 @@ const extraneousRowIndicatorIndex = 7;
 const extraneousRowIndicatorText = "And";
 
 function findAll(each, done) {
-    return request(requestData).then(parseEquivalencies);
+    return request(requestData, module.exports.institution).then(parseEquivalencies);
 }
 
 function parseEquivalencies(body) {

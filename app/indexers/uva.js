@@ -11,7 +11,7 @@ const nvccIndex = 1; // CSS queries are 1-indexed
 const uvaIndex = 2;
 
 function findAll(done) {
-    return request(dataUrl).then(parseEquivalencies);
+    return request(dataUrl, institution).then(parseEquivalencies);
 }
 
 function parseEquivalencies(body) {

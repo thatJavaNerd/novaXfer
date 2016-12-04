@@ -1,17 +1,13 @@
 const assert = require('assert');
 const fs = require('fs');
 const indexers = require('../app/indexers');
+const util = require('../app/util.js');
 
 describe('indexers', function() {
     describe('#findIndexers', function() {
         it('should return files that actually exist', function() {
             return indexers.findIndexers().then(function(result) {
-                var count = 0;
-                for (var i = 0; i < indexers.length; i++) {
-                    fs.access(indexers[i], function(fserr) {
-                        assert.equal(null, fserr)
-                    });
-                }
+                return Promise.all(result.map(ind => util.ensureFileExists(ind)));
             });
         });
     });
@@ -19,7 +15,7 @@ describe('indexers', function() {
     // Increase timeout to 30 seconds because findAll() can be a long-running
     // function
     this.timeout(30000);
-    
+
     describe('gt#findAll', function() {
         it('should call each() with valid courses', function() {
             return testIndexer(require('../app/indexers/gt.js'));
