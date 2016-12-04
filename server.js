@@ -10,6 +10,12 @@ const db = require('./app/database.js');
 const app = express();
 const api = require('./app/routes/api');
 
+// Catch unhandled Promises
+process.on('unhandledRejection', function(reason, p) {
+    console.error("Unhandled Promise rejection: ");
+    throw reason;
+});
+
 ///////////////////// CONFIGURATION /////////////////////
 app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'pug');
