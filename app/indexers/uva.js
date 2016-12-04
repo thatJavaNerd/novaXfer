@@ -1,5 +1,5 @@
-const cheerio = require('cheerio');
-const models = require('../models.js');
+var cheerio = require('cheerio');
+var models = require('../models.js');
 var util = require('../util.js');
 var normalizeWhitespace = util.normalizeWhitespace;
 var request = util.request;

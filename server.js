@@ -1,14 +1,14 @@
-const bodyParser = require('body-parser');
-const express = require('express');
-const helmet = require('helmet');
-const logger = require('morgan');
-const mongodb = require('mongodb')
-const path = require('path');
-const queries = require('./app/queries');
-const db = require('./app/database.js');
+var bodyParser = require('body-parser');
+var express = require('express');
+var helmet = require('helmet');
+var logger = require('morgan');
+var mongodb = require('mongodb')
+var path = require('path');
+var queries = require('./app/queries');
+var db = require('./app/database.js');
 
 const app = express();
-const api = require('./app/routes/api');
+var api = require('./app/routes/api');
 
 // Catch unhandled Promises
 process.on('unhandledRejection', function(reason, p) {

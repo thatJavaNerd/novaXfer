@@ -1,7 +1,7 @@
-const assert = require('assert');
-const fs = require('fs');
-const indexers = require('../app/indexers');
-const util = require('../app/util.js');
+var assert = require('assert');
+var fs = require('fs');
+var indexers = require('../app/indexers');
+var util = require('../app/util.js');
 
 describe('indexers', function() {
     describe('#findIndexers', function() {

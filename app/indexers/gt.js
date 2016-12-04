@@ -1,7 +1,7 @@
-const request = require('../util.js').request;
-const cheerio = require('cheerio');
-const models = require('../models.js');
-const normalizeWhitespace = require('../util.js').normalizeWhitespace;
+var request = require('../util.js').request;
+var cheerio = require('cheerio');
+var models = require('../models.js');
+var normalizeWhitespace = require('../util.js').normalizeWhitespace;
 
 const dataUrl = 'https://oscar.gatech.edu/pls/bprod/wwsktrna.P_find_subj_levl_classes';
 

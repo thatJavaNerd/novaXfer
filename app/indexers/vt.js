@@ -1,6 +1,6 @@
-const request = require('../util.js').request;
-const models = require('../models.js');
-const normalizeWhitespace = require('../util.js').normalizeWhitespace;
+var request = require('../util.js').request;
+var models = require('../models.js');
+var normalizeWhitespace = require('../util.js').normalizeWhitespace;
 
 const dataUrl = "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json";
 

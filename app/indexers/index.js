@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+var fs = require('fs');
+var path = require('path');
 
 /**
  * Finds the names of all the built in university indexers (JS files in
