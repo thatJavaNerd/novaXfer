@@ -70,6 +70,16 @@ module.exports.indexInstitutions = function() {
     });
 };
 
+module.exports.dropIfExists = function(collection) {
+    return db.mongo().listCollections({name: collection}).toArray().then(function(colls) {
+        if (colls.length > 0) {
+            return db.mongo().dropCollection(colls[0].name);
+        } else {
+            return Promise.resolve(true);
+        }
+    });
+}
+
 function requireOne(docs) {
     return new Promise(function(fulfill, reject) {
         if (docs.length !== 1)
@@ -103,7 +113,7 @@ function upsertEquivalency(eq) {
 }
 
 function upsertInstitutions(institutions, done) {
-    return db.mongo().dropCollection(COLL_INSTITUTIONS).then(function() {
+    return exports.dropIfExists(COLL_INSTITUTIONS).then(function() {
         return db.mongo().collection(COLL_INSTITUTIONS).insertMany(institutions);
     });
 }

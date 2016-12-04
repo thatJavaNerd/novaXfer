@@ -9,7 +9,7 @@ describe('database queries', function() {
 
     before(function() {
         return db.connect(db.MODE_TEST).then(function() {
-            return db.mongo().collection('courses').deleteMany({});
+            return queries.dropIfExists('courses');
         }).then(function() {
             return queries.indexInstitutions();
         }).then(function(report) {
@@ -34,7 +34,7 @@ describe('database queries', function() {
 
     describe('#equivalenciesForCourse', function() {
         it('should return exactly one course', function() {
-            return queries.equivalenciesForCourse('CSC', '202', ['GT'])
+            return queries.equivalenciesForCourse('CSC', '202', ['GMU']);
         });
     })
 })

@@ -68,7 +68,7 @@ app.use(function(err, req, res, next) {
 db.connect(db.MODE_PRODUCTION).then(function() {
     if (doIndex) {
         console.log('Indexing...');
-        return db.mongo().collection('courses').deleteMany({})
+        return queries.dropIfExists('courses')
                 .then(queries.indexInstitutions)
                 .then(function(report) {
                     console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)
