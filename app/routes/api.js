@@ -3,6 +3,7 @@ var router = express.Router();
 var db = require('../database.js');
 var queries = require('../queries.js');
 
+/** Gets all courses in a given subject */
 router.get('/subject/:subject', function(req, res, next) {
     var findObj = {};
     var subj = req.params.subject;
@@ -16,6 +17,11 @@ router.get('/subject/:subject', function(req, res, next) {
     });
 });
 
+/**
+ * Gets all courses with equivalencies specified by the given instituition
+ * acronym. Ex: /course/CSC 202/GMU,GT would return a CSC 202 class with
+ * equivalencies at only George Mason and Georgia Tech, if available.
+ */
 router.get('/course/:course/:institutions', function(req, res, next) {
     var course = req.params.course;
     var institutionsRaw = req.params.institutions;
@@ -38,6 +44,9 @@ router.get('/course/:course/:institutions', function(req, res, next) {
     });
 });
 
+/**
+ * Gets the entirety of the institutions collection
+ */
 router.get('/institutions', function(req, res, next) {
     queries.listInstitutions().then(function(institutions) {
         res.json(institutions);
