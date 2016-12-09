@@ -1,4 +1,5 @@
-var request = require('../util.js').request;
+var util = require('../util.js');
+var request = util.request;
 var models = require('../models.js');
 var normalizeWhitespace = require('../util.js').normalizeWhitespace;
 
@@ -84,7 +85,7 @@ function parseCourses(courseStr, creditsStr) {
     // Replace all non course numbers/subjects with whitespace, normalize, and split
     var parts = normalizeWhitespace(courseStr).replace(normalizationRegex, ' ').split(' ');
 
-    var creditsArray = parseCreditsArray(creditsStr);
+    var creditsArray = util.interpretCreditInput(creditsStr);
 
     // Add all identified courses here. Assume there will be at least one course
     var courses = [];
@@ -105,32 +106,6 @@ function parseCourses(courseStr, creditsStr) {
     }
 
     return courses;
-}
-
-// Sometimes credits will be listed in a range ("3-4")
-function parseCreditsArray(str) {
-    // Unknown amount of credits
-    if (str === '')
-        return -1;
-
-    var parts = str.replace(' ', '').split(',');
-    var credits = [];
-
-    for (var i = 0; i < parts.length; i++) {
-        // A hyphen indicates that the credit is a range (ex: "3-4")
-        var segment = parts[i];
-        if (segment.indexOf('-') != -1) {
-            var creditSegments = segment.split('-');
-            credits.push({
-                min: parseInt(creditSegments[0]),
-                max: parseInt(creditSegments[1])
-            });
-        } else {
-            credits.push(parseInt(segment));
-        }
-    }
-
-    return credits;
 }
 
 module.exports.findAll = findAll;

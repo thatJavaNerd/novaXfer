@@ -16,6 +16,12 @@ describe('indexers', function() {
     // function
     this.timeout(30000);
 
+    describe('vcu#findAll', function() {
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/vcu.js'));
+        });
+    });
+
     describe('gt#findAll', function() {
         it('should call each() with valid courses', function() {
             return testIndexer(require('../app/indexers/gt.js'));

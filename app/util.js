@@ -41,6 +41,52 @@ module.exports = {
                 });
             });
         }
+    },
+    loadConfig: function(name) {
+        return new Promise(function(fulfill, reject) {
+            var cfg = `${path.resolve(__dirname)}/../config/${name}.json`
+            fs.readFile(cfg, (err, data) => {
+                if (err) reject(err);
+                else fulfill(JSON.parse(data));
+            });
+        });
+    },
+    /**
+     * Attempts to parse one or more lists of credits.
+     *
+     * "3,3" => [3, 3]
+     * "3-4" => [{min: 3, max:4}]
+     * "3,1-5,4" => [3, {min: 1, max: 5}, 4]
+     */
+    interpretCreditInput: function(str) {
+        // Unknown amount of credits
+        if (str === '')
+            return -1;
+
+        var parts = str.replace(' ', '').split(',');
+        var credits = [];
+
+        for (var i = 0; i < parts.length; i++) {
+            // A hyphen indicates that the credit is a range (ex: "3-4")
+            var segment = parts[i];
+            if (segment.indexOf('-') != -1) {
+                var creditSegments = segment.split('-');
+                var a = parseInt(creditSegments[0]);
+                var b = parseInt(creditSegments[1]);
+
+                // For some odd reason?
+                if (a == b) return a;
+
+                credits.push({
+                    min: Math.min(a, b),
+                    max: Math.max(a, b)
+                });
+            } else {
+                credits.push(parseInt(segment));
+            }
+        }
+
+        return credits;
     }
 };
 

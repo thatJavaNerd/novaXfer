@@ -40,7 +40,7 @@ const gtCreditIndex = 11;
 const extraneousRowIndicatorIndex = 7;
 const extraneousRowIndicatorText = "And";
 
-function findAll(each, done) {
+function findAll() {
     return request(requestData, module.exports.institution).then(parseEquivalencies);
 }
 

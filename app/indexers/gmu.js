@@ -1,8 +1,7 @@
 var util = require('../util.js');
-const request = util.request;
+var request = util.request;
 var models = require('../models.js');
 var cheerio = require('cheerio');
-var fs = require('fs');
 
 const dataUrl = 'http://admissions.gmu.edu/transfer/transfercreditsearch.asp?state=VA&school=USVCCS&course=View+All';
 const institution = new models.Institution('GMU', 'George Mason University');
