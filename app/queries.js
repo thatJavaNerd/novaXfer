@@ -46,7 +46,7 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
 
 module.exports.listInstitutions = function() {
     return db.mongo().collection(COLL_INSTITUTIONS).find().sort({ acronym: 1 }).toArray();
-}
+};
 
 module.exports.indexInstitutions = function() {
     // Super sketch way of making this Promise chain return the result from
@@ -78,7 +78,7 @@ module.exports.dropIfExists = function(collection) {
             return Promise.resolve(true);
         }
     });
-}
+};
 
 function requireOne(docs) {
     return new Promise(function(fulfill, reject) {

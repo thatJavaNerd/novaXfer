@@ -1,4 +1,3 @@
-var Promise = require('promise');
 var db = require('./database.js');
 var request = require('request');
 var nbsp = String.fromCharCode(160);
@@ -45,7 +44,7 @@ module.exports = {
     },
     loadConfig: function(name) {
         return new Promise(function(fulfill, reject) {
-            var cfg = `${path.resolve(__dirname)}/../config/${name}.json`
+            var cfg = `${path.resolve(__dirname)}/../config/${name}.json`;
             fs.readFile(cfg, (err, data) => {
                 if (err) reject(err);
                 else fulfill(JSON.parse(data));
@@ -128,7 +127,7 @@ function saveCache(contents, institution) {
             fs.writeFile(cacheFileForIndexer(institution), contents, function(err) {
                 if (err) reject(err);
                 else fulfill(contents);
-            })
+            });
         });
     });
 }

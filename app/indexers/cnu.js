@@ -47,7 +47,7 @@ function parseEquivalencies(rows) {
 
             if (cnuCourses !== null)
                 equivalencies.push(new models.CourseEquivalency([nvccCourse], cnuCourses, institution));
-        };
+        }
     }
 
     return equivalencies;

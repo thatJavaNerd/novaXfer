@@ -26,7 +26,7 @@ function parseEquivalencies(body) {
             // have a different equivalency than if they were taken
             // individually ("MTH 175 + 176"). Skip entries dedicated to entire
             // subjects.
-            if (entry.gsx$vccscredits.$t == "" || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
+            if (entry.gsx$vccscredits.$t === "" || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
                 continue;
 
             // There is a very specific entry which tells the reader to refer
@@ -43,7 +43,7 @@ function parseEquivalencies(body) {
                 entry.gsx$vtcredits.$t
             );
 
-            if (vtCourses.length == 0 &&
+            if (vtCourses.length === 0 &&
                 individualRegex.test(entry.gsx$vtcoursetitle.$t) ||
                 individualRegex.test(entry.gsx$vtcoursenumber.$t))
                 vtCourses = [ new models.Course("VT", "XXXX", -1) ];

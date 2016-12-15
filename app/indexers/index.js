@@ -32,6 +32,6 @@ module.exports.index = function() {
             "equivalencies": equivalencies,
             institutionsIndexed: equivalencies.length,
             coursesIndexed: equivalencies.map(it => it.length).reduce((a, b) => a + b, 0)
-        }
+        };
     });
 };

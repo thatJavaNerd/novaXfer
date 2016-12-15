@@ -24,7 +24,7 @@ module.exports.connect = function(mode) {
         state.db = result;
         state.mode = mode;
     });
-}
+};
 
 module.exports.mongo = function() {
     return state.db;
@@ -32,4 +32,4 @@ module.exports.mongo = function() {
 
 module.exports.mode = function() {
     return state.mode;
-}
+};
