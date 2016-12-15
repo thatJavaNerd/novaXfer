@@ -4,7 +4,7 @@ var util = require('../util.js');
 var normalizeWhitespace = util.normalizeWhitespace;
 var request = util.request;
 
-const dataUrl = 'http://saz-webdmz.eservices.virginia.edu/asequivs/Main1/GetEquivsGivenSchool?schoolDropDownList=Northern+Virginia+Cmty+College+Annandale';
+const dataUrl = 'http://ascs8.eservices.virginia.edu/AsEquivs/Home/EquivsShow?schoolId=1001975';
 const institution = new models.Institution('UVA', 'University of Virginia');
 const headerRows = 2;
 const nvccIndex = 1; // CSS queries are 1-indexed
@@ -19,7 +19,7 @@ function parseEquivalencies(body) {
         var $ = cheerio.load(body);
         var equivalencies = [];
 
-        var rows = $('table tr').slice(headerRows);
+        var rows = $($('table')[3]).find('tr').slice(headerRows);
         rows.each(function(index, element) {
             var rowType = getRowType($(this));
 

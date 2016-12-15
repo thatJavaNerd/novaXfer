@@ -34,7 +34,7 @@ describe('indexers', function() {
         });
     });
 
-    describe.skip('uva#findAll', function() {
+    describe('uva#findAll', function() {
         it('should call each() with valid courses', function() {
             return testIndexer(require('../app/indexers/uva.js'));
         });
