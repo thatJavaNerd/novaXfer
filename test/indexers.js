@@ -1,49 +1,54 @@
-const assert = require('assert');
-const fs = require('fs');
-const indexers = require('../app/indexers');
+var assert = require('assert');
+var fs = require('fs');
+var indexers = require('../app/indexers');
+var util = require('../app/util.js');
 
 describe('indexers', function() {
     describe('#findIndexers', function() {
-        it('should return files that actually exist', function(done) {
-            indexers.findIndexers(function(err, indexers) {
-                assert.equal(null, err);
-                var count = 0;
-                for (var i = 0; i < indexers.length; i++) {
-                    fs.access(indexers[i], function(fserr) {
-                        assert.equal(null, fserr)
-                        if (++count == indexers.length) {
-                            done();
-                        }
-                    })
-                }
-            })
+        it('should return files that actually exist', function() {
+            return indexers.findIndexers().then(function(result) {
+                return Promise.all(result.map(ind => util.ensureFileExists(ind)));
+            });
         });
     });
 
     // Increase timeout to 30 seconds because findAll() can be a long-running
     // function
     this.timeout(30000);
+
+    describe('cnu#findAll', function() {
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/cnu.js'));
+        });
+    });
+
+    describe('vcu#findAll', function() {
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/vcu.js'));
+        });
+    });
+
     describe('gt#findAll', function() {
-        it('should call each() with valid courses', function(done) {
-            testIndexer(require('../app/indexers/gt.js'), done);
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/gt.js'));
         });
     });
 
     describe('uva#findAll', function() {
-        it('should call each() with valid courses', function(done) {
-            testIndexer(require('../app/indexers/uva.js'), done);
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/uva.js'));
         });
     });
 
     describe('vt#findAll', function() {
-        it('should call each() with valid courses', function(done) {
-            testIndexer(require('../app/indexers/vt.js'), done);
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/vt.js'));
         });
     });
 
     describe('gmu#findAll', function() {
-        it('should call each() with valid courses', function(done) {
-            testIndexer(require('../app/indexers/gmu.js'), done);
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/gmu.js'));
         });
     });
 });
@@ -52,28 +57,27 @@ describe('indexers', function() {
 var courseNumberRegex = /[A-Z0-9-#]{2,4}/;
 // Match 2 to 5 alphabeit characters
 var courseSubjectRegex = /[A-Z]{2,5}/;
+const minEquivalencies = 100;
 
-function testIndexer(indexer, mochaDone) {
-    const minEquivalencies = 100;
-    var equivCounter = 0;
-    assert.notEqual(undefined, indexer.institution);
+function testIndexer(indexer) {
     assert.notEqual(undefined, indexer.findAll);
+    validateInstitution(indexer.institution);
 
-    indexer.findAll(function each(equiv) {
-        // Test each equivalency
-        var equivStr = JSON.stringify(equiv);
-        assert.notEqual(null, equiv, "Equivalency was null: " + equivStr);
+    return indexer.findAll().then(function(equivs) {
+        assert.ok(equivs.length >= minEquivalencies,
+            `Indexer only provided ${equivs.length} equivalencies (expected min ${minEquivalencies})`);
 
-        validateInstitution(equiv.institution, equivStr);
-        validateCourseArray(equiv.input, "input", equivStr);
-        validateCourseArray(equiv.output, "output", equivStr);
-        equivCounter++;
-    }, function done(err) {
-        assert.equal(null, err);
-        assert.ok(equivCounter >= minEquivalencies,
-            `Indexer only provided ${equivCounter} equivalencies (expected min ${minEquivalencies})`);
-        // The indexer is done, let mocha know
-        mochaDone();
+        for (var i = 0; i < equivs.length; i++) {
+            var equiv = equivs[i];
+
+            // Test each equivalency
+            var equivStr = JSON.stringify(equiv);
+            assert.notEqual(null, equiv, "Equivalency was null: " + equivStr);
+
+            validateInstitution(equiv.institution, equivStr);
+            validateCourseArray(equiv.input, "input", equivStr);
+            validateCourseArray(equiv.output, "output", equivStr);
+        }
     });
 }
 
@@ -84,6 +88,7 @@ const acronymRegex = /^[A-Z]+$/;
 const fullNameRegex = /^([A-Z]+ ?)+$/i;
 
 function validateInstitution(inst, json) {
+    assert.notEqual(null, inst);
     assert.notEqual(null, inst.acronym);
     assert.notEqual(null, inst.fullName);
     assert.ok(acronymRegex.test(inst.acronym));

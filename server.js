@@ -1,14 +1,20 @@
-const bodyParser = require('body-parser');
-const express = require('express');
-const helmet = require('helmet');
-const logger = require('morgan');
-const mongodb = require('mongodb')
-const path = require('path');
-const queries = require('./app/queries');
-const db = require('./app/database.js');
+var bodyParser = require('body-parser');
+var express = require('express');
+var helmet = require('helmet');
+var logger = require('morgan');
+var mongodb = require('mongodb')
+var path = require('path');
+var queries = require('./app/queries');
+var db = require('./app/database.js');
 
 const app = express();
-const api = require('./app/routes/api');
+var api = require('./app/routes/api');
+
+// Catch unhandled Promises
+process.on('unhandledRejection', function(reason, p) {
+    console.error("Unhandled Promise rejection: ");
+    throw reason;
+});
 
 ///////////////////// CONFIGURATION /////////////////////
 app.set('views', path.join(__dirname, 'app/views'));
@@ -65,28 +71,20 @@ app.use(function(err, req, res, next) {
 
 ///////////////////////// START /////////////////////////
 // Connect to MongoDB
-db.connect(db.MODE_PRODUCTION, function(err) {
-    if (err) throw err;
-
-    var start = function() {
-        // Finished initializing, start up
-        app.listen(port);
-        console.log('Magic is happening on port ' + port);
-    }
-
+db.connect(db.MODE_PRODUCTION).then(function() {
     if (doIndex) {
-        // Index all our institutions before we start serving
-        console.log("Indexing...");
-        db.mongo().dropCollection('courses', function(err, success) {
-            queries.indexInstitutions(function(err, report) {
-                if (err !== null)
-                    throw err;
-                console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)
-                start();
-            });
-        });
+        console.log('Indexing...');
+        return queries.dropIfExists('courses')
+                .then(queries.indexInstitutions)
+                .then(function(report) {
+                    console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)
+                });
     } else {
         console.log('Skipping index step. Courses may not be up to date.');
-        start();
     }
+}).then(function() {
+    app.listen(port);
+    console.log('Magic is happening on port ' + port);
+}).catch(function(reason) {
+    throw reason;
 });

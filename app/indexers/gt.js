@@ -1,7 +1,7 @@
-const request = require('request');
-const cheerio = require('cheerio');
-const models = require('../models.js');
-const normalizeWhitespace = require('../util.js').normalizeWhitespace;
+var request = require('../util.js').request;
+var cheerio = require('cheerio');
+var models = require('../models.js');
+var normalizeWhitespace = require('../util.js').normalizeWhitespace;
 
 const dataUrl = 'https://oscar.gatech.edu/pls/bprod/wwsktrna.P_find_subj_levl_classes';
 
@@ -40,11 +40,14 @@ const gtCreditIndex = 11;
 const extraneousRowIndicatorIndex = 7;
 const extraneousRowIndicatorText = "And";
 
-function findAll(each, done) {
-    request(requestData, function(err, response, body) {
-        if (err !== null)
-            return done(err);
+function findAll() {
+    return request(requestData, module.exports.institution).then(parseEquivalencies);
+}
+
+function parseEquivalencies(body) {
+    return new Promise(function(fulfill, reject) {
         var $ = cheerio.load(body);
+        var equivalencies = [];
 
         // Access the main table
         var cssQuery = 'table.datadisplaytable tr';
@@ -89,11 +92,11 @@ function findAll(each, done) {
                 module.exports.institution
             );
 
-            each(equiv);
+            equivalencies.push(equiv);
         });
 
         // Since $.each is synchronous we can call done() when outside that block
-        return done(null);
+        return fulfill(equivalencies);
     });
 }
 

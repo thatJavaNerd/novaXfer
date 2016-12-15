@@ -1,29 +1,31 @@
-const request = require('request');
-const cheerio = require('cheerio');
-const models = require('../models.js');
-var normalizeWhitespace = require('../util.js').normalizeWhitespace;
+var cheerio = require('cheerio');
+var models = require('../models.js');
+var util = require('../util.js');
+var normalizeWhitespace = util.normalizeWhitespace;
+var request = util.request;
 
-const dataUrl = 'http://saz-webdmz.eservices.virginia.edu/asequivs/Main1/GetEquivsGivenSchool?schoolDropDownList=Northern+Virginia+Cmty+College+Annandale';
+const dataUrl = 'http://ascs8.eservices.virginia.edu/AsEquivs/Home/EquivsShow?schoolId=1001975';
 const institution = new models.Institution('UVA', 'University of Virginia');
 const headerRows = 2;
 const nvccIndex = 1; // CSS queries are 1-indexed
 const uvaIndex = 2;
 
-function findAll(each, done) {
-    request(dataUrl, function(err, response, body) {
-        if (err !== null)
-            return done(err);
+function findAll(done) {
+    return request(dataUrl, institution).then(parseEquivalencies);
+}
 
+function parseEquivalencies(body) {
+    return new Promise(function(fulfill, reject) {
         var $ = cheerio.load(body);
+        var equivalencies = [];
 
-        var error = null;
-        var rows = $('table tr').slice(headerRows);
+        var rows = $($('table')[3]).find('tr').slice(headerRows);
         rows.each(function(index, element) {
             var rowType = getRowType($(this));
 
             switch (getRowType($(this))) {
                 case 'unknown':
-                    error = "Found row with type 'unknown'";
+                    reject(new Error("Found row with type 'unknown'"));
                     return false;
                 case 'empty':// This is a row to separate courses, skip
                 case 'input':
@@ -42,7 +44,7 @@ function findAll(each, done) {
                 // Possibility of extraneous row
                 var nextRowType = getRowType($(rows[index + 1]));
                 if (nextRowType === 'unknown') {
-                    error = "Found row with type 'unknown'";
+                    reject("Found row with type 'unknown'");
                     return false;
                 }
                 if (nextRowType === 'input' || nextRowType === 'output') {
@@ -54,11 +56,11 @@ function findAll(each, done) {
                 }
             }
 
-            each(eq);
+            equivalencies.push(eq);
         });
 
         // Since $.each is synchronous we can call done() when outside that block
-        return done(error);
+        fulfill(equivalencies);
     });
 }
 

@@ -1,7 +1,7 @@
-const request = require('request');
-const models = require('../models.js');
-const cheerio = require('cheerio');
-const fs = require('fs');
+var util = require('../util.js');
+var request = util.request;
+var models = require('../models.js');
+var cheerio = require('cheerio');
 
 const dataUrl = 'http://admissions.gmu.edu/transfer/transfercreditsearch.asp?state=VA&school=USVCCS&course=View+All';
 const institution = new models.Institution('GMU', 'George Mason University');
@@ -19,12 +19,14 @@ const gmuCreditsIndex = 5;
  *             one is found.
  * @param done Function that is supplied an error if one is encountered
  */
-function findAll(each, done) {
-    request(dataUrl, function(err, response, body) {
-        if (err)
-            return done(err);
+function findAll() {
+    return request(dataUrl, institution).then(parseEquivalencies);
+}
 
+function parseEquivalencies(body) {
+    return new Promise(function(fulfill, reject) {
         var $ = cheerio.load(body);
+        var equivalencies = [];
 
         var $rows = $('#contentPrimary tr').slice(headerRows);
         $rows.each(function() {
@@ -36,9 +38,10 @@ function findAll(each, done) {
             var equiv = new models.CourseEquivalency(
                 nvccCourses, gmuCourses, institution);
 
-            each(equiv);
+            equivalencies.push(equiv);
         });
-        return done(null);
+
+        return fulfill(equivalencies);
     });
 }
 

@@ -13,20 +13,23 @@ const PRODUCTION_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/novaX
 module.exports.MODE_TEST = 'mode_test';
 module.exports.MODE_PRODUCTION = 'mode_production';
 
-module.exports.connect = function(mode, done) {
-    // Already connected
-    if (state.db) return done();
+/** Returns a Promise that will connect to our MongoDB instance */
+module.exports.connect = function(mode) {
+    return new Promise(function(fulfill, reject) {
+        if (state.db) return reject('Already connected');
 
-    var uri = mode === exports.MODE_TEST ? TEST_URI : PRODUCTION_URI;
-
-    MongoClient.connect(uri, function(err, db) {
-        if (err) return done(err);
-        state.db = db;
+        fulfill(mode === exports.MODE_PRODUCTION ? PRODUCTION_URI : TEST_URI);
+    }).then(MongoClient.connect)
+    .then(function(result) {
+        state.db = result;
         state.mode = mode;
-        done();
     });
-};
+}
 
 module.exports.mongo = function() {
     return state.db;
 };
+
+module.exports.mode = function() {
+    return state.mode;
+}
