@@ -3,10 +3,6 @@ var request = util.request;
 var models = require('../models.js');
 var cheerio = require('cheerio');
 
-//////////////////
-var inspect = require('util').inspect;
-//////////////////
-
 const dataUrl = 'http://www.transfer.vcu.edu/vccs/course-equivalency.aspx';
 const vcuCourseIndex = 3;
 const creditsColumnOffset = 2;
