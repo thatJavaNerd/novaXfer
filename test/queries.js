@@ -25,6 +25,7 @@ describe('database queries', function() {
         it('should return courses in only one subject', function() {
             var subj = 'acc';
             return queries.coursesInSubject(subj).then(function(docs) {
+                assert.ok(docs.length > 0);
                 for (var i = 0; i < docs.length; i++) {
                     assert.equal(docs[i].subject, subj.toUpperCase());
                 }
@@ -34,7 +35,7 @@ describe('database queries', function() {
 
     describe('#equivalenciesForCourse', function() {
         it('should return exactly one course', function() {
-            return queries.equivalenciesForCourse('CSC', '202', ['GMU']);
+            return queries.equivalenciesForCourse('CSC', '202', ['CNU']);
         });
     })
 })

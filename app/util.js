@@ -4,6 +4,7 @@ var request = require('request');
 var nbsp = String.fromCharCode(160);
 var fs = require('fs');
 var path = require('path');
+var pdf2table = require('pdf2table');
 
 module.exports = {
     /**
@@ -26,11 +27,11 @@ module.exports = {
      * Specialized request() wrapper for indexers. Utilizes caching when
      * specified by shouldSkipCache().
      */
-    request: function(requestData, institution) {
+    request: function(requestData, institution, useCache = true) {
         if (institution === undefined)
-            return Promise.reject('expecting an instituiton');
+            return Promise.reject('expecting an institution');
 
-        if (shouldSkipCache()) {
+        if (!useCache || shouldSkipCache()) {
             // Go directly for the fresh data
             return networkRequest(requestData);
         } else {
@@ -87,18 +88,29 @@ module.exports = {
         }
 
         return credits;
+    },
+    parsePdf: function(buffer) {
+        return new Promise(function(fulfill, reject) {
+            pdf2table.parse(buffer, function(err, rows, rowsdebug) {
+                if (err) reject(err);
+                else fulfill(rows);
+            });
+        });
     }
 };
 
 /** Uses the request module to send an HTTP request */
 function networkRequest(requestData) {
     return new Promise(function(fulfill, reject) {
+        var chunks = [];
         request(requestData, function(err, response, body) {
             if (err) return reject(err);
             if (response.statusCode !== 200)
                 return reject(new Error(`Bad status code: ${response.statusCode}`));
-
-            return fulfill(body);
+        }).on('data', function(chunk) {
+            chunks.push(chunk);
+        }).on('end', function() {
+            fulfill(Buffer.concat(chunks));
         });
     });
 }

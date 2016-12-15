@@ -16,6 +16,12 @@ describe('indexers', function() {
     // function
     this.timeout(30000);
 
+    describe('cnu#findAll', function() {
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/cnu.js'));
+        });
+    });
+
     describe('vcu#findAll', function() {
         it('should call each() with valid courses', function() {
             return testIndexer(require('../app/indexers/vcu.js'));
@@ -28,7 +34,7 @@ describe('indexers', function() {
         });
     });
 
-    describe('uva#findAll', function() {
+    describe.skip('uva#findAll', function() {
         it('should call each() with valid courses', function() {
             return testIndexer(require('../app/indexers/uva.js'));
         });

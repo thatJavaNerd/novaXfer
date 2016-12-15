@@ -17,6 +17,7 @@
     "helmet": "^3.1.0",
     "mongodb": "^2.2.11",
     "morgan": "^1.7.0",
+    "pdf2table": "0.0.1",
     "promise": "^7.1.1",
     "pug": "^2.0.0-beta6",
     "request": "^2.78.0"

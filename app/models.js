@@ -27,5 +27,9 @@ module.exports = {
     Institution: function(acronym, fullName) {
         this.acronym = acronym;
         this.fullName = fullName;
-    }
+    },
+    // No information about credits given
+    CREDITS_UNKNOWN: -1,
+    // A student should check with the university for further clarificaiton
+    CREDITS_UNCLEAR: -2
 };
