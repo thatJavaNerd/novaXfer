@@ -1,6 +1,6 @@
 {
   "name": "novaXfer",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Quick and easy NVCC course equivalencies",
   "main": "server.js",
   "scripts": {
