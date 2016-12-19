@@ -1,5 +1,36 @@
-extends layout
+doctype html
+html
+  head
+    // These 3 <meta> headers must come first
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
 
-block content
-  h1= title
-  p Welcome to #{title}
+    title novaXfer
+    link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.css')
+    link(rel='stylesheet', href='/style/base.css')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Slabo+27px')
+
+    script(src='/bower_components/jquery/dist/jquery.js')
+    script(src='/bower_components/tether/dist/js/tether.js')
+    script(src='/bower_components/bootstrap/dist/js/bootstrap.js')
+    script(src='scripts/front.js')
+  body
+    header.text-center novaXfer
+
+    main.container-fluid
+      div
+        | Will
+        span.input(data-name='course', contenteditable=true)
+        | transfer to
+        span.input(data-name='inst', contenteditable=true)
+        |?
+      button#find-equivalencies.btn.btn-default Find
+
+      p#result(hidden) bla bla
+
+
+    footer.footer
+      div.container
+        span.text-muted
+         | Copyright (c) Matthew Dean 2017
