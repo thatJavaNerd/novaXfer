@@ -1,5 +1,5 @@
 doctype html
-html
+html(ng-app='novaxfer')
   head
     // These 3 <meta> headers must come first
     meta(charset='utf-8')
@@ -8,27 +8,22 @@ html
 
     title novaXfer
     link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.css')
-    link(rel='stylesheet', href='/style/base.css')
     link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Slabo+27px')
+    link(rel='stylesheet', href='/style/base.css')
 
     script(src='/bower_components/jquery/dist/jquery.js')
     script(src='/bower_components/tether/dist/js/tether.js')
-    script(src='/bower_components/bootstrap/dist/js/bootstrap.js')
-    script(src='scripts/front.js')
-  body
+    script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+    script(src='/bower_components/angular/angular.min.js')
+    script(src='/app.module.js')
+    script(src='/single-course-lookup/scl.module.js')
+    script(src='/single-course-lookup/scl.component.js')
+
+body
     header.text-center novaXfer
 
-    main.container-fluid
-      div
-        | Will
-        span.input(data-name='course', contenteditable=true)
-        | transfer to
-        span.input(data-name='inst', contenteditable=true)
-        |?
-      button#find-equivalencies.btn.btn-default Find
-
-      p#result(hidden) bla bla
-
+    main
+        single-course-lookup
 
     footer.footer
       div.container
