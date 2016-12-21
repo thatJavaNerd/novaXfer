@@ -3,11 +3,7 @@ var request = util.request;
 var models = require('../models.js');
 var cheerio = require('cheerio');
 
-//////////////////
-var inspect = require('util').inspect;
-//////////////////
-
-const dataUrl = 'http://www.transfer.vcu.edu/vccs/course-equivalency.aspx'
+const dataUrl = 'http://www.transfer.vcu.edu/vccs/course-equivalency.aspx';
 const vcuCourseIndex = 3;
 const creditsColumnOffset = 2;
 
@@ -32,7 +28,7 @@ function parseEquivalencies(body) {
     // rows that don't have one of these two classes are dedicated to headers.
     var tableRows = $('table.course-table tr.even,.odd');
     tableRows.each(function(index, element) {
-        var equivRawData = $(this).children('td').map(function() {return $(this).text()});
+        var equivRawData = $(this).children('td').map(function() {return $(this).text();});
         var inputMatrix = parseRawCourses(equivRawData);
         var outputMatrix = parseRawCourses(equivRawData, vcuCourseIndex);
 

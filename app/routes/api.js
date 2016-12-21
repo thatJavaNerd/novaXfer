@@ -27,9 +27,9 @@ router.get('/course/:course/:institutions', function(req, res, next) {
     var institutionsRaw = req.params.institutions;
 
     if (course === undefined)
-        return next(new ParameterError('Missing parameter', 'course', course));
+        return next(new ParameterError('Missing parameter', {'course': course} ));
     if (institutionsRaw === undefined)
-        return next(new ParameterError('Missing parameter', 'institution', course));
+        return next(new ParameterError('Missing parameter', {'institution': institutionsRaw} ));
 
     var courseParts = course.split(' ');
     var subject = courseParts[0];
@@ -40,7 +40,7 @@ router.get('/course/:course/:institutions', function(req, res, next) {
     queries.equivalenciesForCourse(subject, number, institutions).then(function(doc) {
         res.json(doc);
     }).catch(function(err) {
-        next(new ParameterError('Invalid course', ['subject', 'number'], [subject, number]));
+        next(new ParameterError('Invalid course', {'subject': subject, 'number': number} ));
     });
 });
 
@@ -70,10 +70,9 @@ function GeneralApiError(reason, status = 400) {
     this.status = status;
 }
 
-function ParameterError(reason, parameter, value, status = 400) {
+function ParameterError(reason, parameters, status = 400) {
     this.reason = reason;
-    this.parameter = parameter;
-    this.value = value;
+    this.parameters = parameters;
     this.status = status;
 }
 

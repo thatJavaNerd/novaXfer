@@ -8,7 +8,7 @@ module.exports = {
 
         this.stripCredits = function() {
             return new Course(subject, number);
-        }
+        };
     },
     /**
      * Creates a new CourseEquivalency.

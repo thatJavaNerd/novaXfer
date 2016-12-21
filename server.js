@@ -38,7 +38,7 @@ process.argv.slice(2).forEach(function(val, index, array) {
 
 //////////////////////// ROUTING ////////////////////////
 app.use('/api', api);
-
+app.use('/', require('./app/routes/front'));
 
 ///////////////////// ERROR HANDLING ////////////////////
 // Catch 404 and forward to error handler
