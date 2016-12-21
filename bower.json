@@ -1,7 +1,7 @@
 {
   "name": "novaxfer",
   "description": "Quick and easy NVCC course equivalencies",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://novaxfer.herokuapp.com",
   "license": "MIT",
   "private": true,
