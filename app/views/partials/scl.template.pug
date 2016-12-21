@@ -1,10 +1,10 @@
 div.container-fluid#big-question
-    | Will
-    input(ng-model='$ctrl.course', size='3', course-validator)
-    | transfer to
-    input(ng-model='$ctrl.institution', size='3')
-    |?
-
+    div
+        | Will
+        input(ng-model='$ctrl.course', size='3', course-validator)
+        | transfer to
+        input(ng-model='$ctrl.institution', size='3')
+        |?
     button#find-equivalencies.btn.btn-default(ng-click='$ctrl.requestEquiv()') Find
 
 div.container
@@ -14,4 +14,4 @@ div.container
         span.glyphicon.glyphicon-arrow-down
         div.course-set-block
             p(ng-repeat="output in equivalency.output") {{output.subject}} {{output.number}} ({{output.credits}} credits)
-    pre.error(ng-show="$ctrl.error") {{$ctrl.error}}
+    p.text-danger(ng-show="$ctrl.error") {{$ctrl.error}}
