@@ -3,12 +3,13 @@ div.container-fluid#big-question
         | Will
         input(ng-model='$ctrl.course', size='3', course-validator)
         | transfer to
-        input(ng-model='$ctrl.institution', size='3')
+        input(ng-model='$ctrl.institution', size='1')
         |?
     button#find-equivalencies.btn.btn-default(ng-click='$ctrl.requestEquiv()') Find
 
 div.container
     div.equivalency-block(ng-repeat="equivalency in $ctrl.result.equivalencies")
+        h2 Option {{$index + 1}}
         div.course-set-block
             p(ng-repeat="input in equivalency.input") {{input.subject}} {{input.number}} ({{input.credits}} credits)
         span.glyphicon.glyphicon-arrow-down
