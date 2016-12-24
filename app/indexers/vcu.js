@@ -108,7 +108,7 @@ function parseCourses(courseStr, creditsStr) {
 
 function parseCourse(courseStr, creditsStr) {
     var parts = courseStr.split('-');
-    return new models.Course(parts[0], parts[1], util.interpretCreditInput(creditsStr)[0]);
+    return new models.Course(parts[0].trim(), parts[1].trim(), util.interpretCreditInput(creditsStr)[0]);
 }
 
 module.exports.findAll = findAll;

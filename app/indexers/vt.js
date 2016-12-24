@@ -79,11 +79,23 @@ function parseCourses(courseStr, creditsStr) {
     // "FOR 202 + HLT 106 + FOR 290/297"
 
     // Remove all non course subjects/course numbers
-    // http://regexr.com/3end1
-    var normalizationRegex = /(, | [&+] | or )/ig;
+    // http://regexr.com/3euqd
+    var normalizationRegex = /(, | ?[&+] ?| or |\/)/ig;
 
     // Replace all non course numbers/subjects with whitespace, normalize, and split
     var parts = normalizeWhitespace(courseStr).replace(normalizationRegex, ' ').split(' ');
+
+    // Search for parts that were stuck together (like 'CHEM1025') and split
+    // them into two capture groups.
+    // http://regexr.com/3euqg
+    var unbindingRegex = /^([A-Z]{2,4})([0-9]{2,4})$/;
+    for (let i = 0; i < parts.length; i++) {
+        let match = parts[i].match(unbindingRegex);
+        if (match) {
+            parts[i++] = match[1];
+            parts.splice(i, 0, match[2]);
+        }
+    }
 
     var creditsArray = util.interpretCreditInput(creditsStr);
 

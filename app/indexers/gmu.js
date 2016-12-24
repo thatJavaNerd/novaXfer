@@ -63,6 +63,10 @@ function parseCourse(courseStr, creditsStr) {
     // the subject is "ACCT" and the number is "----", replace first hyphen
     // with a space and then split.
     var parts = courseStr.replace('-', ' ').split(' ');
+    // PHT 102 is listed as 'PHT`-102', remove the tick
+    if (parts[0].indexOf('`') === parts[0].length - 1) {
+        parts[0] = parts[0].slice(0, parts[0].length - 1);
+    }
     var credits = creditsStr === undefined ? -1 : parseInt(creditsStr);
     return new models.Course(parts[0], parts[1], credits);
 }

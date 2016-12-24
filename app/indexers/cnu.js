@@ -22,7 +22,7 @@ function parseEquivalencies(rows) {
     for (let row of rows) {
         if (subjectRegex.test(row[0])) {
             // NVCC is pretty convenient
-            var nvccCourse = new models.Course(row[0], row[1], parseInt(row[2]));
+            var nvccCourses = parseNvccCourses(row);
 
             // CNU isn't
             var cnuCourses = null;
@@ -46,11 +46,27 @@ function parseEquivalencies(rows) {
             }
 
             if (cnuCourses !== null)
-                equivalencies.push(new models.CourseEquivalency([nvccCourse], cnuCourses, institution));
+                equivalencies.push(new models.CourseEquivalency(nvccCourses, cnuCourses, institution));
         }
     }
 
     return equivalencies;
+}
+
+function parseNvccCourses(row) {
+    let courseNumbers = row[1].split(/[-+]/);
+    var courses = [];
+    var creditsUsed = false;
+    for (let courseNumber of courseNumbers) {
+        let credits = models.CREDITS_UNKNOWN;
+        if (!creditsUsed) {
+            credits = parseInt(row[2]);
+            creditsUsed = true;
+        }
+        courses.push(new models.Course(row[0], courseNumber, parseInt(row[2])));
+    }
+
+    return courses;
 }
 
 function parseCnuCourses(rawString) {

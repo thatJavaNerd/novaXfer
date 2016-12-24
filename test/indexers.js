@@ -58,11 +58,6 @@ describe('indexers', function() {
         });
     })
 });
-
-// Match 2 to 4 alphabetic characters (including hyphen and pound)
-var courseNumberRegex = /[A-Z0-9-#]{2,4}/;
-// Match 2 to 5 alphabeit characters
-var courseSubjectRegex = /[A-Z]{2,5}/;
 const minEquivalencies = 100;
 
 function testIndexer(indexer) {
@@ -92,6 +87,10 @@ const acronymRegex = /^[A-Z&]+$/;
 // Match [at least one letter with an optional space] one or more times
 // thorughout the entire string
 const fullNameRegex = /^([A-Z&]+ ?)+$/i;
+// http://regexr.com/3euqa
+const courseNumberRegex = /^[-\dA-Z#]{2,5}$/;
+// Match 2 to 5 alphabeit characters
+const courseSubjectRegex = /^[A-Z]{2,5}$/;
 
 function validateInstitution(inst, json) {
     assert.notEqual(null, inst);
@@ -112,9 +111,9 @@ function validateCourseArray(array, arrayName, json) {
 
         // Validate subject and number
         assert.ok(courseNumberRegex.test(course.number),
-            courseSpecifier + " course number didn't conform: " + json)
+            `${courseSpecifier}.number didn't match: '${course.number}': ${json}`);
         assert.ok(courseSubjectRegex.test(course.subject),
-            courseSpecifier + " course subject didn't conform: " + json);
+            `${courseSpecifier}.subject didn't match: '${course.subject}': ${json}`);
 
         // Validate credit property
         var creditErr = validateCreditRange(course, courseSpecifier);
