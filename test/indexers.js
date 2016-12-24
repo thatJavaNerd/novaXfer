@@ -22,9 +22,9 @@ describe('indexers', function() {
         });
     });
 
-    describe('vcu#findAll', function() {
+    describe('gmu#findAll', function() {
         it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/vcu.js'));
+            return testIndexer(require('../app/indexers/gmu.js'));
         });
     });
 
@@ -40,17 +40,23 @@ describe('indexers', function() {
         });
     });
 
+    describe('vcu#findAll', function() {
+        it('should call each() with valid courses', function() {
+            return testIndexer(require('../app/indexers/vcu.js'));
+        });
+    });
+
     describe('vt#findAll', function() {
         it('should call each() with valid courses', function() {
             return testIndexer(require('../app/indexers/vt.js'));
         });
     });
 
-    describe('gmu#findAll', function() {
+    describe('wm#findAll', function() {
         it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/gmu.js'));
+            return testIndexer(require('../app/indexers/wm.js'));
         });
-    });
+    })
 });
 
 // Match 2 to 4 alphabetic characters (including hyphen and pound)
@@ -60,7 +66,7 @@ var courseSubjectRegex = /[A-Z]{2,5}/;
 const minEquivalencies = 100;
 
 function testIndexer(indexer) {
-    assert.notEqual(undefined, indexer.findAll);
+    assert.notEqual(undefined, indexer.findAll, 'findAll() was undefined');
     validateInstitution(indexer.institution);
 
     return indexer.findAll().then(function(equivs) {
@@ -81,11 +87,11 @@ function testIndexer(indexer) {
     });
 }
 
-// Match only uppercase letters throughout the entire string
-const acronymRegex = /^[A-Z]+$/;
-// Match [at least one letter with an optional space] one ore more times
+// Match only uppercase letters and ampersands throughout the entire string
+const acronymRegex = /^[A-Z&]+$/;
+// Match [at least one letter with an optional space] one or more times
 // thorughout the entire string
-const fullNameRegex = /^([A-Z]+ ?)+$/i;
+const fullNameRegex = /^([A-Z&]+ ?)+$/i;
 
 function validateInstitution(inst, json) {
     assert.notEqual(null, inst);
