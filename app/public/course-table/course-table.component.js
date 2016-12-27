@@ -95,6 +95,7 @@ angular.module('courseTable')
             // Dynamically get a list of all institutions
             $http.get('/api/institutions').then(function(data) {
                 self.availableInstitutions = _.map(data.data, o => o.acronym);
+                self.institutions = [self.availableInstitutions[0], ''];
             });
         }],
     });
