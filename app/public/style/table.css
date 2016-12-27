@@ -9,3 +9,12 @@ div.equivalency-cell p {
 td.course-input {
     width: 8em;
 }
+
+th.table-header {
+    text-align: center;
+    vertical-align: middle !important;
+}
+
+input.form-control {
+    text-align: center;
+}
