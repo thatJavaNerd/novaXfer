@@ -36,12 +36,18 @@ angular.module('courseTable')
                     // Reset the data
                     $ctrl.data = [];
                     for (let inputClass of validInputList) {
-                        // Find index of the equivalency list for inputClass
-                        let rowIndex = _.findIndex(results, function(o) {
-                            return o.subject + ' ' + o.number === inputClass;
+                        // Since validInputList is a filtered list, we need two
+                        // indexes, one for the results (which is derived from
+                        // the filtered list) and one for the grid data
+                        let resultsIndex = _.findIndex(results, function(o) {
+                            return o.subject + ' ' + o.number === inputClass.toUpperCase();
                         });
 
-                        let result = results[rowIndex];
+                        let rowIndex = _.findIndex($ctrl.input, function(o) {
+                            return o.toUpperCase() === inputClass.toUpperCase();
+                        });
+
+                        let result = results[resultsIndex];
                         $ctrl.data[rowIndex] = [];
 
                         let groupedEquivs = _.groupBy(result.equivalencies, 'institution');
