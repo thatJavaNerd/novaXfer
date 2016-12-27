@@ -10,7 +10,8 @@ angular.module('courseTable')
             // 2D array representing table data
             this.data = [];
 
-            this.institutionList = ['GMU', 'VT']
+            // List of all API-provided institutions
+            this.availableInstitutions = [];
 
             this.fillTable = function() {
                 let $ctrl = this;
@@ -93,7 +94,7 @@ angular.module('courseTable')
             let self = this;
             // Dynamically get a list of all institutions
             $http.get('/api/institutions').then(function(data) {
-                self.institutionList = _.map(data.data, o => o.acronym);
+                self.availableInstitutions = _.map(data.data, o => o.acronym);
             });
         }],
     });

@@ -3,7 +3,7 @@ div.container
         tr
             th NVCC
             th(ng-repeat="institution in $ctrl.institutions track by $index")
-                select.input-institution.form-control(ng-model='$ctrl.institutions[$index]' ng-options='inst for inst in $ctrl.institutionList')
+                select.input-institution.form-control(ng-model='$ctrl.institutions[$index]' ng-options='inst for inst in $ctrl.availableInstitutions')
             th
                 button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInstitution()')
         tr(ng-repeat="inputCourse in $ctrl.input track by $index")
