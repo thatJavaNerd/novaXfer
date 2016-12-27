@@ -2,10 +2,15 @@ angular.module('courseTable')
     .component('courseTable', {
         templateUrl: '/partial/course-table',
         controller: ['$http', '$q', function CourseTableController($http, $q) {
+            let self = this;
+
             // Create as empty arrays so that one input will be created for the
             // user to start off with
             this.institutions = [''];
             this.input = [''];
+
+            // Used to validate course inputs. Lenient about spaces and case
+            this.courseRegex = / *[A-Z]{3} +[0-9]{3} */i;
 
             // 2D array representing table data
             this.data = [];
@@ -23,12 +28,14 @@ angular.module('courseTable')
                     });
                 };
 
-                $q.all($ctrl.input.map(course => createPromise(course))).then(function(results) {
+
+                let validInputList = _.filter($ctrl.input, input => input);
+                $q.all(_.map(validInputList, course => createPromise(course))).then(function(results) {
                     results = results.map(result => result.data);
 
                     // Reset the data
                     $ctrl.data = [];
-                    for (let inputClass of $ctrl.input) {
+                    for (let inputClass of validInputList) {
                         // Find index of the equivalency list for inputClass
                         let rowIndex = _.findIndex(results, function(o) {
                             return o.subject + ' ' + o.number === inputClass;
@@ -64,7 +71,7 @@ angular.module('courseTable')
                 }).catch(function(err) {
                     // TODO
                     console.error(err);
-                })
+                });
             };
 
             this.addInstitution = function() {
@@ -72,7 +79,7 @@ angular.module('courseTable')
             };
 
             this.addInputCourse = function() {
-                this.input.push('');
+                this.input.push(null);
             }
 
             this.joinValidInstitutions = function() {
@@ -91,7 +98,38 @@ angular.module('courseTable')
                 return _.join(_.map(courses, c => c.subject + ' ' + c.number), ', ');
             };
 
-            let self = this;
+            this.inputName = function(index) { return 'input' + index; };
+
+            let createStylesObject = function(form, index, dangerClass, warningClass) {
+                let styles = {};
+                let control = form[self.inputName(index)];
+
+                if (control.$touched) {
+                    if (control.$error.required) {
+                        // Only warning empty
+                        styles[warningClass] = true;
+                    } else {
+                        // Whine otherwise
+                        styles[dangerClass] = control.$invalid;
+                    }
+                }
+                return styles;
+            }
+
+            /**
+             * Create an object that can be passed to ngClass
+             *
+             * @param form The table form from course-table.template.pug
+             * @param index The index of the <input> within the form
+             */
+            this.createInputStyleObject = function(form, index) {
+                return createStylesObject(form, index, 'has-error', 'has-warning')
+            }
+
+            this.createRowStyleObject = function(form, index) {
+                return createStylesObject(form, index, 'danger', 'warning')
+            }
+
             // Dynamically get a list of all institutions
             $http.get('/api/institutions').then(function(data) {
                 self.availableInstitutions = _.map(data.data, o => o.acronym);

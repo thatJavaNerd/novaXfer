@@ -1,19 +1,27 @@
 div.container
-    table.table.table-bordered.table-hover
+    form(name='tableForm' novalidate): table.table.table-bordered
         tr
             th NVCC
             th(ng-repeat="institution in $ctrl.institutions track by $index")
                 select.input-institution.form-control(ng-model='$ctrl.institutions[$index]' ng-options='inst for inst in $ctrl.availableInstitutions')
             th
                 button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInstitution()')
-        tr(ng-repeat="inputCourse in $ctrl.input track by $index")
-            td.course-input
-                input.form-control(ng-model='$ctrl.input[$index]')
+
+        tr(ng-repeat="inputCourse in $ctrl.input track by $index" ng-class="$ctrl.createRowStyleObject(tableForm, $index)")
+            td.course-input(ng-class='$ctrl.createInputStyleObject(tableForm, $index)')
+                input.form-control(
+                    type='text'
+                    name='{{"input" + $index}}'
+                    ng-model='$ctrl.input[$index]'
+                    ng-pattern='$ctrl.courseRegex'
+                    required
+                )
             td(ng-repeat="equivs in $ctrl.data[$index]")
                 div.equivalency-cell(ng-repeat="equiv in equivs")
                     p.text-muted(ng-show="equiv.muted") (when taken with {{equiv.muted}})
                     p {{equiv.normal}}
                     p.text-danger(ng-show="equiv.danger") No equivalency
+
         tr: td: button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInputCourse()')
 
     button.btn.btn-default#find(ng-click='$ctrl.fillTable()') Fill table
