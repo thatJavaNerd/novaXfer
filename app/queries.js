@@ -41,7 +41,20 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
             number: { $first: "$number" },
             equivalencies: {$push: "$equivalencies"}
         } }
-    ]).toArray().then(requireOne);
+    ]).toArray().then(function(docs) {
+        if (docs.length === 0) {
+            return {
+                id: -1,
+                subject: courseSubject,
+                number: courseNumber,
+                equivalencies: []
+            };
+        } else if (docs.length === 1) {
+            return docs[0];
+        } else {
+            return Promise.reject(new Error(`Expecting 1 result, got ${docs.length}`));
+        }
+    });
 };
 
 module.exports.listInstitutions = function() {
@@ -79,15 +92,6 @@ module.exports.dropIfExists = function(collection) {
         }
     });
 };
-
-function requireOne(docs) {
-    return new Promise(function(fulfill, reject) {
-        if (docs.length !== 1)
-            return reject(new Error(`Expecting 1 result, got ${docs.length}`));
-
-        return fulfill(docs[0]);
-    });
-}
 
 function upsertEquivalency(eq) {
     return new Promise(function(fulfill, reject) {
