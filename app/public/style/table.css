@@ -5,3 +5,7 @@ div.equivalency-cell:not(:last-child) {
 div.equivalency-cell p {
     margin: 5px auto;
 }
+
+td.course-input {
+    width: 8em;
+}

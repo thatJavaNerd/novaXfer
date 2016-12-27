@@ -10,6 +10,8 @@ angular.module('courseTable')
             // 2D array representing table data
             this.data = [];
 
+            this.institutionList = ['GMU', 'VT']
+
             this.fillTable = function() {
                 let $ctrl = this;
 
@@ -87,5 +89,11 @@ angular.module('courseTable')
             this.formatCourseArray = function(courses) {
                 return _.join(_.map(courses, c => c.subject + ' ' + c.number), ', ');
             };
+
+            let self = this;
+            // Dynamically get a list of all institutions
+            $http.get('/api/institutions').then(function(data) {
+                self.institutionList = _.map(data.data, o => o.acronym);
+            });
         }],
     });
