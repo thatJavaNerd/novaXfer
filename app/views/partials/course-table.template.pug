@@ -6,11 +6,14 @@ div.container
                 input(ng-model='$ctrl.institutions[$index]')
             th
                 button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInstitution()')
-        tr(ng-repeat="row in $ctrl.data")
-            td(ng-repeat="equivs in row")
+        tr(ng-repeat="inputCourse in $ctrl.input track by $index")
+            td
+                input(ng-model='$ctrl.input[$index]')
+            td(ng-repeat="equivs in $ctrl.data[$index]")
                 div.equivalency-cell(ng-repeat="equiv in equivs")
                     p.text-muted(ng-show="equiv.muted") (when taken with {{equiv.muted}})
                     p {{equiv.normal}}
                     p.text-danger(ng-show="equiv.danger") No equivalency
+        tr: td: button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInputCourse()')
 
     button.btn.btn-default#find(ng-click='$ctrl.fillTable()') Fill table

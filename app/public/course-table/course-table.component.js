@@ -2,8 +2,12 @@ angular.module('courseTable')
     .component('courseTable', {
         templateUrl: '/partial/course-table',
         controller: ['$http', '$q', function CourseTableController($http, $q) {
+            // Create as empty arrays so that one input will be created for the
+            // user to start off with
             this.institutions = [''];
-            this.input = ['FOR 202', 'ACC 212'];
+            this.input = [''];
+
+            // 2D array representing table data
             this.data = [];
 
             this.fillTable = function() {
@@ -23,9 +27,12 @@ angular.module('courseTable')
                     $ctrl.data = [];
                     for (let inputClass of $ctrl.input) {
                         // Find index of the equivalency list for inputClass
-                        let rowIndex = _.findIndex(results, function(o) { return o.subject + ' ' + o.number === inputClass; });
+                        let rowIndex = _.findIndex(results, function(o) {
+                            return o.subject + ' ' + o.number === inputClass;
+                        });
+
                         let result = results[rowIndex];
-                        $ctrl.data[rowIndex] = [[{normal: inputClass}]];
+                        $ctrl.data[rowIndex] = [];
 
                         let groupedEquivs = _.groupBy(result.equivalencies, 'institution');
 
@@ -33,9 +40,9 @@ angular.module('courseTable')
                             let institution = $ctrl.institutions[i];
                             if (institution.trim() === '')
                                 continue;
-                            // The first index is the input class which is
-                            // already assigned
-                            let columnIndex = i + 1;
+
+                            // No real reason for this variable other than semantics
+                            let columnIndex = i;
 
                             if (!(institution in groupedEquivs)) {
                                 // No equivalencies found
@@ -43,6 +50,7 @@ angular.module('courseTable')
                             } else {
                                 let equivs = groupedEquivs[institution];
 
+                                // Assign the data to its specific location
                                 $ctrl.data[rowIndex][columnIndex] = [];
                                 for (let equiv of equivs) {
                                     $ctrl.data[rowIndex][columnIndex].push($ctrl.prepareEquivalency(equiv));
@@ -60,14 +68,16 @@ angular.module('courseTable')
                 this.institutions.push('');
             };
 
+            this.addInputCourse = function() {
+                this.input.push('');
+            }
+
             this.joinValidInstitutions = function() {
                 // Avoid bad API calls when empty cells are present
                 return _.join(_.filter(this.institutions, o => o.trim() !== ''))
             }
 
             this.prepareEquivalency = function(equiv) {
-                console.log(equiv);
-                console.log('prepare');
                 return {
                     muted: this.formatCourseArray(_.drop(equiv.input)),
                     normal: this.formatCourseArray(equiv.output)
