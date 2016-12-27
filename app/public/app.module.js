@@ -1,4 +1,5 @@
 
 angular.module('novaxfer', [
-    'singleCourseLookup'
+    'singleCourseLookup',
+    'courseTable'
 ]);

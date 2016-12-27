@@ -1,0 +1,23 @@
+#big-question {
+    text-align: center;
+    font-size: 2em;
+}
+
+single-course-lookup input {
+    margin: 0 5px;
+    padding: 5px;
+    text-align: center;
+}
+
+div.equivalency-block {
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    border: 1px black dashed;
+    margin: 20px 0;
+}
+
+div.equivalency-block h2 {
+    margin-top: 0;
+}

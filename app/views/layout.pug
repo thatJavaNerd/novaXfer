@@ -1,0 +1,30 @@
+doctype html
+html(ng-app='novaxfer')
+    head
+        // These 3 <meta> headers must come first
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+
+        block title
+            title novaXfer
+
+        block stylesheets
+            link(rel='stylesheet', href='/style/base.css')
+
+        block scripts
+            script(src='/bower_components/jquery/dist/jquery.min.js')
+            script(src='https://www.promisejs.org/polyfills/promise-7.0.4.min.js')
+
+
+    body
+        block header
+            header.text-center novaXfer
+
+        block content
+
+        block footer
+            footer.footer
+              div.container
+                span.text-muted
+                 | Copyright (c) Matthew Dean 2017

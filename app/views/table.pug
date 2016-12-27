@@ -4,13 +4,14 @@ block stylesheets
     link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.css')
     link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Slabo+27px')
     link(rel='stylesheet', href='/style/base.css')
-    link(rel='stylesheet', href='/style/scl.css')
+    link(rel='stylesheet', href='/style/table.css')
 
 block scripts
+    script(src='/bower_components/lodash/dist/lodash.min.js')
     script(src='/bower_components/jquery/dist/jquery.js')
     script(src='/bower_components/tether/dist/js/tether.js')
     script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
-    script(src='/bower_components/angular/angular.min.js')
+    script(src='/bower_components/angular/angular.js')
     script(src='/app.module.js')
     script(src='/course-table/course-table.module.js')
     script(src='/course-table/course-table.component.js')
@@ -19,6 +20,4 @@ block scripts
 
 block content
     main
-        single-course-lookup
-        div.container
-            a(href='/table').text-center Need bulk equivalencies?
+        course-table

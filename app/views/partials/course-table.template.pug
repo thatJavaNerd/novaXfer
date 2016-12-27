@@ -1,0 +1,13 @@
+div.container
+    table.table.table-bordered
+        tr
+            th NVCC
+            th(ng-repeat="institution in $ctrl.institutions") {{institution}}
+        tr(ng-repeat="row in $ctrl.data")
+            td(ng-repeat="equivs in row")
+                div.equivalency-cell(ng-repeat="equiv in equivs")
+                    p.text-muted(ng-show="equiv.muted") (when taken with {{equiv.muted}})
+                    p {{equiv.normal}}
+                    p.text-danger(ng-show="equiv.danger") No equivalency
+
+    button.btn.btn-default#find(ng-click='$ctrl.fillTable()') Fill table
