@@ -2,7 +2,10 @@ div.container
     table.table.table-bordered
         tr
             th NVCC
-            th(ng-repeat="institution in $ctrl.institutions") {{institution}}
+            th(ng-repeat="institution in $ctrl.institutions track by $index")
+                input(ng-model='$ctrl.institutions[$index]')
+            th
+                button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInstitution()')
         tr(ng-repeat="row in $ctrl.data")
             td(ng-repeat="equivs in row")
                 div.equivalency-cell(ng-repeat="equiv in equivs")

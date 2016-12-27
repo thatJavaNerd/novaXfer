@@ -2,7 +2,7 @@ angular.module('courseTable')
     .component('courseTable', {
         templateUrl: '/partial/course-table',
         controller: ['$http', '$q', function CourseTableController($http, $q) {
-            this.institutions = ['GMU', 'VT', 'CNU', 'UVA'];
+            this.institutions = [''];
             this.input = ['FOR 202', 'ACC 212'];
             this.data = [];
 
@@ -11,7 +11,7 @@ angular.module('courseTable')
 
                 let createPromise = function(course) {
                     return new Promise(function(fulfill, reject) {
-                        let url = '/api/course/' + encodeURIComponent(course) + '/' + $ctrl.institutions.join(',');
+                        let url = '/api/course/' + encodeURIComponent(course) + '/' + $ctrl.joinValidInstitutions();
                         $http.get(url).then(fulfill).catch(reject);
                     });
                 };
@@ -31,6 +31,8 @@ angular.module('courseTable')
 
                         for (let i = 0; i < $ctrl.institutions.length; i++) {
                             let institution = $ctrl.institutions[i];
+                            if (institution.trim() === '')
+                                continue;
                             // The first index is the input class which is
                             // already assigned
                             let columnIndex = i + 1;
@@ -45,7 +47,6 @@ angular.module('courseTable')
                                 for (let equiv of equivs) {
                                     $ctrl.data[rowIndex][columnIndex].push($ctrl.prepareEquivalency(equiv));
                                 }
-
                             }
                         }
                     }
@@ -55,6 +56,15 @@ angular.module('courseTable')
                 })
             };
 
+            this.addInstitution = function() {
+                this.institutions.push('');
+            };
+
+            this.joinValidInstitutions = function() {
+                // Avoid bad API calls when empty cells are present
+                return _.join(_.filter(this.institutions, o => o.trim() !== ''))
+            }
+
             this.prepareEquivalency = function(equiv) {
                 console.log(equiv);
                 console.log('prepare');
@@ -62,10 +72,10 @@ angular.module('courseTable')
                     muted: this.formatCourseArray(_.drop(equiv.input)),
                     normal: this.formatCourseArray(equiv.output)
                 };
-            }
+            };
 
             this.formatCourseArray = function(courses) {
                 return _.join(_.map(courses, c => c.subject + ' ' + c.number), ', ');
-            }
+            };
         }],
     });
