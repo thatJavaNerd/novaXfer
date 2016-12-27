@@ -25,9 +25,10 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
         matchEquivalencies.push({"equivalencies.institution": institutions[i]});
     }
 
+    let courseRegex = new RegExp('^' + courseSubject + '$', 'i');
     return db.mongo().collection(COLL_COURSES).aggregate([
         // Match first document with the given subject and number
-        { $match: { subject: courseSubject, number: courseNumber} },
+        { $match: { subject: courseRegex, number: courseNumber} },
         { $limit: 1 },
         // Create seperate documents for each equivalency (all have same ID)
         { $unwind: "$equivalencies" },

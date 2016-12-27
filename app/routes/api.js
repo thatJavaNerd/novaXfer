@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 var db = require('../database.js');
 var queries = require('../queries.js');
+let util = require('../util.js');
+
+const subjectRegex = /^[A-Z]{3}$/i;
+const numberRegex = /^\d{3}$/i;
 
 /** Gets all courses in a given subject */
 router.get('/subject/:subject', function(req, res, next) {
@@ -23,19 +27,27 @@ router.get('/subject/:subject', function(req, res, next) {
  * equivalencies at only George Mason and Georgia Tech, if available.
  */
 router.get('/course/:course/:institutions', function(req, res, next) {
-    var course = req.params.course;
-    var institutionsRaw = req.params.institutions;
+    let course = util.normalizeWhitespace(req.params.course);
+    let institutionsRaw = util.normalizeWhitespace(req.params.institutions);
 
     if (course === undefined)
         return next(new ParameterError('Missing parameter', {'course': course} ));
     if (institutionsRaw === undefined)
         return next(new ParameterError('Missing parameter', {'institution': institutionsRaw} ));
 
-    var courseParts = course.split(' ');
-    var subject = courseParts[0];
-    var number = courseParts[1];
+    let courseParts = course.split(' ');
+    if (courseParts.length !== 2)
+        return next(new ParameterError('Malformed course', {'course': course }));
 
-    var institutions = institutionsRaw.split(',');
+    let subject = courseParts[0];
+    if (!validateSubject(subject))
+        return next(new ParameterError('Malformed course subject', {'course': course}));
+
+    let number = courseParts[1];
+    if (!validateNumber(number))
+        return next(new ParameterError('Malformed course number', {'course': course}))
+
+    let institutions = institutionsRaw.split(',');
 
     queries.equivalenciesForCourse(subject, number, institutions).then(function(doc) {
         res.json(doc);
@@ -61,8 +73,13 @@ router.use('/', function(err, req, res, next) {
     res.send(err);
 });
 
+
 function validateSubject(subj) {
-    return /^[A-Z]+$/i.test(subj);
+    return subjectRegex.test(subj);
+}
+
+function validateNumber(num) {
+    return numberRegex.test(num);
 }
 
 function GeneralApiError(reason, status = 400) {
