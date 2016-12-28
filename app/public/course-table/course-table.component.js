@@ -172,12 +172,26 @@ angular.module('courseTable')
              * when empty cells are present
              */
             this.joinValidInstitutions = function() {
-                return _.join(_.filter(this.institutions, o => o.trim() !== ''));
+                return _.join(
+                    _.filter(
+                        _.uniq(this.institutions), o => o.trim() !== ''));
             };
 
             /** Input version of joinValidInstitutions() */
             this.joinValidCourses = function() {
-                return _.join(_.filter(this.displayedInput, o => o && o.trim() !== ''));
+                // 1. Transform each value into whitespace-normalized version
+                // 2. Filter all non-empty values
+                // 3. Only use unique values
+                // 4. Join result using comma
+                return _.join(
+                    _.uniq(
+                        _.filter(
+                            _.map(
+                                this.displayedInput, o => o ? self.normalizeWhitespace(o) : o
+                            ), o => o && o !== ''
+                        )
+                    )
+                )
             }
 
             /**
