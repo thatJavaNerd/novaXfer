@@ -140,7 +140,7 @@ module.exports.indexInstitutions = function() {
     }).then(function(result) {
         indexReport = result;
         // Then add those equivalencies to the database
-        return bulkUpsert(result.equivalencies);
+        return bulkUpsert(result.equivalencyContexts);
     }).then(function(result) {
         return indexReport;
     });
@@ -156,10 +156,11 @@ module.exports.dropIfExists = function(collection) {
     });
 };
 
-function bulkUpsert(equivalenciesByInstitution) {
+function bulkUpsert(equivalencyContexts) {
     let operations = [];
-    for (let institution of equivalenciesByInstitution) {
-        for (let eq of institution) {
+    for (let context of equivalencyContexts) {
+        let institution = context.institution;
+        for (let eq of context.equivalencies) {
             operations.push({
                 updateOne: {
                     filter: {
@@ -170,7 +171,7 @@ function bulkUpsert(equivalenciesByInstitution) {
                         // Add to equivalencies array if it doesn't already exist
                         $addToSet: {
                             equivalencies: {
-                                "institution": eq.institution.acronym,
+                                "institution": institution.acronym,
                                 "input": eq.input,
                                 "output": eq.output
                             }

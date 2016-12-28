@@ -14,55 +14,48 @@ function findAll(each, done) {
 }
 
 function parseEquivalencies(body) {
-    return new Promise(function(fulfill, reject) {
+    var equivalencies = [];
+    var entries = JSON.parse(body).feed.entry;
+    for (let i = 0; i < entries.length; i++) {
+        var entry = entries[i];
 
-        var equivalencies = [];
-        var entries = JSON.parse(body).feed.entry;
-        for (let i = 0; i < entries.length; i++) {
-            var entry = entries[i];
+        // The VT transfer site lists entire subjects ("MTH"), specific courses
+        // ("MTH 173"), and courses that must be taken together that have a
+        // different equivalency than if they were taken individually
+        // ("MTH 175 + 176"). Skip entries dedicated to entire subjects.
+        if (entry.gsx$vccscredits.$t === "" || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
+            continue;
 
-            // The VT transfer site lists entire subjects ("MTH"), specific
-            // courses ("MTH 173"), and courses that must be taken together that
-            // have a different equivalency than if they were taken
-            // individually ("MTH 175 + 176"). Skip entries dedicated to entire
-            // subjects.
-            if (entry.gsx$vccscredits.$t === "" || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
-                continue;
+        // There is a very specific entry which tells the reader to refer
+        // to another site for ENGE equivalents. Ignore this entry.
+        if (entry.gsx$vccscoursetitle.$t === '' &&
+                entry.gsx$vtcoursetitle.$t === '')
+            continue;
 
-            // There is a very specific entry which tells the reader to refer
-            // to another site for ENGE equivalents. Ignore this entry.
-            if (entry.gsx$vccscoursetitle.$t === '' &&
-                    entry.gsx$vtcoursetitle.$t === '')
-                continue;
+        var vtCourses = parseCourses(
+            // Some classes that don't have direct equivalents will be
+            // listed as either 'Yxxx' or 'YXXX' (where Y is a positive
+            // integer), make sure our output is uniform
+            entry.gsx$vtcoursenumber.$t.toUpperCase(),
+            entry.gsx$vtcredits.$t
+        );
 
-            var vtCourses = parseCourses(
-                // Some classes that don't have direct equivalents will be
-                // listed as either 'Yxxx' or 'YXXX' (where Y is a positive
-                // integer), make sure our output is uniform
-                entry.gsx$vtcoursenumber.$t.toUpperCase(),
-                entry.gsx$vtcredits.$t
-            );
+        if (vtCourses.length === 0 &&
+            individualRegex.test(entry.gsx$vtcoursetitle.$t) ||
+            individualRegex.test(entry.gsx$vtcoursenumber.$t))
+            vtCourses = [ new models.Course("VT", "XXXX", -1) ];
 
-            if (vtCourses.length === 0 &&
-                individualRegex.test(entry.gsx$vtcoursetitle.$t) ||
-                individualRegex.test(entry.gsx$vtcoursenumber.$t))
-                vtCourses = [ new models.Course("VT", "XXXX", -1) ];
+        var nvccCourses = parseCourses(
+            entry.gsx$vccscoursenumber.$t,
+            entry.gsx$vccscredits.$t
+        );
 
-            var nvccCourses = parseCourses(
-                entry.gsx$vccscoursenumber.$t,
-                entry.gsx$vccscredits.$t
-            );
+        var equiv = new models.CourseEquivalency(nvccCourses, vtCourses);
 
-            var equiv = new models.CourseEquivalency(
-                nvccCourses,
-                vtCourses,
-                module.exports.institution);
+        equivalencies.push(equiv);
+    }
 
-            equivalencies.push(equiv);
-        }
-
-        return fulfill(equivalencies);
-    });
+    return new models.EquivalencyContext(module.exports.institution, equivalencies);
 }
 
 function parseCourses(courseStr, creditsStr) {

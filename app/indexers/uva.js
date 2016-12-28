@@ -15,53 +15,50 @@ function findAll(done) {
 }
 
 function parseEquivalencies(body) {
-    return new Promise(function(fulfill, reject) {
-        var $ = cheerio.load(body);
-        var equivalencies = [];
+    var $ = cheerio.load(body);
+    var equivalencies = [];
 
-        var rows = $($('table')[3]).find('tr').slice(headerRows);
-        rows.each(function(index, element) {
-            var rowType = getRowType($(this));
+    var rows = $($('table')[3]).find('tr').slice(headerRows);
+    rows.each(function(index, element) {
+        var rowType = getRowType($(this));
 
-            switch (getRowType($(this))) {
-                case 'unknown':
-                    reject(new Error("Found row with type 'unknown'"));
-                    return false;
-                case 'empty':// This is a row to separate courses, skip
-                case 'input':
-                case 'output':
-                    // We handle supplement and freebie rows when their base
-                    // courses are found
-                    return true;
+        switch (getRowType($(this))) {
+            case 'unknown':
+                reject(new Error("Found row with type 'unknown'"));
+                return false;
+            case 'empty':// This is a row to separate courses, skip
+            case 'input':
+            case 'output':
+                // We handle supplement and freebie rows when their base courses
+                // are found
+                return true;
+        }
+
+        var nvccCourses = [ parseCourse($(this), nvccIndex) ];
+        var uvaCourses = [ parseCourse($(this), uvaIndex) ];
+
+        var eq = new models.CourseEquivalency(nvccCourses, uvaCourses);
+
+        if (index + 1 < rows.length) {
+            // Possibility of extraneous row
+            var nextRowType = getRowType($(rows[index + 1]));
+            if (nextRowType === 'unknown') {
+                reject("Found row with type 'unknown'");
+                return false;
             }
-
-            var nvccCourses = [ parseCourse($(this), nvccIndex) ];
-            var uvaCourses = [ parseCourse($(this), uvaIndex) ];
-
-            var eq = new models.CourseEquivalency(nvccCourses, uvaCourses, institution);
-
-            if (index + 1 < rows.length) {
-                // Possibility of extraneous row
-                var nextRowType = getRowType($(rows[index + 1]));
-                if (nextRowType === 'unknown') {
-                    reject("Found row with type 'unknown'");
-                    return false;
-                }
-                if (nextRowType === 'input' || nextRowType === 'output') {
-                    // Add a supplement
-                    var columnIndex = nvccIndex; // Assume input course
-                    if (nextRowType === 'output')
-                        index = uvaIndex;
-                    eq[nextRowType].push(parseCourse($(rows[index + 1]), columnIndex));
-                }
+            if (nextRowType === 'input' || nextRowType === 'output') {
+                // Add a supplement
+                var columnIndex = nvccIndex; // Assume input course
+                if (nextRowType === 'output')
+                    index = uvaIndex;
+                eq[nextRowType].push(parseCourse($(rows[index + 1]), columnIndex));
             }
+        }
 
-            equivalencies.push(eq);
-        });
-
-        // Since $.each is synchronous we can call done() when outside that block
-        fulfill(equivalencies);
+        equivalencies.push(eq);
     });
+
+    return new models.EquivalencyContext(institution, equivalencies);
 }
 
 function parseCourse($tr, index) {

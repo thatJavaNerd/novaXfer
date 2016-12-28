@@ -45,59 +45,52 @@ function findAll() {
 }
 
 function parseEquivalencies(body) {
-    return new Promise(function(fulfill, reject) {
-        var $ = cheerio.load(body);
-        var equivalencies = [];
+    var $ = cheerio.load(body);
+    var equivalencies = [];
 
-        // Access the main table
-        var cssQuery = 'table.datadisplaytable tr';
-        var tableRows = $(cssQuery).slice(headerRows);
-        tableRows.each(function(index, element) {
-            var row = $(tableRows[index]);
-            if (isExtraneousRow(row)) {
-                // Skip this row, it's been handled by the row previous
-                return true;
+    // Access the main table
+    var cssQuery = 'table.datadisplaytable tr';
+    var tableRows = $(cssQuery).slice(headerRows);
+    tableRows.each(function(index, element) {
+        var row = $(tableRows[index]);
+        if (isExtraneousRow(row)) {
+            // Skip this row, it's been handled by the row previous
+            return true;
+        }
+
+        var nvccNumber = getCourseNumber(row, nvccNumberIndex);
+        if (nvccNumber[1].length < 3) {
+            // Some courses listed are malformed. Check to make sure the
+            // NVCC course number (just the number, not the subject) is an
+            // appropriate length. Example: "MATH 6", "EXL 12"
+            return true;
+        }
+
+        var gtNumber = getCourseNumber(row, gtNumberIndex);
+        var gtCredits = parseInt(columnAtIndex(row, gtCreditIndex).text().trim());
+
+        var nvccCourses = [ new models.Course(nvccNumber[0], nvccNumber[1], -1) ];
+        var gtCourses = [ new models.Course(gtNumber[0], gtNumber[1], gtCredits) ];
+
+        // Check for the possibility of additional row
+        if (index < tableRows.length - 1) {
+            var nextRow = $(tableRows[index + 1]);
+            if (isExtraneousRow(nextRow)) {
+                var numberParts = getCourseNumber(nextRow, gtNumberIndex);
+                gtCourses.push(new models.Course(
+                    numberParts[0],
+                    numberParts[1],
+                    parseInt(columnAtIndex(nextRow, gtCreditIndex).text().trim())
+                ));
             }
+        }
 
-            var nvccNumber = getCourseNumber(row, nvccNumberIndex);
-            if (nvccNumber[1].length < 3) {
-                // Some courses listed are malformed. Check to make sure the
-                // NVCC course number (just the number, not the subject) is an
-                // appropriate length. Example: "MATH 6", "EXL 12"
-                return true;
-            }
+        var equiv = new models.CourseEquivalency(nvccCourses, gtCourses);
 
-            var gtNumber = getCourseNumber(row, gtNumberIndex);
-            var gtCredits = parseInt(columnAtIndex(row, gtCreditIndex).text().trim());
-
-            var nvccCourses = [ new models.Course(nvccNumber[0], nvccNumber[1], -1) ];
-            var gtCourses = [ new models.Course(gtNumber[0], gtNumber[1], gtCredits) ];
-
-            // Check for the possibility of additional row
-            if (index < tableRows.length - 1) {
-                var nextRow = $(tableRows[index + 1]);
-                if (isExtraneousRow(nextRow)) {
-                    var numberParts = getCourseNumber(nextRow, gtNumberIndex);
-                    gtCourses.push(new models.Course(
-                        numberParts[0],
-                        numberParts[1],
-                        parseInt(columnAtIndex(nextRow, gtCreditIndex).text().trim())
-                    ));
-                }
-            }
-
-            var equiv = new models.CourseEquivalency(
-                nvccCourses,
-                gtCourses,
-                module.exports.institution
-            );
-
-            equivalencies.push(equiv);
-        });
-
-        // Since $.each is synchronous we can call done() when outside that block
-        return fulfill(equivalencies);
+        equivalencies.push(equiv);
     });
+
+    return new models.EquivalencyContext(module.exports.institution, equivalencies);
 }
 
 function columnAtIndex(tr, index) {

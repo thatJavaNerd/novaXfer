@@ -70,10 +70,10 @@ function parseEquivalencies(rows) {
 
         let wmMatrix = parseWmCourseMatrix(wmData);
         for (let wm of wmMatrix)
-            equivalencies.push(new models.CourseEquivalency(nvcc, wm, institution));
+            equivalencies.push(new models.CourseEquivalency(nvcc, wm));
     }
 
-    return equivalencies;
+    return new models.EquivalencyContext(institution, equivalencies);
 }
 
 /**

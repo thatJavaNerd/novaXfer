@@ -18,11 +18,14 @@ module.exports = {
      * @param input Array of courses from NVCC
      * @param output Array of ocurses from `institution`
      */
-    CourseEquivalency: function CourseEquivalency(input, output, institution) {
+    CourseEquivalency: function CourseEquivalency(input, output) {
         this.keyCourse = input[0].stripCredits();
         this.input = input;
         this.output = output;
+    },
+    EquivalencyContext: function EquivalencyContext(institution, equivalencies) {
         this.institution = institution;
+        this.equivalencies = equivalencies;
     },
     Institution: function(acronym, fullName) {
         this.acronym = acronym;

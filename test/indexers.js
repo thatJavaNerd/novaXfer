@@ -64,7 +64,9 @@ function testIndexer(indexer) {
     assert.notEqual(undefined, indexer.findAll, 'findAll() was undefined');
     validateInstitution(indexer.institution);
 
-    return indexer.findAll().then(function(equivs) {
+    return indexer.findAll().then(function(equivalencyContext) {
+        validateInstitution(equivalencyContext.institution);
+        let equivs = equivalencyContext.equivalencies;
         assert.ok(equivs.length >= minEquivalencies,
             `Indexer only provided ${equivs.length} equivalencies (expected min ${minEquivalencies})`);
 
@@ -75,7 +77,6 @@ function testIndexer(indexer) {
             var equivStr = JSON.stringify(equiv);
             assert.notEqual(null, equiv, "Equivalency was null: " + equivStr);
 
-            validateInstitution(equiv.institution, equivStr);
             validateCourseArray(equiv.input, "input", equivStr);
             validateCourseArray(equiv.output, "output", equivStr);
         }
@@ -92,7 +93,7 @@ const courseNumberRegex = /^[-\dA-Z#]{2,5}$/;
 // Match 2 to 5 alphabeit characters
 const courseSubjectRegex = /^[A-Z]{2,5}$/;
 
-function validateInstitution(inst, json) {
+function validateInstitution(inst) {
     assert.notEqual(null, inst);
     assert.notEqual(null, inst.acronym);
     assert.notEqual(null, inst.fullName);

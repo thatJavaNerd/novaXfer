@@ -34,12 +34,12 @@ function parseEquivalencies(body) {
 
         for (let input of inputMatrix) {
             for (let output of outputMatrix) {
-                equivalencies.push(new models.CourseEquivalency(input, output, module.exports.institution));
+                equivalencies.push(new models.CourseEquivalency(input, output));
             }
         }
     });
 
-    return equivalencies;
+    return new models.EquivalencyContext(module.exports.institution, equivalencies);
 }
 
 function parseRawCourses(equivRawData, offset = 0) {

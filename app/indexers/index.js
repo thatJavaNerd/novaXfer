@@ -27,11 +27,16 @@ module.exports.index = function() {
     // Find all our university course equivalency indexers
     return exports.findIndexers().then(function(indexers) {
         return Promise.all(indexers.map(ind => require(ind).findAll()));
-    }).then(function(equivalencies) {
+    }).then(function(contexts) {
+        let totalCourses = 0;
+        for (let context of contexts) {
+            totalCourses += context.equivalencies.length;
+        }
+
         return {
-            "equivalencies": equivalencies,
-            institutionsIndexed: equivalencies.length,
-            coursesIndexed: equivalencies.map(it => it.length).reduce((a, b) => a + b, 0)
+            equivalencyContexts: contexts,
+            institutionsIndexed: contexts.length,
+            coursesIndexed: totalCourses
         };
     });
 };

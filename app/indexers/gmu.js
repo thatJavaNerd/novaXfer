@@ -24,25 +24,22 @@ function findAll() {
 }
 
 function parseEquivalencies(body) {
-    return new Promise(function(fulfill, reject) {
-        var $ = cheerio.load(body);
-        var equivalencies = [];
+    var $ = cheerio.load(body);
+    var equivalencies = [];
 
-        var $rows = $('#contentPrimary tr').slice(headerRows);
-        $rows.each(function() {
-            var vals = $(this).children('td').map(function() { return $(this).text(); });
+    var $rows = $('#contentPrimary tr').slice(headerRows);
+    $rows.each(function() {
+        var vals = $(this).children('td').map(function() { return $(this).text(); });
 
-            var nvccCourses = parseCourses(vals, nvccNumberIndex, nvccCreditsIndex);
-            var gmuCourses = parseCourses(vals, gmuNumberIndex, gmuCreditsIndex);
+        var nvccCourses = parseCourses(vals, nvccNumberIndex, nvccCreditsIndex);
+        var gmuCourses = parseCourses(vals, gmuNumberIndex, gmuCreditsIndex);
 
-            var equiv = new models.CourseEquivalency(
-                nvccCourses, gmuCourses, institution);
+        var equiv = new models.CourseEquivalency(nvccCourses, gmuCourses);
 
-            equivalencies.push(equiv);
-        });
-
-        return fulfill(equivalencies);
+        equivalencies.push(equiv);
     });
+
+    return new models.EquivalencyContext(institution, equivalencies);
 }
 
 function parseCourses(vals, numberIndex, creditsIndex) {
