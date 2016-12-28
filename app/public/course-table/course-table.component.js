@@ -1,7 +1,7 @@
 angular.module('courseTable')
     .component('courseTable', {
         templateUrl: '/partial/course-table',
-        controller: ['$http', '$q', function CourseTableController($http, $q) {
+        controller: ['$scope', '$http', '$q', function CourseTableController($scope, $http, $q) {
             let self = this;
 
             // Create as empty arrays so that one input will be created for the
@@ -9,8 +9,11 @@ angular.module('courseTable')
             this.institutions = [''];
             this.input = [''];
 
+            // Input that has had already been sent to the API
+            this.displayedInput = [];
+
             // Used to validate course inputs. Lenient about spaces and case
-            this.courseRegex = / *[A-Z]{3} +[0-9]{3} */i;
+            this.courseRegex = /^ *[A-Z]{3} +[0-9]{3} *$/i;
 
             // 2D array representing table data
             this.data = [];
@@ -80,6 +83,45 @@ angular.module('courseTable')
                 });
             };
 
+            this.populateRow = function(rowIndex) {
+                let url = '/api/course/' +
+                        encodeURIComponent(self.displayedInput[rowIndex]) +
+                        '/' + self.joinValidInstitutions();
+
+                $http.get(url).then(function(data) {
+                    data = data.data;
+
+                    // Reset
+                    self.data[rowIndex] = [];
+                    let groupedEquivs = _.groupBy(data.equivalencies, 'institution');
+
+                    for (let i = 0; i < self.institutions.length; i++) {
+                        let institution = self.institutions[i];
+                        if (institution.trim() === '')
+                            continue;
+
+                        // No real reason for this variable other than semantics
+                        let columnIndex = i;
+
+                        if (!(institution in groupedEquivs)) {
+                            // No equivalencies found
+                            self.data[rowIndex][columnIndex] = [{danger: true}]
+                        } else {
+                            let equivs = groupedEquivs[institution];
+
+                            // Assign the data to its specific location
+                            self.data[rowIndex][columnIndex] = [];
+                            for (let equiv of equivs) {
+                                self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv));
+                            }
+                        }
+                    }
+                }).catch(function(err) {
+                    // TODO
+                    console.error(err);
+                });
+            }
+
             this.addInstitution = function() {
                 this.institutions.push('');
             };
@@ -139,7 +181,33 @@ angular.module('courseTable')
             // Dynamically get a list of all institutions
             $http.get('/api/institutions').then(function(data) {
                 self.availableInstitutions = data.data;
-                self.institutions = [self.availableInstitutions[0], ''];
+                self.institutions = [self.availableInstitutions[0].acronym, ''];
             });
+
+            $scope.$watchCollection('$ctrl.input', function(newVal, oldVal) {
+                // Form scope hasn't been registered yet
+                if (!$scope.tableForm)
+                    return;
+
+                for (let i = 0; i < self.input.length; i++) {
+                    let inputCourse = self.input[i];
+                    let inputElement = $scope.tableForm[self.inputName(i)];
+
+                    // Form scope hasn't been registered yet
+                    if (!inputElement)
+                        break;
+
+                    // $modelValue is only set when it's valid
+                    if (!inputElement.$modelValue)
+                        continue;
+                    console.log(inputElement);
+                    let value = inputElement.$modelValue.toUpperCase();
+
+                    if (inputElement.$valid && value !== self.displayedInput[i]) {
+                        self.displayedInput[i] = value;
+                        self.populateRow(i);
+                    }
+                }
+            })
         }],
     });
