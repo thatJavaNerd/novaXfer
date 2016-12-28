@@ -292,6 +292,7 @@ angular.module('courseTable')
 
                     if (inputElement.$valid && value !== self.displayedInput[i]) {
                         self.displayedInput[i] = value;
+                        self.input[i] = value;
                         self.populateRow(i);
                     }
                 }
