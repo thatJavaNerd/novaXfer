@@ -205,8 +205,13 @@ angular.module('courseTable')
             }
 
             this.formatCourseArray = function(courses) {
-                return _.join(_.map(courses, c => c.subject + ' ' + c.number), ', ');
+                return _.join(_.map(courses, c => `${c.subject} ${c.number} (${self.formatCredits(c.credits)} credits)`), ', ');
             };
+
+            this.formatCredits = function(credits) {
+                if (credits === -1 || credits === -2) return '?';
+                return credits;
+            }
 
             this.inputName = function(index) { return 'input' + index; };
             this.selectName = function(index) { return 'institution' + index; };
