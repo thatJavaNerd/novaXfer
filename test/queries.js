@@ -103,5 +103,14 @@ describe('database queries', function() {
             // could be more specific
             assert.ok(courses.length === data.courses.length);
         });
+
+        it('should return blank data when no equivalencies are available', function() {
+            let courses = [{subject: 'FOR', number: '202'}]
+            return queries.equivalenciesForInstitution('GMU', courses).then(function(data) {
+                assert.ok(Object.keys(data).length === 2);
+                assert.ok(data.institution === 'GMU');
+                assert.ok(data.courses.length === 0);
+            });
+        });
     })
 })

@@ -110,6 +110,12 @@ module.exports.equivalenciesForInstitution = function(institution, courses) {
             // 'courses.equivalencies.institution': 0
         }}
     ]).toArray().then(function(docs) {
+        if (docs.length === 0) {
+            return {
+                institution: institution,
+                courses: []
+            };
+        }
         return docs[0];
     });
 }
