@@ -10,7 +10,7 @@ const COLL_INSTITUTIONS = 'institutions';
 module.exports.coursesInSubject = function(subject) {
     var col = db.mongo().collection(COLL_COURSES);
     // INJECTION WARNING
-    return col.find({subject: new RegExp('^' + subject + '$', 'i')})
+    return col.find({subject: subjectRegex(subject)})
         .sort({number: 1})
         .toArray();
 };
@@ -25,10 +25,9 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
         matchEquivalencies.push({"equivalencies.institution": institutions[i]});
     }
 
-    let courseRegex = new RegExp('^' + courseSubject + '$', 'i');
     return db.mongo().collection(COLL_COURSES).aggregate([
         // Match first document with the given subject and number
-        { $match: { subject: courseRegex, number: courseNumber} },
+        { $match: { subject: subjectRegex(courseSubject), number: courseNumber} },
         { $limit: 1 },
         // Create seperate documents for each equivalency (all have same ID)
         { $unwind: "$equivalencies" },
@@ -68,7 +67,7 @@ module.exports.equivalenciesForInstitution = function(institution, courses) {
     // Create an array of filters to pass to $or
     let courseMatch = [];
     for (let c of courses) {
-        courseMatch.push({subject: c.subject, number: c.number});
+        courseMatch.push({subject: subjectRegex(c.subject), number: c.number});
     }
 
     return db.mongo().collection(COLL_COURSES).aggregate([
@@ -175,4 +174,8 @@ function upsertInstitutions(institutions, done) {
     return exports.dropIfExists(COLL_INSTITUTIONS).then(function() {
         return db.mongo().collection(COLL_INSTITUTIONS).insertMany(institutions);
     });
+}
+
+function subjectRegex(subj) {
+    return new RegExp('^' + subj + '$', 'i');
 }
