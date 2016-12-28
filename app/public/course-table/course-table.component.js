@@ -11,6 +11,7 @@ angular.module('courseTable')
 
             // Input that has had already been sent to the API
             this.displayedInput = [];
+            this.displayedInstitutions = [];
 
             // Used to validate course inputs. Lenient about spaces and case
             this.courseRegex = /^ *[A-Z]{3} +[0-9]{3} *$/i;
@@ -21,66 +22,17 @@ angular.module('courseTable')
             // List of all API-provided institutions
             this.availableInstitutions = [];
 
-            this.fillTable = function() {
-                let $ctrl = this;
+            /** Copied from app/util.js */
+            this.nbsp = String.fromCharCode(160);
 
-                let createPromise = function(course) {
-                    return new Promise(function(fulfill, reject) {
-                        let url = '/api/course/' + encodeURIComponent(course) + '/' + $ctrl.joinValidInstitutions();
-                        $http.get(url).then(fulfill).catch(reject);
-                    });
-                };
-
-
-                let validInputList = _.filter($ctrl.input, input => input);
-                $q.all(_.map(validInputList, course => createPromise(course))).then(function(results) {
-                    results = results.map(result => result.data);
-
-                    // Reset the data
-                    $ctrl.data = [];
-                    for (let inputClass of validInputList) {
-                        // Since validInputList is a filtered list, we need two
-                        // indexes, one for the results (which is derived from
-                        // the filtered list) and one for the grid data
-                        let resultsIndex = _.findIndex(results, function(o) {
-                            return o.subject + ' ' + o.number === inputClass.toUpperCase();
-                        });
-
-                        let rowIndex = _.findIndex($ctrl.input, function(o) {
-                            return o.toUpperCase() === inputClass.toUpperCase();
-                        });
-
-                        let result = results[resultsIndex];
-                        $ctrl.data[rowIndex] = [];
-
-                        let groupedEquivs = _.groupBy(result.equivalencies, 'institution');
-
-                        for (let i = 0; i < $ctrl.institutions.length; i++) {
-                            let institution = $ctrl.institutions[i];
-                            if (institution.trim() === '')
-                                continue;
-
-                            // No real reason for this variable other than semantics
-                            let columnIndex = i;
-
-                            if (!(institution in groupedEquivs)) {
-                                // No equivalencies found
-                                $ctrl.data[rowIndex][columnIndex] = [{danger: true}]
-                            } else {
-                                let equivs = groupedEquivs[institution];
-
-                                // Assign the data to its specific location
-                                $ctrl.data[rowIndex][columnIndex] = [];
-                                for (let equiv of equivs) {
-                                    $ctrl.data[rowIndex][columnIndex].push($ctrl.prepareEquivalency(equiv));
-                                }
-                            }
-                        }
-                    }
-                }).catch(function(err) {
-                    // TODO
-                    console.error(err);
-                });
+            /**
+             * Copied from app/util.js
+             *
+             * Replaces all sequences of new line, nbsp, and space characters with a
+             * single space.
+             */
+            this.normalizeWhitespace = function(text) {
+                return text.replace(new RegExp(`(?:\r\n|\r|\n|${self.nbsp}| )+`, 'g'), ' ').trim();
             };
 
             this.populateRow = function(rowIndex) {
@@ -120,7 +72,46 @@ angular.module('courseTable')
                     // TODO
                     console.error(err);
                 });
-            }
+            };
+
+            this.populateColumn = function(columnIndex) {
+                let joinedCourses = self.joinValidCourses();
+                if (!joinedCourses)
+                    return;
+
+                let url = '/api/institution/' +
+                        encodeURIComponent(self.displayedInstitutions[columnIndex]) +
+                        '/' + joinedCourses;
+
+                $http.get(url).then(function(data) {
+                    data = data.data;
+
+                    for (let i = 0; i < self.displayedInput.length; i++) {
+                        let course = self.displayedInput[i];
+                        // Hasn't been filled out yet
+                        if (!course)
+                            continue;
+
+                        let rowIndex = _.findIndex(self.input, o => o && o.toUpperCase() === course.toUpperCase());
+
+                        let equivalencyList = _.find(data.courses, c => c.subject + ' ' + c.number === self.normalizeWhitespace(course));
+                        if (!equivalencyList) {
+                            self.data[rowIndex][columnIndex] = [{danger: true}];
+                        } else {
+                            equivalencyList = equivalencyList.equivalencies;
+
+                            // Assign the data to its specific location
+                            self.data[rowIndex][columnIndex] = [];
+                            for (let equiv of equivalencyList) {
+                                self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv));
+                            }
+                        }
+                    }
+                }).catch(function(err) {
+                    // TODO
+                    console.error(err);
+                });
+            };
 
             this.addInstitution = function() {
                 this.institutions.push('');
@@ -128,11 +119,15 @@ angular.module('courseTable')
 
             this.addInputCourse = function() {
                 this.input.push(null);
-            }
+            };
 
             this.joinValidInstitutions = function() {
                 // Avoid bad API calls when empty cells are present
-                return _.join(_.filter(this.institutions, o => o.trim() !== ''))
+                return _.join(_.filter(this.institutions, o => o.trim() !== ''));
+            };
+
+            this.joinValidCourses = function() {
+                return _.join(_.filter(this.displayedInput, o => o && o.trim() !== ''));
             }
 
             this.prepareEquivalency = function(equiv) {
@@ -147,6 +142,7 @@ angular.module('courseTable')
             };
 
             this.inputName = function(index) { return 'input' + index; };
+            this.selectName = function(index) { return 'institution' + index; };
 
             let createStylesObject = function(form, index, dangerClass, warningClass) {
                 let styles = {};
@@ -200,7 +196,7 @@ angular.module('courseTable')
                     // $modelValue is only set when it's valid
                     if (!inputElement.$modelValue)
                         continue;
-                    console.log(inputElement);
+
                     let value = inputElement.$modelValue.toUpperCase();
 
                     if (inputElement.$valid && value !== self.displayedInput[i]) {
@@ -208,6 +204,30 @@ angular.module('courseTable')
                         self.populateRow(i);
                     }
                 }
-            })
+            });
+
+            $scope.$watchCollection('$ctrl.institutions', function(newVal, oldVal) {
+                // No scope registered yet
+                if (!$scope.tableForm)
+                    return;
+
+                for (let i = 0; i < self.institutions.length; i++) {
+                    let institution = self.institutions[i];
+                    let selectElement = $scope.tableForm[self.selectName(i)];
+
+                    if (!selectElement)
+                        break;
+
+                    // if (!selectElement.$modelValue)
+                    //     continue;
+
+                    let value = selectElement.$modelValue;
+
+                    if (selectElement.$valid && value !== self.displayedInstitutions[i]) {
+                        self.displayedInstitutions[i] = value;
+                        self.populateColumn(i);
+                    }
+                }
+            });
         }],
     });

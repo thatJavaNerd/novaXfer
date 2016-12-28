@@ -4,8 +4,10 @@ div.container
             th.table-header NVCC
             th.table-header(ng-repeat="institution in $ctrl.institutions track by $index")
                 select.input-institution.form-control(
+                    name='{{"institution" + $index}}'
                     ng-model='$ctrl.institutions[$index]'
                     ng-options='inst.acronym as inst.fullName for inst in $ctrl.availableInstitutions'
+                    required
                 )
             th.table-header
                 button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInstitution()')
@@ -26,5 +28,3 @@ div.container
                     p.text-danger(ng-show="equiv.danger") No equivalency
 
         tr: td: button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInputCourse()')
-
-    button.btn.btn-default#find(ng-click='$ctrl.fillTable()') Semi-automatic fill table
