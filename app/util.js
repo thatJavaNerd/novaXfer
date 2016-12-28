@@ -102,14 +102,19 @@ module.exports = {
 function networkRequest(requestData) {
     return new Promise(function(fulfill, reject) {
         var chunks = [];
-        request(requestData, function(err, response, body) {
-            if (err) return reject(err);
+        var error = null;
+
+        request(requestData)
+        .on('response', function(response) {
             if (response.statusCode !== 200)
-                return reject(new Error(`Bad status code: ${response.statusCode}`));
+                error = new Error(`Bad status code: ${response.statusCode}`);
+        }).on('error', function(err) {
+            if (err) error = err;
         }).on('data', function(chunk) {
             chunks.push(chunk);
         }).on('end', function() {
-            fulfill(Buffer.concat(chunks));
+            if (error) return reject(error);
+            else return fulfill(Buffer.concat(chunks));
         });
     });
 }
@@ -150,17 +155,19 @@ function mkdir(dir) {
     // Test if the directory exists
     return module.exports.ensureFileExists(dir)
     .catch(function(err) {
-        if (err && err.code === 'ENOENT') {
-            // Catch an error if when accessing a directory that doesn't exist
-            fs.mkdir(dir, function(err) {
-                // Then make said directory
-                if (err) return Promise.reject(err);
-                else return Promise.resolve(dir);
-            });
-        } else {
-            // Some other unexpected error
-            return Promise.reject(err);
-        }
+        return new Promise(function(fulfill, reject) {
+            if (err && err.code === 'ENOENT') {
+                // Catch an error if when accessing a directory that doesn't exist
+                fs.mkdir(dir, function(err) {
+                    // Then make said directory
+                    if (err) return reject(err);
+                    else return fulfill(dir);
+                });
+            } else {
+                // Some other unexpected error
+                return Promise.reject(err);
+            }
+        });
     }).then(function() {
         // lstat(2) our fd
         return lstat(dir);
