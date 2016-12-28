@@ -97,8 +97,17 @@ module.exports.equivalenciesForInstitution = function(institution, courses) {
         {$project: {
             _id: false,
             // Remove all institution references because it's a root value
-            'courses.temp_institution': 0,
-            'courses.equivalencies.institution': 0
+            institution: true,
+            'courses.number': true,
+            'courses.subject': true,
+            'courses._id': true,
+            'courses.equivalencies.input': true,
+            'courses.equivalencies.output': true
+
+            // MongoDB doesn't like excluding non-root _id fields, so we have to
+            // whitelist properties instead of blacklist them
+            // 'courses.temp_institution': 0,
+            // 'courses.equivalencies.institution': 0
         }}
     ]).toArray().then(function(docs) {
         return docs[0];
