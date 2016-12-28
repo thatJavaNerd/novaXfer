@@ -6,6 +6,7 @@ let util = require('../util.js');
 
 const subjectRegex = /^[A-Z]{3}$/i;
 const numberRegex = /^\d{3}$/i;
+const institutionRegex = /^[A-Z&]{2,3}$/;
 
 /** Gets all courses in a given subject */
 router.get('/subject/:subject', function(req, res, next) {
@@ -67,12 +68,57 @@ router.get('/institutions', function(req, res, next) {
     });
 });
 
+router.get('/institution/:institution/:courses', function(req, res, next) {
+    let institution = util.normalizeWhitespace(req.params.institution).toUpperCase();
+    if (!validateInstitutionAcronym(institution))
+        return next(new ParameterError('Malformed institution acronym', {'institution': institution}))
+
+    let coursesRaw = util.normalizeWhitespace(req.params.courses);
+    let coursesParts = coursesRaw.split(',');
+    let courses = [];
+
+    for (let i = 0; i < coursesParts.length; i++) {
+        let parts = util.normalizeWhitespace(coursesParts[i]).split(' ');
+
+        if (parts.length !== 2)
+            return next(new ParameterError('Malformed course', {
+                'courses': coursesRaw,
+                'parts': parts,
+                'index': i
+            }));
+
+        if (!validateSubject(parts[0]))
+            return next(new ParameterError('Malformed course subject', {
+                'courses': coursesRaw,
+                'parts': parts,
+                'index': i
+            }));
+
+        if (!validateNumber(parts[1]))
+            return next(new ParameterError('Malformed course number', {
+                'courses': coursesRaw,
+                'parts': parts,
+                'index': i
+            }));
+
+        courses.push({
+            subject: parts[0],
+            number: parts[1]
+        });
+    }
+
+    queries.equivalenciesForInstitution(institution, courses).then(function(data) {
+        res.json(data);
+    }).catch(function(err) {
+        return next(new GeneralApiError('Something went wrong'))
+    })
+});
+
 // Error handling
 router.use('/', function(err, req, res, next) {
     res.status(err.status || 500);
     res.send(err);
 });
-
 
 function validateSubject(subj) {
     return subjectRegex.test(subj);
@@ -80,6 +126,10 @@ function validateSubject(subj) {
 
 function validateNumber(num) {
     return numberRegex.test(num);
+}
+
+function validateInstitutionAcronym(inst) {
+    return institutionRegex.test(inst);
 }
 
 function GeneralApiError(reason, status = 400) {

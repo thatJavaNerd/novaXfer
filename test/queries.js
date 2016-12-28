@@ -10,9 +10,8 @@ describe('database queries', function() {
     before(function() {
         return db.connect(db.MODE_TEST).then(function() {
             return queries.dropIfExists('courses');
-        }).then(function() {
-            return queries.indexInstitutions();
-        }).then(function(report) {
+        }).then(queries.indexInstitutions)
+        .then(function(report) {
             assert.ok(report.institutionsIndexed > 0);
             // Usually around ~800 courses for every institution, having
             // less than that for all of our indexers combined is
@@ -37,5 +36,5 @@ describe('database queries', function() {
         it.skip('should return exactly one course', function() {
             return queries.equivalenciesForCourse('CSC', '202', ['CNU']);
         });
-    })
+    });
 })

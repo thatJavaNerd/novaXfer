@@ -58,6 +58,54 @@ module.exports.equivalenciesForCourse = function(courseSubject, courseNumber, in
     });
 };
 
+/**
+ * Find all listed courses that have equivalencies at the given institution.
+ *
+ * @param institution The institution's acronym (GMU, VCU, etc)
+ * @param courses Array of objects containing two keys: `subject` and `number`
+ */
+module.exports.equivalenciesForInstitution = function(institution, courses) {
+    // Create an array of filters to pass to $or
+    let courseMatch = [];
+    for (let c of courses) {
+        courseMatch.push({subject: c.subject, number: c.number});
+    }
+
+    return db.mongo().collection(COLL_COURSES).aggregate([
+        {$match: { $or: courseMatch }},
+        // Break down equivalencies array
+        {$unwind: '$equivalencies'},
+        // Filter array so we only match GMU equivalencies
+        {$match: {'equivalencies.institution': institution}},
+        // Reassemble the equivalency
+        {$group: {
+            _id: '$_id',
+            // Store institution as a temporary value that way it gets
+            // evaluated as a string rather than an array during the next
+            // $group
+            temp_institution: {$first: '$equivalencies.institution'},
+            number: {$first: '$number'},
+            subject: {$first: '$subject'},
+            equivalencies: {$push: '$equivalencies'}
+        }},
+        {$group: {
+            // Group all resulting documents together
+            _id: null,
+            institution: {$first: '$temp_institution'},
+            // Push each original document as a subdocument of 'courses'
+            courses: {$push: '$$ROOT'}
+        }},
+        {$project: {
+            _id: false,
+            // Remove all institution references because it's a root value
+            'courses.temp_institution': 0,
+            'courses.equivalencies.institution': 0
+        }}
+    ]).toArray().then(function(docs) {
+        return docs[0];
+    });
+}
+
 module.exports.listInstitutions = function() {
     return db.mongo().collection(COLL_INSTITUTIONS).find().sort({ acronym: 1 }).toArray();
 };
@@ -97,7 +145,7 @@ module.exports.dropIfExists = function(collection) {
 function upsertEquivalency(eq) {
     return new Promise(function(fulfill, reject) {
         var coll = db.mongo().collection(COLL_COURSES);
-        coll.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
+        return coll.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
             {
                 // Add to equivalencies array if it doesn't already exist
                 $addToSet: {
