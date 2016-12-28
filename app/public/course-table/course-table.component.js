@@ -16,8 +16,9 @@ angular.module('courseTable')
             // Used to validate course inputs. Lenient about spaces and case
             this.courseRegex = /^ *[A-Z]{3} +[0-9]{3} *$/i;
 
-            // 2D array representing table data
-            this.data = [];
+            // 2D array representing table data. Initialize it with two empty
+            // cells on the first row
+            this.data = [[{}, {}]];
 
             // List of all API-provided institutions
             this.availableInstitutions = [];
@@ -67,6 +68,8 @@ angular.module('courseTable')
                                 self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv));
                             }
                         }
+
+                        self.fillEmptyCellsInRow(rowIndex);
                     }
                 }).catch(function(err) {
                     // TODO
@@ -115,11 +118,28 @@ angular.module('courseTable')
 
             this.addInstitution = function() {
                 this.institutions.push('');
+                this.fillEmptyCellsInColumn(this.institutions.length - 1);
             };
 
             this.addInputCourse = function() {
                 this.input.push(null);
+                this.fillEmptyCellsInRow(this.input.length - 1);
             };
+
+            this.fillEmptyCellsInRow = function(rowIndex) {
+                if (!self.data[rowIndex])
+                    self.data[rowIndex] = [];
+                // Fill in with blank data
+                for (let j = 0; j < self.institutions.length; j++)
+                    if (!self.data[rowIndex][j])
+                        self.data[rowIndex][j] = []
+            };
+
+            this.fillEmptyCellsInColumn = function(columnIndex) {
+                for (let j = 0; j < self.input.length; j++)
+                    if (!self.data[j][columnIndex])
+                        self.data[j][columnIndex] = [];
+            }
 
             this.joinValidInstitutions = function() {
                 // Avoid bad API calls when empty cells are present
@@ -192,6 +212,14 @@ angular.module('courseTable')
                     // Form scope hasn't been registered yet
                     if (!inputElement)
                         break;
+
+                    if (inputElement.$invalid) {
+                        self.data[i] = [];
+                        for (let j = 0; j < self.institutions.length; j++)
+                            self.data[i].push([]);
+                        self.displayedInput[i] = null;
+                        continue;
+                    }
 
                     // $modelValue is only set when it's valid
                     if (!inputElement.$modelValue)
