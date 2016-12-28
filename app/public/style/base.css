@@ -17,10 +17,19 @@ body {
 header {
     width: 100%;
     min-height: 100px;
+    background-color: #0C6E40;
+    text-align: center;
     font-size: 7em;
     font-family: 'Slabo 27px', serif;
-    background-color: #0C6E40;
+}
+
+header > a {
     color: #fff;
+}
+
+header > a:hover {
+    color: #fff;
+    text-decoration: none;
 }
 
 .footer {
