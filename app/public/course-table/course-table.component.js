@@ -33,12 +33,17 @@ angular.module('courseTable')
              * Copied from app/util.js
              *
              * Replaces all sequences of new line, nbsp, and space characters with a
-             * single space.
+             * single space and trims.
              */
             this.normalizeWhitespace = function(text) {
                 return text.replace(new RegExp(`(?:\r\n|\r|\n|${self.nbsp}| )+`, 'g'), ' ').trim();
             };
 
+            /**
+             * Displays the data from /api/course/:courses/:institution where
+             * :courses is course located at input[rowIndex] and :institutions
+             * is a comma-separated list of selected institutions.
+             */
             this.populateRow = function(rowIndex) {
                 let url = '/api/course/' +
                         encodeURIComponent(self.displayedInput[rowIndex]) +
@@ -61,7 +66,7 @@ angular.module('courseTable')
 
                         if (!(institution in groupedEquivs)) {
                             // No equivalencies found
-                            self.data[rowIndex][columnIndex] = [{danger: true}]
+                            self.data[rowIndex][columnIndex] = [self.prepareUnknownEquivalency()]
                         } else {
                             let equivs = groupedEquivs[institution];
 
@@ -80,6 +85,12 @@ angular.module('courseTable')
                 });
             };
 
+            /**
+             * Populates a column with data from
+             * /api/institution/:institution/:courses where :institution is the
+             * value at displayedInstitutions[columnIndex] and :courses is a
+             * comma-separated list of courses from displayedInput
+             */
             this.populateColumn = function(columnIndex) {
                 let joinedCourses = self.joinValidCourses();
                 if (!joinedCourses)
@@ -100,9 +111,14 @@ angular.module('courseTable')
 
                         let rowIndex = _.findIndex(self.input, o => o && o.toUpperCase() === course.toUpperCase());
 
-                        let equivalencyList = _.find(data.courses, c => c.subject + ' ' + c.number === self.normalizeWhitespace(course));
+                        // Find the appropriate equivalency list for the course
+                        // from the data
+                        let equivalencyList = _.find(data.courses,
+                            c => c.subject + ' ' + c.number === self.normalizeWhitespace(course));
+
                         if (!equivalencyList) {
-                            self.data[rowIndex][columnIndex] = [{danger: true}];
+                            // No equivalencies for this couse
+                            self.data[rowIndex][columnIndex] = [self.prepareUnknownEquivalency()];
                         } else {
                             equivalencyList = equivalencyList.equivalencies;
 
@@ -119,16 +135,22 @@ angular.module('courseTable')
                 });
             };
 
+            /** Adds another <select> to choose an institution */
             this.addInstitution = function() {
                 this.institutions.push('');
                 this.fillEmptyCellsInColumn(this.institutions.length - 1);
             };
 
+            /** Adds another <input> for course entry */
             this.addInputCourse = function() {
                 this.input.push(null);
                 this.fillEmptyCellsInRow(this.input.length - 1);
             };
 
+            /**
+             * Populates undefined cells in data[rowIndex] with an empty array
+             * so that Angular renders an empty cell
+             */
             this.fillEmptyCellsInRow = function(rowIndex) {
                 if (!self.data[rowIndex])
                     self.data[rowIndex] = [];
@@ -138,27 +160,49 @@ angular.module('courseTable')
                         self.data[rowIndex][j] = []
             };
 
+            /** Column version of fillEmptyCellsInRow() */
             this.fillEmptyCellsInColumn = function(columnIndex) {
                 for (let j = 0; j < self.input.length; j++)
                     if (!self.data[j][columnIndex])
                         self.data[j][columnIndex] = [];
             }
 
+            /**
+             * Join non-empty institutions by a comma to avoid bad API calls
+             * when empty cells are present
+             */
             this.joinValidInstitutions = function() {
-                // Avoid bad API calls when empty cells are present
                 return _.join(_.filter(this.institutions, o => o.trim() !== ''));
             };
 
+            /** Input version of joinValidInstitutions() */
             this.joinValidCourses = function() {
                 return _.join(_.filter(this.displayedInput, o => o && o.trim() !== ''));
             }
 
+            /**
+             * Transforms an equivalency to a format that is expected by the
+             * template. Resulting object contains two entries.
+             *
+             * 1. 'muted': The equivalencies input array but with the first
+             *     course dropped. Displayed with a 'text-muted' CSS class,
+             *     hence the name.
+             * 2. 'normal': All output courses
+             */
             this.prepareEquivalency = function(equiv) {
                 return {
                     muted: this.formatCourseArray(_.drop(equiv.input)),
                     normal: this.formatCourseArray(equiv.output)
                 };
             };
+
+            /**
+             * Returns {danger: true}. Used by the template to detect when a
+             * course has no equivalencies.
+             */
+            this.prepareUnknownEquivalency = function() {
+                return {danger: true};
+            }
 
             this.formatCourseArray = function(courses) {
                 return _.join(_.map(courses, c => c.subject + ' ' + c.number), ', ');
@@ -167,6 +211,14 @@ angular.module('courseTable')
             this.inputName = function(index) { return 'input' + index; };
             this.selectName = function(index) { return 'institution' + index; };
 
+            /**
+             * Create an object that can be passed to ngClass
+             *
+             * @param form The table form from course-table.template.pug
+             * @param index The index of the <input> within the form
+             * @param dangerClass The name of the class to applied for an error
+             * @param warningClass The name of the class to applied for a warning
+             */
             let createStylesObject = function(form, index, dangerClass, warningClass) {
                 let styles = {};
                 let control = form[self.inputName(index)];
@@ -184,15 +236,16 @@ angular.module('courseTable')
             }
 
             /**
-             * Create an object that can be passed to ngClass
-             *
-             * @param form The table form from course-table.template.pug
-             * @param index The index of the <input> within the form
+             * Creates a styles object using createStylesObject() for <input>
+             * elements.
              */
             this.createInputStyleObject = function(form, index) {
                 return createStylesObject(form, index, 'has-error', 'has-warning')
             }
 
+            /**
+             * createInputStyleObject() but for <tr> elements
+             */
             this.createRowStyleObject = function(form, index) {
                 return createStylesObject(form, index, 'danger', 'warning')
             }
@@ -203,6 +256,8 @@ angular.module('courseTable')
                 self.institutions = [self.availableInstitutions[0].acronym, ''];
             });
 
+            // Deep-watch input courses to populate a row when a course
+            // becomes valid
             $scope.$watchCollection('$ctrl.input', function(newVal, oldVal) {
                 // Form scope hasn't been registered yet
                 if (!$scope.tableForm)
@@ -237,6 +292,8 @@ angular.module('courseTable')
                 }
             });
 
+            // Do the same as the previous $watchCollection, but for
+            // institutions and columns
             $scope.$watchCollection('$ctrl.institutions', function(newVal, oldVal) {
                 // No scope registered yet
                 if (!$scope.tableForm)
