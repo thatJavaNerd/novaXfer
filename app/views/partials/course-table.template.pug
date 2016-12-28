@@ -1,4 +1,6 @@
 div.container
+    p.text-danger.text-center(ng-show='$ctrl.criticalError'): strong {{$ctrl.criticalError}}
+
     form(name='tableForm' novalidate): table.table
         tr
             th.table-header NVCC

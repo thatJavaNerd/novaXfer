@@ -4,6 +4,9 @@ angular.module('courseTable')
         controller: ['$scope', '$http', '$q', function CourseTableController($scope, $http, $q) {
             let self = this;
 
+            // Set when an unexpted error occurs
+            this.criticalError = null;
+
             // Create as empty arrays so that one input will be created for the
             // user to start off with
             this.institutions = [''];
@@ -72,7 +75,7 @@ angular.module('courseTable')
                         self.fillEmptyCellsInRow(rowIndex);
                     }
                 }).catch(function(err) {
-                    // TODO
+                    $ctrl.criticalError = 'Unable to complete the request'
                     console.error(err);
                 });
             };
@@ -111,7 +114,7 @@ angular.module('courseTable')
                         }
                     }
                 }).catch(function(err) {
-                    // TODO
+                    $ctrl.criticalError = 'Unable to complete the request'
                     console.error(err);
                 });
             };
