@@ -15,7 +15,11 @@ module.exports = function(grunt) {
             }
         },
         jshint: {
-            all: ['app/**/*.js'],
+            all: [
+                'Gruntfile.js',
+                'app/**/*.js',
+                '!app/public/bower_components/**/*.js'
+            ],
             options: {
                 // ECMAScript version 6
                 esversion: 6
@@ -27,10 +31,11 @@ module.exports = function(grunt) {
         'mocha-test',
         'contrib-jshint',
         'run'
-    ]
+    ];
+    
     for (var i = 0; i < tasks.length; i++) {
         grunt.loadNpmTasks(`grunt-${tasks[i]}`);
     }
 
     grunt.registerTask('default', ['mochaTest']);
-}
+};

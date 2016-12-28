@@ -9,7 +9,7 @@ angular.module('singleCourseLookup')
             this.requestEquiv = function() {
                 var self = this;
 
-                var url = `/api/course/${encodeURIComponent(this.course)}/${encodeURIComponent(this.institution)}`
+                var url = `/api/course/${encodeURIComponent(this.course)}/${encodeURIComponent(this.institution)}`;
                 $http.get(url).then(function(data) {
                     self.result = data.data;
                     self.error = null;
@@ -17,6 +17,6 @@ angular.module('singleCourseLookup')
                     self.error = err.data.reason;
                     self.result = null;
                 });
-            }
+            };
         }]
     });

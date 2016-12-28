@@ -46,7 +46,7 @@ router.get('/course/:course/:institutions', function(req, res, next) {
 
     let number = courseParts[1];
     if (!validateNumber(number))
-        return next(new ParameterError('Malformed course number', {'course': course}))
+        return next(new ParameterError('Malformed course number', {'course': course}));
 
     let institutions = institutionsRaw.split(',');
 
@@ -71,7 +71,7 @@ router.get('/institutions', function(req, res, next) {
 router.get('/institution/:institution/:courses', function(req, res, next) {
     let institution = util.normalizeWhitespace(req.params.institution).toUpperCase();
     if (!validateInstitutionAcronym(institution))
-        return next(new ParameterError('Malformed institution acronym', {'institution': institution}))
+        return next(new ParameterError('Malformed institution acronym', {'institution': institution}));
 
     let coursesRaw = util.normalizeWhitespace(req.params.courses);
     let coursesParts = coursesRaw.split(',');
@@ -110,8 +110,8 @@ router.get('/institution/:institution/:courses', function(req, res, next) {
     queries.equivalenciesForInstitution(institution, courses).then(function(data) {
         res.json(data);
     }).catch(function(err) {
-        return next(new GeneralApiError('Something went wrong'))
-    })
+        return next(new GeneralApiError('Something went wrong'));
+    });
 });
 
 // Error handling

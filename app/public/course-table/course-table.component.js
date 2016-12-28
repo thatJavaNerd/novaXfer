@@ -66,7 +66,7 @@ angular.module('courseTable')
 
                         if (!(institution in groupedEquivs)) {
                             // No equivalencies found
-                            self.data[rowIndex][columnIndex] = [self.prepareUnknownEquivalency()]
+                            self.data[rowIndex][columnIndex] = [self.prepareUnknownEquivalency()];
                         } else {
                             let equivs = groupedEquivs[institution];
 
@@ -80,7 +80,7 @@ angular.module('courseTable')
                         self.fillEmptyCellsInRow(rowIndex);
                     }
                 }).catch(function(err) {
-                    $ctrl.criticalError = 'Unable to complete the request'
+                    $ctrl.criticalError = 'Unable to complete the request';
                     console.error(err);
                 });
             };
@@ -103,18 +103,27 @@ angular.module('courseTable')
                 $http.get(url).then(function(data) {
                     data = data.data;
 
+                    // Make JSHint happy by not directly making functions in a loop
+                    let findIndexCallback = function(course) {
+                        return o => o && o.toUpperCase() === course.toUpperCase();
+                    };
+
+                    let findEquivListCallback = function(course) {
+                        return c => c.subject + ' ' + c.number === self.normalizeWhitespace(course);
+                    };
+
                     for (let i = 0; i < self.displayedInput.length; i++) {
                         let course = self.displayedInput[i];
                         // Hasn't been filled out yet
                         if (!course)
                             continue;
 
-                        let rowIndex = _.findIndex(self.input, o => o && o.toUpperCase() === course.toUpperCase());
+                        let rowIndex = _.findIndex(self.input, findIndexCallback(course));
 
                         // Find the appropriate equivalency list for the course
                         // from the data
-                        let equivalencyList = _.find(data.courses,
-                            c => c.subject + ' ' + c.number === self.normalizeWhitespace(course));
+                        let equivalencyList = _.find(data.courses, findEquivListCallback(course));
+
 
                         if (!equivalencyList) {
                             // No equivalencies for this couse
@@ -130,7 +139,7 @@ angular.module('courseTable')
                         }
                     }
                 }).catch(function(err) {
-                    $ctrl.criticalError = 'Unable to complete the request'
+                    $ctrl.criticalError = 'Unable to complete the request';
                     console.error(err);
                 });
             };
@@ -157,7 +166,7 @@ angular.module('courseTable')
                 // Fill in with blank data
                 for (let j = 0; j < self.institutions.length; j++)
                     if (!self.data[rowIndex][j])
-                        self.data[rowIndex][j] = []
+                        self.data[rowIndex][j] = [];
             };
 
             /** Column version of fillEmptyCellsInRow() */
@@ -165,7 +174,7 @@ angular.module('courseTable')
                 for (let j = 0; j < self.input.length; j++)
                     if (!self.data[j][columnIndex])
                         self.data[j][columnIndex] = [];
-            }
+            };
 
             /**
              * Join non-empty institutions by a comma to avoid bad API calls
@@ -191,8 +200,8 @@ angular.module('courseTable')
                             ), o => o && o !== ''
                         )
                     )
-                )
-            }
+                );
+            };
 
             /**
              * Transforms an equivalency to a format that is expected by the
@@ -216,7 +225,7 @@ angular.module('courseTable')
              */
             this.prepareUnknownEquivalency = function() {
                 return {danger: true};
-            }
+            };
 
             this.formatCourseArray = function(courses) {
                 return _.join(_.map(courses, c => `${c.subject} ${c.number} (${self.formatCredits(c.credits)} credits)`), ', ');
@@ -225,7 +234,7 @@ angular.module('courseTable')
             this.formatCredits = function(credits) {
                 if (credits === -1 || credits === -2) return '?';
                 return credits;
-            }
+            };
 
             this.inputName = function(index) { return 'input' + index; };
             this.selectName = function(index) { return 'institution' + index; };
@@ -252,22 +261,22 @@ angular.module('courseTable')
                     }
                 }
                 return styles;
-            }
+            };
 
             /**
              * Creates a styles object using createStylesObject() for <input>
              * elements.
              */
             this.createInputStyleObject = function(form, index) {
-                return createStylesObject(form, index, 'has-error', 'has-warning')
-            }
+                return createStylesObject(form, index, 'has-error', 'has-warning');
+            };
 
             /**
              * createInputStyleObject() but for <tr> elements
              */
             this.createRowStyleObject = function(form, index) {
-                return createStylesObject(form, index, 'danger', 'warning')
-            }
+                return createStylesObject(form, index, 'danger', 'warning');
+            };
 
             // Dynamically get a list of all institutions
             $http.get('/api/institutions').then(function(data) {
@@ -341,14 +350,14 @@ angular.module('courseTable')
             // Automatically add new input rows when the last <input> has text
             $scope.$watch(function() {
                 // Find the last <input> available in the form
-                if (self.input.length === 0) return 'NO INPUTS';
+                if (self.input.length === 0) return undefined;
                 let input = $scope.tableForm[self.inputName(self.input.length - 1)];
                 if (!input) return undefined;
 
                 // Use $$lastCommittedViewValue rather than $viewValue because
                 // $viewValue has to pass through validation before it gets set,
                 // we care about the raw input.
-                return input['$$lastCommittedViewValue'];
+                return input.$$lastCommittedViewValue;
             }, function(newVal, oldVal) {
                 if (!newVal)
                     return;
@@ -358,6 +367,6 @@ angular.module('courseTable')
                 if ((oldVal === '' || oldVal === null) && newVal !== '') {
                     self.addInputCourse();
                 }
-            })
+            });
         }],
     });

@@ -66,7 +66,7 @@ function parseEquivalencies(rows) {
                 wmData = findGeneratorElement(partialMatch, rows[i + 1], wmPartsRegex);
         }
 
-        if (!wmData) throw `No wmData for rows[${i}]=${rows[i]}`
+        if (!wmData) throw `No wmData for rows[${i}]=${rows[i]}`;
 
         let wmMatrix = parseWmCourseMatrix(wmData);
         for (let wm of wmMatrix)
@@ -149,4 +149,4 @@ function parseWmCourseMatrix(raw) {
 module.exports = {
     institution: institution,
     findAll: findAll
-}
+};

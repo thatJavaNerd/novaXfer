@@ -118,7 +118,7 @@ module.exports.equivalenciesForInstitution = function(institution, courses) {
         }
         return docs[0];
     });
-}
+};
 
 module.exports.listInstitutions = function() {
     return db.mongo().collection(COLL_INSTITUTIONS).find().sort({ acronym: 1 }).toArray();
