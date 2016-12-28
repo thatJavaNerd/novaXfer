@@ -7,21 +7,29 @@ describe('database queries', function() {
     // This might take a while...
     this.timeout(30000);
 
-    before(function() {
-        return db.connect(db.MODE_TEST).then(function() {
-            return queries.dropIfExists('courses');
-        }).then(queries.indexInstitutions)
-        .then(function(report) {
-            assert.ok(report.institutionsIndexed > 0);
-            // Usually around ~800 courses for every institution, having
-            // less than that for all of our indexers combined is
-            // generally a good indication that something is wrong
-            assert.ok(report.coursesIndexed / report.institutionsIndexed > 800);
+    before(function mongoConnect() {
+        // In a perfect world we'd also indexInstitutions() before every test
+        // but 1) ain't nobody got time for that and 2) these are all read-only
+        // functions
+        return db.connect(db.MODE_TEST);
+    })
+
+    describe('#indexInstitutions', function() {
+        it('should provide a healthy average of courses per institution', function() {
+            return queries.dropIfExists('courses')
+            .then(queries.indexInstitutions)
+            .then(function(report) {
+                assert.ok(report.institutionsIndexed > 0);
+                // Usually around ~800 courses for every institution, having
+                // less than that for all of our indexers combined is
+                // generally a good indication that something is wrong
+                assert.ok(report.coursesIndexed / report.institutionsIndexed > 800);
+            });
         });
     });
 
     describe('#coursesInSubject', function() {
-        it.skip('should return courses in only one subject', function() {
+        it('should return courses in only one subject', function() {
             var subj = 'acc';
             return queries.coursesInSubject(subj).then(function(docs) {
                 assert.ok(docs.length > 0, 'returned no documents');
@@ -33,7 +41,7 @@ describe('database queries', function() {
     });
 
     describe('#equivalenciesForCourse', function() {
-        it.skip('should return exactly one course', function() {
+        it('should return exactly one course', function() {
             return queries.equivalenciesForCourse('CSC', '202', ['CNU']);
         });
     });

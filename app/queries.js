@@ -126,7 +126,7 @@ module.exports.indexInstitutions = function() {
     }).then(function(result) {
         indexReport = result;
         // Then add those equivalencies to the database
-        return Promise.all(result.equivalencies.map(equivs => equivs.map(eq => upsertEquivalency(eq))));
+        return bulkUpsert(result.equivalencies);
     }).then(function(result) {
         return indexReport;
     });
@@ -142,27 +142,33 @@ module.exports.dropIfExists = function(collection) {
     });
 };
 
-function upsertEquivalency(eq) {
-    return new Promise(function(fulfill, reject) {
-        var coll = db.mongo().collection(COLL_COURSES);
-        return coll.updateOne({number: eq.keyCourse.number, subject: eq.keyCourse.subject},
-            {
-                // Add to equivalencies array if it doesn't already exist
-                $addToSet: {
-                    equivalencies: {
-                        "institution": eq.institution.acronym,
-                        "input": eq.input,
-                        "output": eq.output
-                    }
+function bulkUpsert(equivalenciesByInstitution) {
+    let operations = [];
+    for (let institution of equivalenciesByInstitution) {
+        for (let eq of institution) {
+            operations.push({
+                updateOne: {
+                    filter: {
+                        number: eq.keyCourse.number,
+                        subject: eq.keyCourse.subject
+                    },
+                    update: {
+                        // Add to equivalencies array if it doesn't already exist
+                        $addToSet: {
+                            equivalencies: {
+                                "institution": eq.institution.acronym,
+                                "input": eq.input,
+                                "output": eq.output
+                            }
+                        }
+                    },
+                    upsert: true
                 }
-            },
-            {upsert: true},
-            function(err, result) {
-                if (err) reject(err);
-                else fulfill(result);
-            }
-        );
-    });
+            });
+
+        }
+    }
+    return db.mongo().collection(COLL_COURSES).bulkWrite(operations);
 }
 
 function upsertInstitutions(institutions, done) {
