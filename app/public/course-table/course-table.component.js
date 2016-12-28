@@ -317,5 +317,27 @@ angular.module('courseTable')
                     }
                 }
             });
+
+            // Automatically add new input rows when the last <input> has text
+            $scope.$watch(function() {
+                // Find the last <input> available in the form
+                if (self.input.length === 0) return 'NO INPUTS';
+                let input = $scope.tableForm[self.inputName(self.input.length - 1)];
+                if (!input) return undefined;
+
+                // Use $$lastCommittedViewValue rather than $viewValue because
+                // $viewValue has to pass through validation before it gets set,
+                // we care about the raw input.
+                return input['$$lastCommittedViewValue'];
+            }, function(newVal, oldVal) {
+                if (!newVal)
+                    return;
+
+                // oldVal will either be null or an empty string when the
+                // new course needs to be created
+                if ((oldVal === '' || oldVal === null) && newVal !== '') {
+                    self.addInputCourse();
+                }
+            })
         }],
     });
