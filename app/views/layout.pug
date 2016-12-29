@@ -14,17 +14,17 @@ html(ng-app='novaxfer')
 
         block scripts
             script(src='/bower_components/jquery/dist/jquery.min.js')
-            script(src='https://www.promisejs.org/polyfills/promise-7.0.4.min.js')
 
 
     body
         block header
             header: a.text-center(href='/') novaXfer
 
-        block content
+        main
+            block content
 
         block footer
-            footer.footer
+            footer
               div.container
                 span.text-muted
                  | Copyright (c) Matthew Dean 2017
