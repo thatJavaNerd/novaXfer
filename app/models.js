@@ -3,12 +3,7 @@ module.exports = {
     Course: function Course(subject, number, credits) {
         this.subject = subject;
         this.number = number;
-        if (credits !== undefined)
-            this.credits = credits;
-
-        this.stripCredits = function() {
-            return new Course(subject, number);
-        };
+        this.credits = credits;
     },
     /**
      * Creates a new CourseEquivalency.
@@ -17,11 +12,13 @@ module.exports = {
      *                  and number, no credits
      * @param input Array of courses from NVCC
      * @param output Array of ocurses from `institution`
+     * @param type Equivalency type. Must be a value specified by models.TYPE_*
      */
-    CourseEquivalency: function CourseEquivalency(input, output) {
-        this.keyCourse = input[0].stripCredits();
+    CourseEquivalency: function CourseEquivalency(input, output, type) {
+        this.keyCourse = new module.exports.Course(input[0].subject, input[0].number);
         this.input = input;
-        this.output = output;
+        this.output = output
+        this.type = type;
     },
     EquivalencyContext: function EquivalencyContext(institution, equivalencies) {
         this.institution = institution;
