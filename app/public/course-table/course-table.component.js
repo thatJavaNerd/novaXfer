@@ -247,7 +247,7 @@ angular.module('courseTable')
                 };
 
                 return _.join(_.map(courses, c => {
-                    return `${primaryClause(c)} (${secondaryCluase(c.credits)})`
+                    return `${primaryClause(c)} (${secondaryCluase(c.credits)})`;
                 }), ', ');
             };
 
