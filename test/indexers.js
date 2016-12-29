@@ -148,5 +148,5 @@ function validateCreditRange(course, courseSpecifier) {
 function validateType(type, json) {
     assert.ok(type, 'Missing type: ' + json)
     assert.ok(type === models.TYPE_DIRECT || type === models.TYPE_GENERIC ||
-        type === models.TYPE_NONE, `Invalid type: '${type}': ${json}`);
+        type === models.TYPE_NONE || type === models.TYPE_SPECIAL, `Invalid type: '${type}': ${json}`);
 }
