@@ -2,9 +2,19 @@ angular.module('singleCourseLookup')
     .component('singleCourseLookup', {
         templateUrl: '/partial/scl',
         controller: ['$http', function SclController($http) {
+            let self = this;
+
             this.course = 'ACC 211';
             this.institution = 'GMU';
             this.result = null;
+
+            this.availableInstitutions = [];
+
+            // Dynamically get a list of all institutions
+            $http.get('/api/institutions').then(function(data) {
+                self.availableInstitutions = data.data;
+                self.institutions = [self.availableInstitutions[0].acronym, ''];
+            });
 
             this.requestEquiv = function() {
                 var self = this;
@@ -18,5 +28,10 @@ angular.module('singleCourseLookup')
                     self.result = null;
                 });
             };
+
+            // Dynamically get a list of all institutions
+            $http.get('/api/institutions').then(function(data) {
+                self.availableInstitutions = data.data;
+            });
         }]
     });

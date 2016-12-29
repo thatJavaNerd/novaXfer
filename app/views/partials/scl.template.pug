@@ -3,7 +3,10 @@ div.container-fluid#big-question
         | Will
         input(ng-model='$ctrl.course', size='3', course-validator)
         | transfer to
-        input(ng-model='$ctrl.institution', size='1')
+        select(
+            ng-model='$ctrl.institution'
+            ng-options='inst.acronym as inst.acronym for inst in $ctrl.availableInstitutions'
+        )
         |?
     button#find-equivalencies.btn.btn-default(ng-click='$ctrl.requestEquiv()') Find
 
