@@ -1,14 +1,15 @@
 div.container-fluid#big-question
-    div
-        | Will
-        input(ng-model='$ctrl.course', size='3', course-validator)
-        | transfer to
-        select(
-            ng-model='$ctrl.institution'
-            ng-options='inst.acronym as inst.acronym for inst in $ctrl.availableInstitutions'
-        )
-        |?
-    button#find-equivalencies.btn.btn-default(ng-click='$ctrl.requestEquiv()') Find
+    form.form-inline
+        div
+            | Will
+            input.form-control(ng-model='$ctrl.course', size='3', course-validator)
+            | transfer to
+            select.form-control(
+                ng-model='$ctrl.institution'
+                ng-options='inst.acronym as inst.acronym for inst in $ctrl.availableInstitutions'
+            )
+            |?
+        button#find-equivalencies.btn.btn-default(ng-click='$ctrl.requestEquiv()') Find
 
 div.container
     div.equivalency-block(ng-repeat="equivalency in $ctrl.result.equivalencies")
