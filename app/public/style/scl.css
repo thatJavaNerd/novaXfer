@@ -23,3 +23,8 @@ div.equivalency-block {
 div.equivalency-block h2 {
     margin-top: 0;
 }
+
+div.no-results {
+    margin: 15px 0;
+    text-align: center;
+}

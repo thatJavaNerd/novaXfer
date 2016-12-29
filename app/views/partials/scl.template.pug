@@ -29,3 +29,6 @@ div.container
         span.glyphicon.glyphicon-arrow-down
         div.course-set-block
             p(ng-repeat="output in equivalency.output") {{output.subject}} {{output.number}} ({{output.credits}} credits)
+                
+div.no-results(ng-show="$ctrl.result && $ctrl.result.equivalencies.length === 0")
+    p.text-muted There's nothing here ¯\_(ツ)_/¯
