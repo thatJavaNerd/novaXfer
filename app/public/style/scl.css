@@ -11,7 +11,7 @@ input.form-control, select.form-control {
     font-size: 1em;
 }
 
-div.container,.container-fluid {
+main div.container,.container-fluid {
     margin: 20px auto;
 }
 
