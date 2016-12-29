@@ -1,15 +1,25 @@
 div.container-fluid#big-question
-    form.form-inline
+    form(name='sclForm').form-inline
         div
             | Will
-            input.form-control(ng-model='$ctrl.course', size='3', course-validator)
+            span(ng-class='$ctrl.createCourseStyleObject()')
+                input.form-control(
+                    type='text'
+                    placeholder='CSC 202'
+                    name='course'
+                    size='3',
+                    required
+                    ng-model='$ctrl.course'
+                    ng-pattern='$ctrl.courseRegex'
+                )
             | transfer to
             select.form-control(
+                name='institution'
                 ng-model='$ctrl.institution'
                 ng-options='inst.acronym as inst.acronym for inst in $ctrl.availableInstitutions'
+                required
             )
             |?
-        button#find-equivalencies.btn.btn-default(ng-click='$ctrl.requestEquiv()') Find
 
 div.container
     div.equivalency-block(ng-repeat="equivalency in $ctrl.result.equivalencies")
@@ -19,4 +29,3 @@ div.container
         span.glyphicon.glyphicon-arrow-down
         div.course-set-block
             p(ng-repeat="output in equivalency.output") {{output.subject}} {{output.number}} ({{output.credits}} credits)
-    p.text-danger(ng-show="$ctrl.error") {{$ctrl.error}}
