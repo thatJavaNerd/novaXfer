@@ -10,6 +10,9 @@ const headerRows = 2;
 const nvccIndex = 1; // CSS queries are 1-indexed
 const uvaIndex = 2;
 
+// Used when the college doens't accept equivalencies for a NVCC course
+const COURSE_NO_EQUIV = new models.Course('NONE', '000', 0);
+
 function findAll(done) {
     return request(dataUrl, institution).then(parseEquivalencies);
 }
@@ -55,6 +58,8 @@ function parseEquivalencies(body) {
             }
         }
 
+        eq.type = determineEquivType(eq.output);
+
         equivalencies.push(eq);
     });
 
@@ -67,7 +72,7 @@ function parseCourse($tr, index) {
     if (baseStr === '(no credit)') {
         // UVA doesn't offer credit for this course, make up our own
         // course number
-        return new models.Course("NONE", "000", 0);
+        return COURSE_NO_EQUIV;
     }
 
     // Business as usual
@@ -106,6 +111,16 @@ function getRowType($tr) {
     if (nvccColumn === '' && uvaColumn !== '')
         return 'output';
     return 'unknown';
+}
+
+function determineEquivType(uvaCourses) {
+    if (uvaCourses[0].subject === COURSE_NO_EQUIV.subject &&
+            uvaCourses[0].number === COURSE_NO_EQUIV.number) {
+
+        return models.TYPE_NONE;
+    }
+
+    return util.determineEquivType(uvaCourses, 'T');
 }
 
 module.exports.findAll = findAll;

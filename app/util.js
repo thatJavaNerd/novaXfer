@@ -1,4 +1,5 @@
 var db = require('./database.js');
+var models = require('./models.js');
 var request = require('request');
 var nbsp = String.fromCharCode(160);
 var fs = require('fs');
@@ -87,6 +88,21 @@ module.exports = {
         }
 
         return credits;
+    },
+    /** Returns true if at least one of the courses ends with numberEnding */
+    determineEquivType: function(courses, numberEnding = 'XX') {
+        if (!courses)
+            throw new Error('No courses passed');
+
+        let containsGeneric = false;
+        for (let course of courses) {
+            if (course.number.endsWith(numberEnding)) {
+                containsGeneric = true;
+                break;
+            }
+        }
+
+        return containsGeneric ? models.TYPE_GENERIC : models.TYPE_DIRECT;
     },
     parsePdf: function(buffer) {
         return new Promise(function(fulfill, reject) {

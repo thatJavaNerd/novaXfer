@@ -172,6 +172,7 @@ function bulkUpsert(equivalencyContexts) {
                         $addToSet: {
                             equivalencies: {
                                 "institution": institution.acronym,
+                                "type": eq.type,
                                 "input": eq.input,
                                 "output": eq.output
                             }

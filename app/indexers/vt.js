@@ -50,7 +50,7 @@ function parseEquivalencies(body) {
             entry.gsx$vccscredits.$t
         );
 
-        var equiv = new models.CourseEquivalency(nvccCourses, vtCourses);
+        var equiv = new models.CourseEquivalency(nvccCourses, vtCourses, util.determineEquivType(vtCourses));
 
         equivalencies.push(equiv);
     }

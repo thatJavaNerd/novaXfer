@@ -34,7 +34,8 @@ function parseEquivalencies(body) {
 
         for (let input of inputMatrix) {
             for (let output of outputMatrix) {
-                equivalencies.push(new models.CourseEquivalency(input, output));
+                equivalencies.push(
+                    new models.CourseEquivalency(input, output, util.determineEquivType(output)));
             }
         }
     });

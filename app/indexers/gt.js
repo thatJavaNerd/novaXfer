@@ -1,7 +1,8 @@
-var request = require('../util.js').request;
 var cheerio = require('cheerio');
 var models = require('../models.js');
-var normalizeWhitespace = require('../util.js').normalizeWhitespace;
+var util = require('../util.js');
+var request = util.request;
+var normalizeWhitespace = util.normalizeWhitespace;
 
 const dataUrl = 'https://oscar.gatech.edu/pls/bprod/wwsktrna.P_find_subj_levl_classes';
 
@@ -85,12 +86,26 @@ function parseEquivalencies(body) {
             }
         }
 
-        var equiv = new models.CourseEquivalency(nvccCourses, gtCourses);
-
+        var equiv = new models.CourseEquivalency(nvccCourses, gtCourses, determineEquivType(gtCourses));
         equivalencies.push(equiv);
     });
 
     return new models.EquivalencyContext(module.exports.institution, equivalencies);
+}
+
+function determineEquivType(gtCourses) {
+    if (gtCourses[0].subject === 'ET') {
+        // ET NOGT means no credit
+        if (gtCourses[0].number === 'NOGT')
+            return models.TYPE_NONE;
+        // ET DEPT means that the course's department must approve it or some
+        // other special handling. ET LAB means that credit is awarded with
+        // the lab course
+        else if (gtCourses[0].number === 'DEPT' || gtCourses[0].number === 'LAB')
+            return models.TYPE_SPECIAL;
+    }
+
+    return util.determineEquivType(gtCourses);
 }
 
 function columnAtIndex(tr, index) {

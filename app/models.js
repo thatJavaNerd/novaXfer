@@ -3,7 +3,8 @@ module.exports = {
     Course: function Course(subject, number, credits) {
         this.subject = subject;
         this.number = number;
-        this.credits = credits;
+        if (credits !== undefined)
+            this.credits = credits;
     },
     /**
      * Creates a new CourseEquivalency.
@@ -17,7 +18,7 @@ module.exports = {
     CourseEquivalency: function CourseEquivalency(input, output, type) {
         this.keyCourse = new module.exports.Course(input[0].subject, input[0].number);
         this.input = input;
-        this.output = output
+        this.output = output;
         this.type = type;
     },
     EquivalencyContext: function EquivalencyContext(institution, equivalencies) {
@@ -30,6 +31,12 @@ module.exports = {
     },
     // No information about credits given
     CREDITS_UNKNOWN: -1,
-    // A student should check with the university for further clarificaiton
-    CREDITS_UNCLEAR: -2
+    // Transfers directly to a specific class
+    TYPE_DIRECT: 'direct',
+    // At least one course transfers as a generic course
+    TYPE_GENERIC: 'generic',
+    // The student should clarify with the institution
+    TYPE_SPECIAL: 'special',
+    // Doesn't transfer at all
+    TYPE_NONE: 'none'
 };
