@@ -70,7 +70,8 @@ function parseEquivalencies(rows) {
 
         let wmMatrix = parseWmCourseMatrix(wmData);
         for (let wm of wmMatrix)
-            equivalencies.push(new models.CourseEquivalency(nvcc, wm));
+            equivalencies.push(new models.CourseEquivalency(nvcc, wm, util.determineEquivType(wm, 'ELT')));
+
     }
 
     return new models.EquivalencyContext(institution, equivalencies);

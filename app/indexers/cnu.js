@@ -1,5 +1,6 @@
 var util = require('../util.js');
 var request = util.request;
+var determineEquivType = util.determineEquivType;
 var models = require('../models.js');
 
 const dataUrl = 'http://cnu.edu/transfer/pdf/vccs_transferguide.pdf';
@@ -45,8 +46,8 @@ function parseEquivalencies(rows) {
                 }
             }
 
-            if (cnuCourses !== null)
-                equivalencies.push(new models.CourseEquivalency(nvccCourses, cnuCourses));
+            equivalencies.push(new models.CourseEquivalency(
+                nvccCourses, cnuCourses, determineEquivType(cnuCourses)));
         }
     }
 
@@ -84,7 +85,7 @@ function parseCnuCourses(rawString) {
             subject = matchedCourses[i];
         } else {
             // First letter is non-alphabetical, assume course number
-            courses.push(new models.Course(subject, matchedCourses[i], models.CREDITS_UNCLEAR));
+            courses.push(new models.Course(subject, matchedCourses[i], models.CREDITS_UNKNOWN));
         }
     }
 

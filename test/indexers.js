@@ -2,6 +2,7 @@ var assert = require('assert');
 var fs = require('fs');
 var indexers = require('../app/indexers');
 var util = require('../app/util.js');
+var models = require('../app/models.js');
 
 describe('indexers', function() {
     describe('#findIndexers', function() {
@@ -77,6 +78,7 @@ function testIndexer(indexer) {
             var equivStr = JSON.stringify(equiv);
             assert.notEqual(null, equiv, "Equivalency was null: " + equivStr);
 
+            validateType(equiv.type, equivStr);
             validateCourseArray(equiv.input, "input", equivStr);
             validateCourseArray(equiv.output, "output", equivStr);
         }
@@ -141,4 +143,10 @@ function validateCreditRange(course, courseSpecifier) {
 
     // All well and good
     return null;
+}
+
+function validateType(type, json) {
+    assert.ok(type, 'Missing type: ' + json)
+    assert.ok(type === models.TYPE_DIRECT || type === models.TYPE_GENERIC ||
+        type === models.TYPE_NONE || type === models.TYPE_SPECIAL, `Invalid type: '${type}': ${json}`);
 }

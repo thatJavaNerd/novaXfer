@@ -34,9 +34,8 @@ function parseEquivalencies(body) {
         var nvccCourses = parseCourses(vals, nvccNumberIndex, nvccCreditsIndex);
         var gmuCourses = parseCourses(vals, gmuNumberIndex, gmuCreditsIndex);
 
-        var equiv = new models.CourseEquivalency(nvccCourses, gmuCourses);
-
-        equivalencies.push(equiv);
+        equivalencies.push(new models.CourseEquivalency(
+            nvccCourses, gmuCourses, util.determineEquivType(gmuCourses, '---')));
     });
 
     return new models.EquivalencyContext(institution, equivalencies);

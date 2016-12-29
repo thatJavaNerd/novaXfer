@@ -73,7 +73,7 @@ angular.module('courseTable')
                             // Assign the data to its specific location
                             self.data[rowIndex][columnIndex] = [];
                             for (let equiv of equivs) {
-                                self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv));
+                                self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv, institution));
                             }
                         }
 
@@ -134,7 +134,7 @@ angular.module('courseTable')
                             // Assign the data to its specific location
                             self.data[rowIndex][columnIndex] = [];
                             for (let equiv of equivalencyList) {
-                                self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv));
+                                self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv, data.institution));
                             }
                         }
                     }
@@ -212,10 +212,13 @@ angular.module('courseTable')
              *     hence the name.
              * 2. 'normal': All output courses
              */
-            this.prepareEquivalency = function(equiv) {
+            this.prepareEquivalency = function(equiv, institution) {
+                if (equiv.type === 'none')
+                    return self.prepareUnknownEquivalency();
+
                 return {
-                    muted: this.formatCourseArray(_.drop(equiv.input)),
-                    normal: this.formatCourseArray(equiv.output)
+                    muted: this.formatCourseArray(_.drop(equiv.input), 'direct'),
+                    normal: this.formatCourseArray(equiv.output, equiv.type, institution)
                 };
             };
 
@@ -227,12 +230,30 @@ angular.module('courseTable')
                 return {danger: true};
             };
 
-            this.formatCourseArray = function(courses) {
-                return _.join(_.map(courses, c => `${c.subject} ${c.number} (${self.formatCredits(c.credits)} credits)`), ', ');
+            this.formatCourseArray = function(courses, type, institution) {
+                let primaryClause = function(course) {
+                    if (type === 'generic')
+                        return 'Generic ' + course.subject;
+                    return course.subject + ' ' + course.number;
+                };
+
+                let secondaryCluase = function(credits) {
+                    if (type === 'special')
+                        return 'check with ' + institution;
+                    if (type === 'none' || credits === 0)
+                        return 'no credit';
+
+                    return self.formatCredits(credits) + ' credits';
+                };
+
+                return _.join(_.map(courses, c => {
+                    return `${primaryClause(c)} (${secondaryCluase(c.credits)})`;
+                }), ', ');
             };
 
             this.formatCredits = function(credits) {
-                if (credits === -1 || credits === -2) return '?';
+                if (credits === -1) return '?';
+                if (typeof credits === 'object') return `${credits.min}-${credits.max}`;
                 return credits;
             };
 

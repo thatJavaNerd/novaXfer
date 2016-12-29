@@ -14,16 +14,16 @@ div.container
             th.table-header
                 button.btn.btn-default.glyphicon.glyphicon-plus(ng-click='$ctrl.addInstitution()')
 
-        tr(ng-repeat="inputCourse in $ctrl.input track by $index" ng-class="$ctrl.createRowStyleObject(tableForm, $index)")
-            td.course-input(ng-class='$ctrl.createInputStyleObject(tableForm, $index)')
+        tr(ng-repeat="(rowIndex, inputCourse) in $ctrl.input track by rowIndex" ng-class="$ctrl.createRowStyleObject(tableForm, rowIndex)")
+            td.course-input(ng-class='$ctrl.createInputStyleObject(tableForm, rowIndex)')
                 input.form-control(
                     type='text'
-                    name='{{"input" + $index}}'
-                    ng-model='$ctrl.input[$index]'
+                    name='{{"input" + rowIndex}}'
+                    ng-model='$ctrl.input[rowIndex]'
                     ng-pattern='$ctrl.courseRegex'
                     required
                 )
-            td(ng-repeat="equivs in $ctrl.data[$index]")
+            td(ng-repeat="equivs in $ctrl.data[rowIndex]")
                 div.equivalency-cell(ng-repeat="equiv in equivs")
                     p.text-muted(ng-show="equiv.muted") (when taken with {{equiv.muted}})
                     p {{equiv.normal}}

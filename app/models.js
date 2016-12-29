@@ -5,10 +5,6 @@ module.exports = {
         this.number = number;
         if (credits !== undefined)
             this.credits = credits;
-
-        this.stripCredits = function() {
-            return new Course(subject, number);
-        };
     },
     /**
      * Creates a new CourseEquivalency.
@@ -17,11 +13,13 @@ module.exports = {
      *                  and number, no credits
      * @param input Array of courses from NVCC
      * @param output Array of ocurses from `institution`
+     * @param type Equivalency type. Must be a value specified by models.TYPE_*
      */
-    CourseEquivalency: function CourseEquivalency(input, output) {
-        this.keyCourse = input[0].stripCredits();
+    CourseEquivalency: function CourseEquivalency(input, output, type) {
+        this.keyCourse = new module.exports.Course(input[0].subject, input[0].number);
         this.input = input;
         this.output = output;
+        this.type = type;
     },
     EquivalencyContext: function EquivalencyContext(institution, equivalencies) {
         this.institution = institution;
@@ -33,6 +31,12 @@ module.exports = {
     },
     // No information about credits given
     CREDITS_UNKNOWN: -1,
-    // A student should check with the university for further clarificaiton
-    CREDITS_UNCLEAR: -2
+    // Transfers directly to a specific class
+    TYPE_DIRECT: 'direct',
+    // At least one course transfers as a generic course
+    TYPE_GENERIC: 'generic',
+    // The student should clarify with the institution
+    TYPE_SPECIAL: 'special',
+    // Doesn't transfer at all
+    TYPE_NONE: 'none'
 };
