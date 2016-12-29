@@ -23,6 +23,10 @@ div.equivalency-block {
     border: 1px black dashed;
 }
 
+div.equivalency-block:not(:last-child) {
+    margin-bottom: 20px;
+}
+
 div.equivalency-block h2 {
     margin-top: 0;
 }
