@@ -25,6 +25,6 @@ div.container
                 )
             td(ng-repeat="equivs in $ctrl.data[rowIndex]")
                 div.equivalency-cell(ng-repeat="equiv in equivs")
-                    p.text-muted(ng-show="equiv.muted") (when taken with {{equiv.muted}})
-                    p {{equiv.normal}}
-                    p.text-danger(ng-show="equiv.danger") No equivalency
+                    p.text-danger(ng-show="!equiv.willTransfer") No equivalency
+                    p.text-muted(ng-show="equiv.input.length") When you also take {{equiv.input}}
+                    p {{equiv.output}}

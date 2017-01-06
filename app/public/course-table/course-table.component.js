@@ -1,7 +1,7 @@
 angular.module('courseTable')
     .component('courseTable', {
         templateUrl: '/partial/course-table',
-        controller: ['$scope', '$http', '$q', function CourseTableController($scope, $http, $q) {
+        controller: ['$scope', '$filter', '$http', '$q', function CourseTableController($scope, $filter, $http, $q) {
             let self = this;
 
             // Set when an unexpted error occurs
@@ -11,6 +11,8 @@ angular.module('courseTable')
             // user to start off with
             this.institutions = [''];
             this.input = [''];
+
+            this.equivalencyFilter = $filter('equivalency');
 
             // Input that has had already been sent to the API
             this.displayedInput = [];
@@ -64,23 +66,18 @@ angular.module('courseTable')
                         // No real reason for this variable other than semantics
                         let columnIndex = i;
 
-                        if (!(institution in groupedEquivs)) {
-                            // No equivalencies found
-                            self.data[rowIndex][columnIndex] = [self.prepareUnknownEquivalency()];
-                        } else {
-                            let equivs = groupedEquivs[institution];
+                        let equivs = groupedEquivs[institution];
 
-                            // Assign the data to its specific location
-                            self.data[rowIndex][columnIndex] = [];
-                            for (let equiv of equivs) {
-                                self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv, institution));
-                            }
-                        }
+                        // Give input to equivalencyFilter such that it returns
+                        // usable data instead of an empty array.
+                        if (equivs === undefined)
+                            equivs = [undefined];
 
+                        self.prepareEquivalencies(equivs, rowIndex, columnIndex);
                         self.fillEmptyCellsInRow(rowIndex);
                     }
                 }).catch(function(err) {
-                    $ctrl.criticalError = 'Unable to complete the request';
+                    self.criticalError = 'Unable to complete the request';
                     console.error(err);
                 });
             };
@@ -124,24 +121,38 @@ angular.module('courseTable')
                         // from the data
                         let equivalencyList = _.find(data.courses, findEquivListCallback(course));
 
+                        // If equivalencyList is undefined, use an array with one
+                        // `undefined` value so that prepareEquivalencies() can
+                        // format the data appropriately
+                        equivalencyList = equivalencyList ? equivalencyList.equivalencies : [undefined];
 
-                        if (!equivalencyList) {
-                            // No equivalencies for this couse
-                            self.data[rowIndex][columnIndex] = [self.prepareUnknownEquivalency()];
-                        } else {
-                            equivalencyList = equivalencyList.equivalencies;
-
-                            // Assign the data to its specific location
-                            self.data[rowIndex][columnIndex] = [];
-                            for (let equiv of equivalencyList) {
-                                self.data[rowIndex][columnIndex].push(self.prepareEquivalency(equiv, data.institution));
-                            }
-                        }
+                        // Assign the data to its specific location
+                        self.prepareEquivalencies(equivalencyList, rowIndex, columnIndex)
                     }
                 }).catch(function(err) {
-                    $ctrl.criticalError = 'Unable to complete the request';
+                    this.criticalError = 'Unable to complete the request';
                     console.error(err);
                 });
+            };
+
+            this.prepareEquivalencies = function(equivs, rowIndex, columnIndex) {
+                self.data[rowIndex][columnIndex] = self.equivalencyFilter(equivs);
+
+                let formatCourseArray = function(courses) {
+                    return _.join(_.map(courses, function(c) {
+                        return c.primary + ' (' + c.secondary + ')';
+                    }), ', ');
+                }
+
+                console.log(self.data[rowIndex][columnIndex])
+
+                for (let j = 0; j < self.data[rowIndex][columnIndex].length; j++) {
+                    let cell = self.data[rowIndex][columnIndex][j];
+                    if (cell.input)
+                        self.data[rowIndex][columnIndex][j].input = formatCourseArray(self.data[rowIndex][columnIndex][j].input.slice(1));
+                    if (cell.output)
+                        self.data[rowIndex][columnIndex][j].output = formatCourseArray(self.data[rowIndex][columnIndex][j].output);
+                }
             };
 
             /** Adds another <select> to choose an institution */
@@ -201,60 +212,6 @@ angular.module('courseTable')
                         )
                     )
                 );
-            };
-
-            /**
-             * Transforms an equivalency to a format that is expected by the
-             * template. Resulting object contains two entries.
-             *
-             * 1. 'muted': The equivalencies input array but with the first
-             *     course dropped. Displayed with a 'text-muted' CSS class,
-             *     hence the name.
-             * 2. 'normal': All output courses
-             */
-            this.prepareEquivalency = function(equiv, institution) {
-                if (equiv.type === 'none')
-                    return self.prepareUnknownEquivalency();
-
-                return {
-                    muted: this.formatCourseArray(_.drop(equiv.input), 'direct'),
-                    normal: this.formatCourseArray(equiv.output, equiv.type, institution)
-                };
-            };
-
-            /**
-             * Returns {danger: true}. Used by the template to detect when a
-             * course has no equivalencies.
-             */
-            this.prepareUnknownEquivalency = function() {
-                return {danger: true};
-            };
-
-            this.formatCourseArray = function(courses, type, institution) {
-                let primaryClause = function(course) {
-                    if (type === 'generic')
-                        return 'Generic ' + course.subject;
-                    return course.subject + ' ' + course.number;
-                };
-
-                let secondaryCluase = function(credits) {
-                    if (type === 'special')
-                        return 'check with ' + institution;
-                    if (type === 'none' || credits === 0)
-                        return 'no credit';
-
-                    return self.formatCredits(credits) + ' credits';
-                };
-
-                return _.join(_.map(courses, c => {
-                    return `${primaryClause(c)} (${secondaryCluase(c.credits)})`;
-                }), ', ');
-            };
-
-            this.formatCredits = function(credits) {
-                if (credits === -1) return '?';
-                if (typeof credits === 'object') return `${credits.min}-${credits.max}`;
-                return credits;
             };
 
             this.inputName = function(index) { return 'input' + index; };

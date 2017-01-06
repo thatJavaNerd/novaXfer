@@ -24,18 +24,26 @@ module.exports = function(grunt) {
                 // ECMAScript version 6
                 esversion: 6
             }
+        },
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js',
+                singleRun: true,
+                browsers: ['Firefox']
+            }
         }
     });
 
     var tasks = [
         'mocha-test',
         'contrib-jshint',
-        'run'
+        'run',
+        'karma'
     ];
-    
+
     for (var i = 0; i < tasks.length; i++) {
         grunt.loadNpmTasks(`grunt-${tasks[i]}`);
     }
 
-    grunt.registerTask('default', ['mochaTest']);
+    grunt.registerTask('default', ['mochaTest', 'karma']);
 };

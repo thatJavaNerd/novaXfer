@@ -21,14 +21,14 @@ div.container-fluid#big-question
             )
             |?
 
-div.container
-    div.equivalency-block(ng-repeat="equivalency in $ctrl.result.equivalencies")
+div.container(ng-show="$ctrl.result")
+    div.equivalency-block(ng-repeat="equivalency in $ctrl.result.equivalencies | equivalency")
         h2 Option {{$index + 1}}
         div.course-set-block
-            p(ng-repeat="input in equivalency.input") {{input.subject}} {{input.number}} ({{input.credits}} credits)
+            p(ng-repeat="input in equivalency.input") {{input.primary}} ({{input.secondary}})
         span.glyphicon.glyphicon-arrow-down
         div.course-set-block
-            p(ng-repeat="output in equivalency.output") {{output.subject}} {{output.number}} ({{output.credits}} credits)
+            p(ng-repeat="output in equivalency.output") {{output.primary}} ({{output.secondary}})
 
 div.container.no-results(ng-show="$ctrl.result && $ctrl.result.equivalencies.length === 0")
     p.text-muted There's nothing here ¯\_(ツ)_/¯
