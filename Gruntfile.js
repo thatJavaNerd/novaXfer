@@ -1,7 +1,9 @@
 module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        clean: ['.cache', 'build'],
+        clean: {
+            testPrep: ['.cache', 'build']
+        },
         run: {
             server: {
                 options: {
@@ -41,9 +43,15 @@ module.exports = function(grunt) {
                 }
             }
         },
+        lcovMerge: {
+            options: {
+                outputFile: 'build/reports/coverage/lcov.merged.info'
+            },
+            src: 'build/reports/coverage/**/lcov.info'
+        },
         coveralls: {
             default: {
-                src: 'build/reports/coverage/**/lcov.info'
+                src: 'build/reports/coverage/lcov.merged.info'
             }
         }
     });
@@ -53,6 +61,7 @@ module.exports = function(grunt) {
         'contrib-clean',
         'coveralls',
         'karma',
+        'lcov-merge',
         'mocha-test',
         'mocha-istanbul',
         'run'
@@ -63,5 +72,6 @@ module.exports = function(grunt) {
     }
 
     grunt.registerTask('default', ['mochaTest', 'karma']);
-    grunt.registerTask('testCoverage', ['clean', 'mocha_istanbul', 'karma']);
+    grunt.registerTask('testCoverage', ['clean:testPrep', 'mocha_istanbul', 'karma']);
+    grunt.registerTask('uploadCoverage', ['lcovMerge', 'coveralls'])
 };

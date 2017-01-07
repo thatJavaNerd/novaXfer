@@ -29,6 +29,7 @@
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-coveralls": "^1.0.1",
     "grunt-karma": "^2.0.0",
+    "grunt-lcov-merge": "^1.2.3",
     "grunt-mocha-istanbul": "^5.0.2",
     "grunt-mocha-test": "^0.13.2",
     "grunt-run": "^0.6.0",
