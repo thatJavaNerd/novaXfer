@@ -25,9 +25,10 @@ module.exports = {
         this.institution = institution;
         this.equivalencies = equivalencies;
     },
-    Institution: function(acronym, fullName) {
+    Institution: function(acronym, fullName, location) {
         this.acronym = acronym;
         this.fullName = fullName;
+        this.location = location;
     },
     // No information about credits given
     CREDITS_UNKNOWN: -1,
