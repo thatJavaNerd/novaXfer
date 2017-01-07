@@ -165,6 +165,10 @@ angular.module('courseTable')
                 this.fillEmptyCellsInRow(this.input.length - 1);
             };
 
+            this.removeInputCourse = function(index) {
+                this.input.splice(index, 1);
+            };
+
             /**
              * Populates undefined cells in data[rowIndex] with an empty array
              * so that Angular renders an empty cell
@@ -343,6 +347,30 @@ angular.module('courseTable')
                 if ((oldVal === '' || oldVal === null) && newVal !== '') {
                     self.addInputCourse();
                 }
+            });
+
+            // Automatically remove unused inputs
+            $scope.$watch(function() {
+                if (!$scope.tableForm)
+                    // Scope hasn't been initialized yet, don't operate
+                    return -1;
+
+                // Find the first index of an input element that is an empty string
+                for (let i = 0; i < self.input.length - 1; i++) {
+                    let input = $scope.tableForm[self.inputName(i)];
+
+                    if (input === undefined)
+                        continue;
+
+                    if (input.$viewValue !== null && input.$viewValue.trim() === '')
+                        return i;
+                }
+
+                // Nothing found, don't operate
+                return -1;
+            }, function(newVal, oldVal) {
+                if (newVal !== -1)
+                    self.removeInputCourse(newVal);
             });
         }],
     });
