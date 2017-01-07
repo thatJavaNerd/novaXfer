@@ -17,53 +17,24 @@ describe('indexers', function() {
     // function
     this.timeout(30000);
 
-    describe('cnu#findAll', function() {
-        it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/cnu.js'));
+    ['cnu', 'gmu', 'gt', 'uva', 'vcu', 'vt', 'wm'].forEach(function(inst) {
+        let indexer = require(`../app/indexers/${inst}.js`);
+        describe(`${indexer.institution.acronym} indexer`, function() {
+            it('should return an array valid courses from findAll()', function() {
+                return testIndexerEquivalencies(indexer);
+            });
+
+            it('should have a valid institution', function() {
+                validateInstitution(indexer.institution);
+            });
         });
     });
-
-    describe('gmu#findAll', function() {
-        it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/gmu.js'));
-        });
-    });
-
-    describe('gt#findAll', function() {
-        it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/gt.js'));
-        });
-    });
-
-    describe('uva#findAll', function() {
-        it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/uva.js'));
-        });
-    });
-
-    describe('vcu#findAll', function() {
-        it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/vcu.js'));
-        });
-    });
-
-    describe('vt#findAll', function() {
-        it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/vt.js'));
-        });
-    });
-
-    describe('wm#findAll', function() {
-        it('should call each() with valid courses', function() {
-            return testIndexer(require('../app/indexers/wm.js'));
-        });
-    })
 });
+
 const minEquivalencies = 100;
 
-function testIndexer(indexer) {
+function testIndexerEquivalencies(indexer) {
     assert.notEqual(undefined, indexer.findAll, 'findAll() was undefined');
-    validateInstitution(indexer.institution);
 
     return indexer.findAll().then(function(equivalencyContext) {
         validateInstitution(equivalencyContext.institution);
