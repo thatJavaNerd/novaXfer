@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        clean: ['.cache', 'build'],
         run: {
             server: {
                 options: {
@@ -31,14 +32,30 @@ module.exports = function(grunt) {
                 singleRun: true,
                 browsers: ['Firefox']
             }
+        },
+        mocha_istanbul: {
+            default: {
+                src: 'test',
+                options: {
+                    coverageFolder: 'build/reports/coverage/backend'
+                }
+            }
+        },
+        coveralls: {
+            default: {
+                src: 'build/reports/coverage/**/lcov.info'
+            }
         }
     });
 
     var tasks = [
-        'mocha-test',
         'contrib-jshint',
-        'run',
-        'karma'
+        'contrib-clean',
+        'coveralls',
+        'karma',
+        'mocha-test',
+        'mocha-istanbul',
+        'run'
     ];
 
     for (var i = 0; i < tasks.length; i++) {
@@ -46,4 +63,5 @@ module.exports = function(grunt) {
     }
 
     grunt.registerTask('default', ['mochaTest', 'karma']);
+    grunt.registerTask('testCoverage', ['clean', 'mocha_istanbul', 'karma']);
 };

@@ -3,3 +3,4 @@ npm-debug.log
 todo.txt
 .cache/
 app/public/bower_components
+build/

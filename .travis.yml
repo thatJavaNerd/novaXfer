@@ -13,8 +13,8 @@ before_script:
   # Virtual screen for firefox to execute Karma tests
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-script: grunt
-after_success: grunt jshint
+script: grunt testCoverage
+after_success: grunt coveralls; grunt jshint
 addons:
   firefox: latest
   apt:
