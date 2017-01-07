@@ -127,7 +127,7 @@ angular.module('courseTable')
                         equivalencyList = equivalencyList ? equivalencyList.equivalencies : [undefined];
 
                         // Assign the data to its specific location
-                        self.prepareEquivalencies(equivalencyList, rowIndex, columnIndex)
+                        self.prepareEquivalencies(equivalencyList, rowIndex, columnIndex);
                     }
                 }).catch(function(err) {
                     this.criticalError = 'Unable to complete the request';
@@ -142,7 +142,7 @@ angular.module('courseTable')
                     return _.join(_.map(courses, function(c) {
                         return c.primary + ' (' + c.secondary + ')';
                     }), ', ');
-                }
+                };
 
                 for (let j = 0; j < self.data[rowIndex][columnIndex].length; j++) {
                     let cell = self.data[rowIndex][columnIndex][j];

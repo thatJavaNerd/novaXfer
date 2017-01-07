@@ -24,19 +24,19 @@ angular.module('core').filter('equivalency', function() {
         return _.map(courses, c => { return {
             primary: primaryClause(c),
             secondary: secondaryCluase(c.credits)
-        } });
+        }; });
     };
 
     let transformEquivalency = function(equiv) {
         if (equiv === undefined || equiv.type === 'none')
-            return {"willTransfer": false}
+            return {"willTransfer": false};
 
         return {
             "willTransfer": true,
             "input": formatCourses(equiv.input, equiv.type, equiv.institution, true),
             "output": formatCourses(equiv.output, equiv.type, equiv.institution)
-        }
-    }
+        };
+    };
 
     // Use _.memoize to make sure we don't create an infinite digest() loop
     return _.memoize(function(equivList) {
@@ -45,7 +45,7 @@ angular.module('core').filter('equivalency', function() {
 
         let newArr = [];
 
-        for (equiv of equivList)
+        for (let equiv of equivList)
             newArr.push(transformEquivalency(equiv));
 
         return newArr;

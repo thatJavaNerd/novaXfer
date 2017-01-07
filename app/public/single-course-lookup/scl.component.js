@@ -36,7 +36,7 @@ angular.module('singleCourseLookup')
                     }
                 }
                 return styles;
-            }
+            };
 
             // Dynamically get a list of all institutions
             $http.get('/api/institutions').then(function(data) {
