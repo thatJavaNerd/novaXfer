@@ -8,7 +8,7 @@ div.container
                 select.input-institution.form-control(
                     name='{{"institution" + $index}}'
                     ng-model='$ctrl.institutions[$index]'
-                    ng-options='inst.acronym as inst.fullName for inst in $ctrl.availableInstitutions'
+                    ng-options='inst.acronym as inst.fullName group by inst.location for inst in $ctrl.availableInstitutions'
                     required
                 )
             th.table-header
