@@ -11,5 +11,9 @@
     "tether": "^1.4.0",
     "angular": "^1.6.0",
     "lodash": "^4.17.3"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "angular-mocks": "^1.6.1"
   }
 }

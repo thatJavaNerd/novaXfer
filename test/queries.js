@@ -26,8 +26,6 @@ describe('database queries', function() {
         });
 
         it('should provide a healthy average of courses per institution', function() {
-            console.log(report.institutionsIndexed);
-            console.log(report.coursesIndexed);
             assert.ok(report.institutionsIndexed > 0);
             // Usually around ~800 courses for every institution, having
             // less than that for all of our indexers combined is

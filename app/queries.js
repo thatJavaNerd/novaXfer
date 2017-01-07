@@ -103,12 +103,12 @@ module.exports.equivalenciesForInstitution = function(institution, courses) {
             'courses._id': true,
             'courses.equivalencies.input': true,
             'courses.equivalencies.output': true,
+            'courses.equivalencies.institution': true,
             'courses.equivalencies.type': true
 
             // MongoDB doesn't like excluding non-root _id fields, so we have to
             // whitelist properties instead of blacklist them
-            // 'courses.temp_institution': 0,
-            // 'courses.equivalencies.institution': 0
+            // 'courses.temp_institution': 0
         }}
     ]).toArray().then(function(docs) {
         if (docs.length === 0) {

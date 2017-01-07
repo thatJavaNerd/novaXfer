@@ -32,7 +32,7 @@ header > a:hover {
     text-decoration: none;
 }
 
-.footer {
+footer {
     position: absolute;
     bottom: 0;
     width: 100%;
