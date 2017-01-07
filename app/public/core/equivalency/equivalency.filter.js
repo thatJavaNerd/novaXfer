@@ -5,7 +5,7 @@ angular.module('core').filter('equivalency', function() {
         return credits;
     };
 
-    let formatCourses = function(courses, type, institution) {
+    let formatCourses = function(courses, type, institution, isInput) {
         let primaryClause = function(course) {
             if (type === 'generic')
                 return 'Generic ' + course.subject;
@@ -13,7 +13,7 @@ angular.module('core').filter('equivalency', function() {
         };
 
         let secondaryCluase = function(credits) {
-            if (type === 'special')
+            if (type === 'special' && !isInput)
                 return 'check with ' + institution;
             if (type === 'none' || credits === 0)
                 return 'no credit';
@@ -33,7 +33,7 @@ angular.module('core').filter('equivalency', function() {
 
         return {
             "willTransfer": true,
-            "input": formatCourses(equiv.input, equiv.type, equiv.institution),
+            "input": formatCourses(equiv.input, equiv.type, equiv.institution, true),
             "output": formatCourses(equiv.output, equiv.type, equiv.institution)
         }
     }
