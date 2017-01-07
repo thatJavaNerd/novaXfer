@@ -4,7 +4,7 @@ var determineEquivType = util.determineEquivType;
 var models = require('../models.js');
 
 const dataUrl = 'https://www.dropbox.com/s/br3di84myslbpqi/cnu.pdf?dl=1';
-const institution = new models.Institution('CNU', 'Christopher Newport University');
+const institution = new models.Institution('CNU', 'Christopher Newport University', 'Virginia');
 const subjectRegex = /^[A-Z]{3}$/;
 // Tests if the entirety of a string represents a valid course identifier.
 // Example: http://regexr.com/3estr

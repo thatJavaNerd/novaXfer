@@ -3,7 +3,7 @@ var request = util.request;
 var models = require('../models.js');
 
 const dataUrl = 'http://www.wm.edu/offices/registrar/documents/transfer/vccs_transfer_guide_table.pdf';
-const institution = new models.Institution('W&M', 'William & Mary');
+const institution = new models.Institution('W&M', 'William & Mary', 'Virginia');
 // See http://regexr.com/3eukm for examples
 const nvccPartsRegex = /^([A-Z]{3}) ([0-9]{3}) (?:(?:\+|or) ([0-9]{3}))?/;
 // http://regexr.com/3eung

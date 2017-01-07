@@ -5,7 +5,7 @@ var normalizeWhitespace = util.normalizeWhitespace;
 var request = util.request;
 
 const dataUrl = 'http://ascs8.eservices.virginia.edu/AsEquivs/Home/EquivsShow?schoolId=1001975';
-const institution = new models.Institution('UVA', 'University of Virginia');
+const institution = new models.Institution('UVA', 'University of Virginia', 'Virginia');
 const headerRows = 2;
 const nvccIndex = 1; // CSS queries are 1-indexed
 const uvaIndex = 2;

@@ -94,6 +94,8 @@ const fullNameRegex = /^([A-Z&]+ ?)+$/i;
 const courseNumberRegex = /^[-\dA-Z#]{2,5}$/;
 // Match 2 to 5 alphabeit characters
 const courseSubjectRegex = /^[A-Z]{2,5}$/;
+// Entire string must be alphabetic
+const institutionLocationRegex = /^[A-Z]+$/i;
 
 function validateInstitution(inst) {
     assert.notEqual(null, inst);
@@ -101,6 +103,8 @@ function validateInstitution(inst) {
     assert.notEqual(null, inst.fullName);
     assert.ok(acronymRegex.test(inst.acronym));
     assert.ok(fullNameRegex.test(inst.fullName));
+    assert.notEqual(null, inst.location);
+    assert.ok(institutionLocationRegex.test(inst.location));
 }
 
 function validateCourseArray(array, arrayName, json) {

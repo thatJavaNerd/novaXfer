@@ -114,4 +114,4 @@ function parseCourse(courseStr, creditsStr) {
 
 module.exports.findAll = findAll;
 module.exports.institution =
-        new models.Institution('VCU', 'Virginia Commonwealth University');
+        new models.Institution('VCU', 'Virginia Commonwealth University', 'Virginia');
