@@ -16,6 +16,7 @@ before_script:
 script: grunt
 after_success: grunt jshint
 addons:
+  firefox: latest
   apt:
     sources:
       - mongodb-upstart
