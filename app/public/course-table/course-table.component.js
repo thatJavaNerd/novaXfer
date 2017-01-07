@@ -144,8 +144,6 @@ angular.module('courseTable')
                     }), ', ');
                 }
 
-                console.log(self.data[rowIndex][columnIndex])
-
                 for (let j = 0; j < self.data[rowIndex][columnIndex].length; j++) {
                     let cell = self.data[rowIndex][columnIndex][j];
                     if (cell.input)
