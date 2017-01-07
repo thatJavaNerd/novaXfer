@@ -227,7 +227,7 @@ angular.module('courseTable')
                 let styles = {};
                 let control = form[self.inputName(index)];
 
-                if (control.$touched) {
+                if (control.$touched && index !== self.input.length - 1) {
                     if (control.$error.required) {
                         // Only warning empty
                         styles[warningClass] = true;
