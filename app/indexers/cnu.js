@@ -3,7 +3,7 @@ var request = util.request;
 var determineEquivType = util.determineEquivType;
 var models = require('../models.js');
 
-const dataUrl = 'http://cnu.edu/transfer/pdf/vccs_transferguide.pdf';
+const dataUrl = 'https://www.dropbox.com/s/br3di84myslbpqi/cnu.pdf?dl=1';
 const institution = new models.Institution('CNU', 'Christopher Newport University');
 const subjectRegex = /^[A-Z]{3}$/;
 // Tests if the entirety of a string represents a valid course identifier.
