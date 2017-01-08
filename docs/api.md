@@ -16,7 +16,7 @@ Returns an array course entries of all courses which have the subject `:subject`
 
 ## Course
 
-### `GET /api/:course/:institutions`
+### `GET /api/course/:course/:institutions`
 
 Returns the course entry for the given course, with `equivalencies` filtered to
 only contain the given institutions.
