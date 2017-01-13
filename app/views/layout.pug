@@ -13,18 +13,7 @@ html(ng-app='novaxfer')
             link(rel='stylesheet', href='/style/base.css')
 
         block scripts
-            script(src='/bower_components/lodash/dist/lodash.min.js')
-            script(src='/bower_components/jquery/dist/jquery.min.js')
-            script(src='/bower_components/tether/dist/js/tether.js')
-            script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
-            script(src='/bower_components/angular/angular.js')
-            script(src='/app.module.js')
-            script(src='/core/core.module.js')
-            script(src='/core/equivalency/equivalency.filter.js')
-            script(src='/course-table/course-table.module.js')
-            script(src='/course-table/course-table.component.js')
-            script(src='/single-course-lookup/scl.module.js')
-            script(src='/single-course-lookup/scl.component.js')
+            script(src='/dist/dist.js')
 
 
     body
@@ -39,7 +28,7 @@ html(ng-app='novaxfer')
               div.container
                 span.text-muted
                  | Copyright (c) Matthew Dean 2017
-        
+
         a(href='https://github.com/thatJavaNerd/novaXfer')
             img(
                 style='position: absolute; top: 0; right: 0; border: 0;'

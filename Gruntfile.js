@@ -53,12 +53,26 @@ module.exports = function(grunt) {
             default: {
                 src: 'build/reports/coverage/lcov.merged.info'
             }
+        },
+        browserify: {
+            js: {
+                src: './app/public/app.module.js',
+                dest: './app/public/dist/dist.js'
+            }
+        },
+        watch: {
+            js: {
+                files: ['./app/public/**/!(dist).js'],
+                tasks: ['browserify']
+            }
         }
     });
 
     var tasks = [
-        'contrib-jshint',
+        'browserify',
         'contrib-clean',
+        'contrib-jshint',
+        'contrib-watch',
         'coveralls',
         'karma',
         'lcov-merge',
@@ -73,5 +87,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default', ['mochaTest', 'karma']);
     grunt.registerTask('testCoverage', ['clean:testPrep', 'mocha_istanbul', 'karma']);
-    grunt.registerTask('uploadCoverage', ['lcovMerge', 'coveralls'])
+    grunt.registerTask('uploadCoverage', ['lcovMerge', 'coveralls']);
+    grunt.registerTask('build', ['browserify']);
 };

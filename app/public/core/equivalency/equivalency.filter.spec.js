@@ -1,7 +1,9 @@
-let expect = chai.expect;
+let expect = require('chai').expect;
+require('../../app.module.js');
+require('angular-mocks');
 
 describe('equivalency.filter', function() {
-    beforeEach(module('core'));
+    beforeEach(angular.mock.module('core'));
 
     it('should handle general equivalencies', inject(function($filter) {
         let inputEquiv = [{

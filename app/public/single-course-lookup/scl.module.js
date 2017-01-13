@@ -1,4 +1,5 @@
+var coreModule = require('../core/core.module.js');
+var sclComponent = require('./scl.component.js');
 
-angular.module('singleCourseLookup', [
-    'core'
-]);
+module.exports = angular.module('singleCourseLookup', [coreModule.name])
+    .component('singleCourseLookup', sclComponent);
