@@ -1,8 +1,6 @@
-node_modules
+node_modules/
 npm-debug.log
 todo.txt
 .cache/
 build/
-app/public/dist
-app/public/build
-app/public/fonts
+app/server/public/

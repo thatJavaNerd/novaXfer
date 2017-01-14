@@ -1,21 +1,19 @@
 module.exports = function(grunt) {
+    let finalDist = 'app/server/public/';
+
+    let build = 'app/client/build/'
+    let buildStaging = build + 'staging/';
+    let buildDist = build + 'dist/';
++
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
             testPrep: ['.cache', 'build'],
-            buildPrep: ['app/public/build', 'app/public/dist', 'app/public/fonts']
-        },
-        run: {
-            server: {
-                options: {
-                    wait: true
-                },
-                args: ['server.js', '--use-strict']
-            }
+            buildPrep: [build, finalDist]
         },
         mochaTest: {
             test: {
-                src: ['test/**/*.js']
+                src: ['app/server/test/**/*.js']
             }
         },
         jshint: {
@@ -37,9 +35,9 @@ module.exports = function(grunt) {
         },
         mocha_istanbul: {
             default: {
-                src: 'test',
+                src: 'app/server/test',
                 options: {
-                    coverageFolder: 'build/reports/coverage/backend'
+                    coverageFolder: 'build/reports/coverage/server'
                 }
             }
         },
@@ -61,9 +59,9 @@ module.exports = function(grunt) {
             //         debug: true
             //     }
             // },
-            js: {
-                src: './app/public/app.module.js',
-                dest: './app/public/build/dist.js'
+            app: {
+                src: 'app/client/app.module.js',
+                dest: buildStaging + 'app.browserify.js'
             }
         },
         babel: {
@@ -71,9 +69,9 @@ module.exports = function(grunt) {
                 presets: ['es2015'],
                 compact: true
             },
-            dist: {
+            app: {
                 files: {
-                    'app/public/build/dist.babel.js': 'app/public/build/dist.js'
+                    [buildStaging + 'app.babel.js']: buildStaging + 'app.browserify.js'
                 }
             }
         },
@@ -81,9 +79,9 @@ module.exports = function(grunt) {
             options: {
                 banner: '/*! Grunt Uglify <%= grunt.template.today("yyyy-mm-dd") %> */ ',
             },
-            build: {
+            app: {
                 files: {
-                    'app/public/dist/dist.min.js': ['app/public/build/dist.babel.js']
+                    [buildStaging + 'app.min.js']: [buildStaging + 'app.babel.js']
                 }
             }
         },
@@ -101,7 +99,25 @@ module.exports = function(grunt) {
             fonts: {
                 cwd: 'node_modules/bootstrap/dist/fonts/',
                 src: '*',
-                dest: 'app/public/fonts/',
+                dest: buildDist + 'fonts',
+                expand: true
+            },
+            rawAssets: {
+                cwd: 'app/client/_assets/raw',
+                src: '*',
+                dest: buildDist + 'assets',
+                expand: true
+            },
+            scripts: {
+                cwd: buildStaging,
+                src: 'app.min.js',
+                dest: buildDist + 'scripts',
+                expand: true
+            },
+            dist: {
+                cwd: buildDist,
+                src: '**', // copy all files and subdirectories
+                dest: finalDist,
                 expand: true
             }
         },
@@ -124,11 +140,11 @@ module.exports = function(grunt) {
     ['scl', 'table'].forEach(css => {
         files.push({
             src: [
-                'app/public/style/base.css',
-                `app/public/style/${css}.css`,
+                'app/client/_assets/style/base.css',
+                `app/client/_assets/style/${css}.css`,
                 'node_modules/bootstrap/dist/css/bootstrap.css'
             ],
-            dest: `app/public/dist/${css}.min.css`
+            dest: buildDist + `style/${css}.min.css`
         });
     });
     grunt.config(cssminProp, files);
@@ -154,8 +170,9 @@ module.exports = function(grunt) {
         grunt.loadNpmTasks(`grunt-${tasks[i]}`);
     }
 
-    grunt.registerTask('default', ['mochaTest', 'karma']);
+    grunt.registerTask('default', ['test']);
+    grunt.registerTask('test', ['mochaTest', 'karma']);
     grunt.registerTask('testCoverage', ['clean:testPrep', 'mocha_istanbul', 'karma']);
     grunt.registerTask('uploadCoverage', ['lcovMerge', 'coveralls']);
-    grunt.registerTask('build', ['clean:buildPrep', 'browserify', 'babel', 'uglify', 'cssmin', 'copy:fonts']);
+    grunt.registerTask('build', ['clean:buildPrep', 'browserify', 'babel', 'uglify', 'cssmin', 'copy']);
 };

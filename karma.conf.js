@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: 'app/public',
+    basePath: 'app/client',
 
 
     // frameworks to use
@@ -43,7 +43,7 @@ module.exports = function(config) {
 
 
     coverageReporter: {
-        dir: '../../build/reports/coverage/frontend',
+        dir: '../../build/reports/coverage/client',
         reporters: [
             { type: 'html', subdir: 'lcov-report' },
             { type: 'lcovonly', subdir: '.', file: 'lcov.info' }

@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var queries = require('../queries.js');
 
 var partialNameRegex = /^[a-z0-9-]+$/;
 
@@ -9,9 +8,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/table', function(req, res, next) {
-    queries.listInstitutions().then(function(institutions) {
-        res.render('table', {institutions: institutions});
-    });
+    res.render('table');
 });
 
 // Serve partial templates for Angular. /partial/my-template retrieves the

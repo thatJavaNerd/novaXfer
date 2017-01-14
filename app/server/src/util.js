@@ -45,7 +45,7 @@ module.exports = {
     },
     loadConfig: function(name) {
         return new Promise(function(fulfill, reject) {
-            var cfg = `${path.resolve(__dirname)}/../config/${name}.json`;
+            var cfg = `${path.resolve(__dirname)}/config/${name}.json`;
             fs.readFile(cfg, (err, data) => {
                 if (err) reject(err);
                 else fulfill(JSON.parse(data));
@@ -207,5 +207,5 @@ function lstat(fd) {
 }
 
 function cacheFileForIndexer(institution) {
-    return `${path.resolve(__dirname)}/../.cache/${institution.acronym.toLowerCase()}`;
+    return `${path.resolve(__dirname)}/../../../.cache/${institution.acronym.toLowerCase()}`;
 }
