@@ -3,10 +3,10 @@ let fs = require('fs');
 module.exports = function(grunt) {
     let finalDist = 'app/server/public/';
 
-    let build = 'app/client/build/'
+    let build = 'app/client/build/';
     let buildStaging = build + 'staging/';
     let buildDist = build + 'dist/';
-+
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
@@ -21,7 +21,8 @@ module.exports = function(grunt) {
         jshint: {
             all: [
                 'Gruntfile.js',
-                'app/**/*.js'
+                'app/client/!(build)/**/*.js',
+                'app/server/src/**/*.js'
             ],
             options: {
                 // ECMAScript version 6
@@ -190,7 +191,7 @@ module.exports = function(grunt) {
         });
 
         return results;
-    }
+    };
 
     // Dynamically add a key-value-pair to pug.compile.files for every file in
     // app/server/src/views

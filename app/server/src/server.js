@@ -2,7 +2,7 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var helmet = require('helmet');
 var logger = require('morgan');
-var mongodb = require('mongodb')
+var mongodb = require('mongodb');
 var path = require('path');
 var queries = require('./queries.js');
 var db = require('./database.js');
@@ -61,7 +61,7 @@ module.exports = function(port, skipIndex) {
             return queries.dropIfExists('courses')
                     .then(queries.indexInstitutions)
                     .then(function(report) {
-                        console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`)
+                        console.log(`Indexed ${report.coursesIndexed} courses from ${report.institutionsIndexed} institutions`);
                     });
         } else {
             console.log('Skipping index step. Courses may not be up to date.');
@@ -72,4 +72,4 @@ module.exports = function(port, skipIndex) {
     }).catch(function(reason) {
         throw reason;
     });
-}
+};
