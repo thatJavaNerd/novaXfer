@@ -2,7 +2,8 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
-            testPrep: ['.cache', 'build']
+            testPrep: ['.cache', 'build'],
+            buildPrep: ['app/public/build', 'app/public/dist']
         },
         run: {
             server: {
@@ -55,23 +56,52 @@ module.exports = function(grunt) {
             }
         },
         browserify: {
+            // Enable source maps at the end of the file
+            // options: {
+            //     browserifyOptions: {
+            //         debug: true
+            //     }
+            // },
             js: {
                 src: './app/public/app.module.js',
-                dest: './app/public/dist/dist.js'
+                dest: './app/public/build/dist.js'
+            }
+        },
+        babel: {
+            options: {
+                presets: ['es2015'],
+                compact: true
+            },
+            dist: {
+                files: {
+                    'app/public/build/dist.babel.js': 'app/public/build/dist.js'
+                }
+            }
+        },
+        uglify: {
+            options: {
+                banner: '/*! Grunt Uglify <%= grunt.template.today("yyyy-mm-dd") %> */ ',
+            },
+            build: {
+                files: {
+                    'app/public/dist/dist.min.js': ['app/public/build/dist.babel.js']
+                }
             }
         },
         watch: {
             js: {
-                files: ['./app/public/**/!(dist).js'],
-                tasks: ['browserify']
+                files: ['./app/public/**/!(dist.min).js'],
+                tasks: ['build']
             }
         }
     });
 
     var tasks = [
+        'babel',
         'browserify',
         'contrib-clean',
         'contrib-jshint',
+        'contrib-uglify',
         'contrib-watch',
         'coveralls',
         'karma',
@@ -88,5 +118,5 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['mochaTest', 'karma']);
     grunt.registerTask('testCoverage', ['clean:testPrep', 'mocha_istanbul', 'karma']);
     grunt.registerTask('uploadCoverage', ['lcovMerge', 'coveralls']);
-    grunt.registerTask('build', ['browserify']);
+    grunt.registerTask('build', ['clean:buildPrep', 'browserify', 'babel', 'uglify']);
 };

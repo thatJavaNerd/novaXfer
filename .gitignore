@@ -4,3 +4,4 @@ todo.txt
 .cache/
 build/
 app/public/dist
+app/public/build
