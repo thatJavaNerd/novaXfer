@@ -5,9 +5,14 @@ node_js:
   - 6
 services:
   - mongodb
-script: grunt mochaTest
-after_success: grunt jshint
+before_script:
+  # Virtual screen for firefox to execute Karma tests
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+script: grunt testCoverage
+after_success: grunt uploadCoverage; grunt jshint
 addons:
+  firefox: latest
   apt:
     sources:
       - mongodb-upstart

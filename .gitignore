@@ -1,5 +1,6 @@
-node_modules
+node_modules/
 npm-debug.log
 todo.txt
 .cache/
-app/public/bower_components
+build/
+app/server/public/
