@@ -114,6 +114,12 @@ module.exports = function(grunt) {
                 dest: buildDist + 'scripts',
                 expand: true
             },
+            style: {
+                cwd: buildDist + 'style',
+                src: ['*.min.css', '*.min.css.map'],
+                dest: finalDist + 'style',
+                expand: true
+            },
             dist: {
                 cwd: buildDist,
                 src: '**', // copy all files and subdirectories
@@ -123,12 +129,12 @@ module.exports = function(grunt) {
         },
         watch: {
             js: {
-                files: ['./app/public/**/!(dist.min).js'],
-                tasks: ['build']
+                files: ['app/client/*.js', 'app/client/!(build)/**/*.js'],
+                tasks: ['browserify', 'babel', 'uglify', 'copy:scripts']
             },
             css: {
-                files: ['./app/public/style/*.css'],
-                tasks: ['cssmin']
+                files: ['./app/client/_assets/style/*.css'],
+                tasks: ['cssmin', 'copy:style']
             }
         }
     });
