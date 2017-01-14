@@ -4,7 +4,7 @@
   "description": "Quick and easy NVCC course equivalencies",
   "main": "server.js",
   "scripts": {
-    "postinstall": "grunt build",
+    "postinstall": "node_modules/.bin/grunt build",
     "start": "node main --use-strict"
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
