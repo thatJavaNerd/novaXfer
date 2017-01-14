@@ -239,8 +239,7 @@ module.exports = function(grunt) {
         'karma',
         'lcov-merge',
         'mocha-test',
-        'mocha-istanbul',
-        'run'
+        'mocha-istanbul'
     ];
 
     for (var i = 0; i < tasks.length; i++) {
