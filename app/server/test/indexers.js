@@ -1,8 +1,8 @@
 var assert = require('assert');
 var fs = require('fs');
-var indexers = require('../app/indexers');
-var util = require('../app/util.js');
-var models = require('../app/models.js');
+var indexers = require('../src/indexers');
+var util = require('../src/util.js');
+var models = require('../src/models.js');
 
 describe('indexers', function() {
     describe('#findIndexers', function() {
@@ -18,7 +18,7 @@ describe('indexers', function() {
     this.timeout(30000);
 
     ['cnu', 'gmu', 'gt', 'uva', 'vcu', 'vt', 'wm'].forEach(function(inst) {
-        let indexer = require(`../app/indexers/${inst}.js`);
+        let indexer = require(`../src/indexers/${inst}.js`);
         describe(`${indexer.institution.acronym} indexer`, function() {
             it('should return an array valid courses from findAll()', function() {
                 return testIndexerEquivalencies(indexer);

@@ -1,5 +1,5 @@
-var db = require('../app/database.js');
-var queries = require('../app/queries.js');
+var db = require('../src/database.js');
+var queries = require('../src/queries.js');
 var assert = require('assert');
 
 describe('database queries', function() {

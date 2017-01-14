@@ -1,4 +1,6 @@
-angular.module('core').filter('equivalency', function() {
+var _ = require('lodash');
+
+module.exports = function() {
     let formatCredits = function(credits) {
         if (credits === -1) return '?';
         if (typeof credits === 'object') return `${credits.min}-${credits.max}`;
@@ -50,4 +52,4 @@ angular.module('core').filter('equivalency', function() {
 
         return newArr;
     });
-});
+};
