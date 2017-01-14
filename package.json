@@ -1,10 +1,11 @@
 {
   "name": "novaXfer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Quick and easy NVCC course equivalencies",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js --use-strict"
+    "postinstall": "grunt build",
+    "start": "node main --use-strict"
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
   "license": "MIT",

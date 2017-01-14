@@ -39,7 +39,7 @@ router.get('/partial/:name', function(req, res, next) {
 
 let sendError = function(next, message, status = 404) {
     return next({status: status, message: message});
-}
+};
 
 let fileServeOptions = {
     dotfiles: 'deny',
@@ -53,6 +53,6 @@ let sendView = function(res, fileName) {
             else return fulfill(fileName);
         });
     });
-}
+};
 
 module.exports = router;
