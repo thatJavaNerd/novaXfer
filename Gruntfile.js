@@ -3,7 +3,7 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         clean: {
             testPrep: ['.cache', 'build'],
-            buildPrep: ['app/public/build', 'app/public/dist']
+            buildPrep: ['app/public/build', 'app/public/dist', 'app/public/fonts']
         },
         run: {
             server: {
@@ -21,8 +21,7 @@ module.exports = function(grunt) {
         jshint: {
             all: [
                 'Gruntfile.js',
-                'app/**/*.js',
-                '!app/public/bower_components/**/*.js'
+                'app/**/*.js'
             ],
             options: {
                 // ECMAScript version 6
@@ -88,18 +87,58 @@ module.exports = function(grunt) {
                 }
             }
         },
+        cssmin: {
+            options: {
+                sourceMap: true
+            },
+            build: {
+                files: [{
+                    // Created dynamically
+                }]
+            }
+        },
+        copy: {
+            fonts: {
+                cwd: 'node_modules/bootstrap/dist/fonts/',
+                src: '*',
+                dest: 'app/public/fonts/',
+                expand: true
+            }
+        },
         watch: {
             js: {
                 files: ['./app/public/**/!(dist.min).js'],
                 tasks: ['build']
+            },
+            css: {
+                files: ['./app/public/style/*.css'],
+                tasks: ['cssmin']
             }
         }
     });
+
+    // Created a .min.css file for every CSS file in the style directory that
+    // isn't base.css
+    let cssminProp = 'cssmin.build.files';
+    let files = [];
+    ['scl', 'table'].forEach(css => {
+        files.push({
+            src: [
+                'app/public/style/base.css',
+                `app/public/style/${css}.css`,
+                'node_modules/bootstrap/dist/css/bootstrap.css'
+            ],
+            dest: `app/public/dist/${css}.min.css`
+        });
+    });
+    grunt.config(cssminProp, files);
 
     var tasks = [
         'babel',
         'browserify',
         'contrib-clean',
+        'contrib-copy',
+        'contrib-cssmin',
         'contrib-jshint',
         'contrib-uglify',
         'contrib-watch',
@@ -118,5 +157,5 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['mochaTest', 'karma']);
     grunt.registerTask('testCoverage', ['clean:testPrep', 'mocha_istanbul', 'karma']);
     grunt.registerTask('uploadCoverage', ['lcovMerge', 'coveralls']);
-    grunt.registerTask('build', ['clean:buildPrep', 'browserify', 'babel', 'uglify']);
+    grunt.registerTask('build', ['clean:buildPrep', 'browserify', 'babel', 'uglify', 'cssmin', 'copy:fonts']);
 };
