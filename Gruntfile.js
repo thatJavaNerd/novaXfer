@@ -1,3 +1,5 @@
+let fs = require('fs');
+
 module.exports = function(grunt) {
     let finalDist = 'app/server/public/';
 
@@ -95,6 +97,13 @@ module.exports = function(grunt) {
                 }]
             }
         },
+        pug: {
+            compile: {
+                files: {
+                    // Created dynamically
+                }
+            }
+        },
         copy: {
             fonts: {
                 cwd: 'node_modules/bootstrap/dist/fonts/',
@@ -120,6 +129,12 @@ module.exports = function(grunt) {
                 dest: finalDist + 'style',
                 expand: true
             },
+            views: {
+                cwd: buildDist + 'views',
+                src: '**',
+                dest: finalDist + 'views',
+                expand: true
+            },
             dist: {
                 cwd: buildDist,
                 src: '**', // copy all files and subdirectories
@@ -135,6 +150,10 @@ module.exports = function(grunt) {
             css: {
                 files: ['./app/client/_assets/style/*.css'],
                 tasks: ['cssmin', 'copy:style']
+            },
+            views: {
+                files: ['app/server/src/views/**/*.pug'],
+                tasks: ['pug', 'copy:views']
             }
         }
     });
@@ -155,6 +174,50 @@ module.exports = function(grunt) {
     });
     grunt.config(cssminProp, files);
 
+    let walkTree = function(dir) {
+        if (dir.endsWith('/'))
+            dir = dir.substring(0, dir.length - 1);
+
+        let results = [];
+        let files = fs.readdirSync(dir);
+        files.forEach(file => {
+            file = dir + '/' + file;
+            let stat = fs.statSync(file);
+            if (stat && stat.isDirectory())
+                results = results.concat(walkTree(file));
+            else
+                results.push(file);
+        });
+
+        return results;
+    }
+
+    // Dynamically add a key-value-pair to pug.compile.files for every file in
+    // app/server/src/views
+
+    let srcDir = 'app/server/src/views/';
+    let outDir = buildDist + 'views/';
+    let filesMap = {};
+
+    // All views that can't be rendered statically or shouldn't be rendered
+    // directly
+    let excludeViews = ['error.pug', 'layout.pug'];
+
+    walkTree(srcDir).forEach(view => {
+        // Get the file name relative to srcDir
+        let relativeName = view.slice(srcDir.length);
+
+        // Ignore dynamic views
+        if (excludeViews.includes(relativeName)) {
+            return;
+        }
+
+        let relativeBasename = relativeName.substring(0, relativeName.lastIndexOf('.'));
+        let compiledPath = outDir + relativeBasename + '.html';
+        filesMap[compiledPath] = view;
+    });
+    grunt.config('pug.compile.files', filesMap);
+
     var tasks = [
         'babel',
         'browserify',
@@ -163,6 +226,7 @@ module.exports = function(grunt) {
         'contrib-cssmin',
         'contrib-jshint',
         'contrib-uglify',
+        'contrib-pug',
         'contrib-watch',
         'coveralls',
         'karma',
@@ -180,5 +244,5 @@ module.exports = function(grunt) {
     grunt.registerTask('test', ['mochaTest', 'karma']);
     grunt.registerTask('testCoverage', ['clean:testPrep', 'mocha_istanbul', 'karma']);
     grunt.registerTask('uploadCoverage', ['lcovMerge', 'coveralls']);
-    grunt.registerTask('build', ['clean:buildPrep', 'browserify', 'babel', 'uglify', 'cssmin', 'copy']);
+    grunt.registerTask('build', ['clean:buildPrep', 'browserify', 'babel', 'uglify', 'cssmin', 'pug', 'copy']);
 };
