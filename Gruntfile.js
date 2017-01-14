@@ -199,6 +199,11 @@ module.exports = function(grunt) {
     let outDir = buildDist + 'views/';
     let filesMap = {};
 
+    // Data to be passed to every template
+    let data = {
+        year: new Date().getFullYear()
+    };
+
     // All views that can't be rendered statically or shouldn't be rendered
     // directly
     let excludeViews = ['error.pug', 'layout.pug'];
@@ -217,6 +222,7 @@ module.exports = function(grunt) {
         filesMap[compiledPath] = view;
     });
     grunt.config('pug.compile.files', filesMap);
+    grunt.config('pug.compile.options.data', data);
 
     var tasks = [
         'babel',
