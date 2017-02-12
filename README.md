@@ -1,6 +1,6 @@
 # novaXfer
 
-[![Travis](https://img.shields.io/travis/rust-lang/rust.svg)](https://travis-ci.org/thatJavaNerd/novaXfer)
+[![Travis](https://img.shields.io/travis/thatJavaNerd/novaXfer.svg)](https://travis-ci.org/thatJavaNerd/novaXfer)
 [![Known Vulnerabilities](https://snyk.io/test/github/thatJavaNerd/novaXfer/badge.svg)](https://snyk.io/test/github/thatjavanerd/novaxfer)
 [![David](https://img.shields.io/david/thatJavaNerd/novaXfer.svg)](https://david-dm.org/thatJavaNerd/novaXfer)
 
