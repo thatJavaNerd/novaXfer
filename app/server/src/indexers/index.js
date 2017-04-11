@@ -26,7 +26,11 @@ module.exports.findIndexers = function() {
 module.exports.index = function() {
     // Find all our university course equivalency indexers
     return exports.findIndexers().then(function(indexers) {
-        return Promise.all(indexers.map(ind => require(ind).findAll()));
+        return Promise.all(indexers.map(ind =>
+            require(ind).findAll().catch(function(err) {
+                throw err;
+            })
+        ));
     }).then(function(contexts) {
         let totalCourses = 0;
         for (let context of contexts) {

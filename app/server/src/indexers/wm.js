@@ -23,6 +23,7 @@ function findAll() {
 function parseEquivalencies(rows) {
     var equivalencies = [];
 
+    let unparsableCount = 0;
     for (let i = 0; i < rows.length; i++) {
         let row = rows[i];
         // Test NVCC course description cell (index 0) to see if we can parse
@@ -66,13 +67,21 @@ function parseEquivalencies(rows) {
                 wmData = findGeneratorElement(partialMatch, rows[i + 1], wmPartsRegex);
         }
 
-        if (!wmData) throw `No wmData for rows[${i}]=${rows[i]}`;
+        if (!wmData) {
+            // PDF parsing is hell. I've gotten 99% of this data and trying to
+            // parse that one course that is an exception to the exception to
+            // the exception is ludicrous
+            unparsableCount++;
+            continue;
+        }
 
         let wmMatrix = parseWmCourseMatrix(wmData);
         for (let wm of wmMatrix)
             equivalencies.push(new models.CourseEquivalency(nvcc, wm, util.determineEquivType(wm, 'ELT')));
 
     }
+
+    if (unparsableCount > 0) console.log('W&M: Unable to parse ' + unparsableCount + ' courses');
 
     return new models.EquivalencyContext(institution, equivalencies);
 }

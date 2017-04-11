@@ -43,15 +43,6 @@ module.exports = {
             });
         }
     },
-    loadConfig: function(name) {
-        return new Promise(function(fulfill, reject) {
-            var cfg = `${path.resolve(__dirname)}/config/${name}.json`;
-            fs.readFile(cfg, (err, data) => {
-                if (err) reject(err);
-                else fulfill(JSON.parse(data));
-            });
-        });
-    },
     /**
      * Attempts to parse one or more lists of credits.
      *

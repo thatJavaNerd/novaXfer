@@ -3,34 +3,35 @@ var request = util.request;
 var models = require('../models.js');
 var cheerio = require('cheerio');
 
-const dataUrl = 'http://www.transfer.vcu.edu/vccs/course-equivalency.aspx';
-const vcuCourseIndex = 3;
-const creditsColumnOffset = 2;
+const dataUrl = 'https://apps.sem.vcu.edu/feeds/transfer/courses/VCCS';
 
 function findAll() {
-    // Load the POST data from config/vcu.json and send the request
-    return util.loadConfig('vcu').then(function(postData) {
-        var requestData = {
-            url: dataUrl,
-            method: 'POST',
-            form: postData
-        };
-
-        return request(requestData, module.exports.institution);
-    }).then(parseEquivalencies);
+    return request(dataUrl, module.exports.institution)
+    .then(parseEquivalencies);
 }
 
 function parseEquivalencies(body) {
-    var $ = cheerio.load(body);
+    let parsed = JSON.parse(body.toString('utf8'));
     var equivalencies = [];
 
-    // Find all <tr> with CCS classes of 'even' and 'odd' within the table. The
-    // rows that don't have one of these two classes are dedicated to headers.
-    var tableRows = $('table.course-table tr.even,.odd');
-    tableRows.each(function(index, element) {
-        var equivRawData = $(this).children('td').map(function() {return $(this).text();});
-        var inputMatrix = parseRawCourses(equivRawData);
-        var outputMatrix = parseRawCourses(equivRawData, vcuCourseIndex);
+    for (let equivalency of parsed) {
+        equivalencies.push(new models.CourseEquivalency(
+            parseCourseList(equivalency.Transfer),
+            parseCourseList(equivalency.VCU),
+            models.TYPE_DIRECT
+        ));
+    }
+
+    return new models.EquivalencyContext(module.exports.institution, equivalencies);
+}
+
+function parseEquivalencies(body) {
+    let parsed = JSON.parse(body.toString('utf8'));
+    var equivalencies = [];
+
+    for (let equivalency of parsed) {
+        var inputMatrix = parseRawCourses(equivalency.Transfer);
+        var outputMatrix = parseRawCourses(equivalency.VCU);
 
         for (let input of inputMatrix) {
             for (let output of outputMatrix) {
@@ -38,13 +39,13 @@ function parseEquivalencies(body) {
                     new models.CourseEquivalency(input, output, util.determineEquivType(output)));
             }
         }
-    });
+    }
 
     return new models.EquivalencyContext(module.exports.institution, equivalencies);
 }
 
-function parseRawCourses(equivRawData, offset = 0) {
-    return parseCourses(equivRawData[offset], equivRawData[offset + creditsColumnOffset]);
+function parseRawCourses(courseListStruct) {
+    return parseCourses(courseListStruct.CourseNumber, courseListStruct.CreditHours);
 }
 
 /**
