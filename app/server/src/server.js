@@ -9,7 +9,7 @@ var db = require('./database.js');
 
 const app = express();
 
-module.exports = function(port, skipIndex) {
+module.exports = function(port, forceIndex) {
     ///////////////////// CONFIGURATION /////////////////////
     app.set('views', path.join(__dirname, './views'));
     app.set('view engine', 'pug');
@@ -55,8 +55,11 @@ module.exports = function(port, skipIndex) {
 
     ///////////////////////// START /////////////////////////
     // Connect to MongoDB
-    db.connect(db.MODE_PRODUCTION).then(function() {
-        if (!skipIndex) {
+    db.connect(db.MODE_PRODUCTION)
+    .then(function() {
+        return queries.shouldIndex();
+    }).then(function(shouldIndex) {
+        if (shouldIndex || forceIndex) {
             console.log('Indexing...');
             return queries.dropIfExists('courses')
                     .then(queries.indexInstitutions)
@@ -66,6 +69,7 @@ module.exports = function(port, skipIndex) {
         } else {
             console.log('Skipping index step. Courses may not be up to date.');
         }
+
     }).then(function() {
         app.listen(port);
         console.log('Magic is happening on port ' + port);
