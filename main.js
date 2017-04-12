@@ -10,12 +10,12 @@ process.on('unhandledRejection', function(reason, p) {
 // Define a port to host the server on
 const port = process.env.PORT || 8080;
 
-// Whether or not to skip indexing institutions
-var skipIndex = false;
+// Whether or not to force the indexing of institutions
+var forceIndex = false;
 process.argv.slice(2).forEach(function(val, index, array) {
-    if (val === '--no-index') {
-        skipIndex = true;
+    if (val === '--force-index') {
+        forceIndex = true;
     }
 });
 
-require('./app/server/src/server.js')(port, skipIndex);
+require('./app/server/src/server.js')(port, forceIndex);

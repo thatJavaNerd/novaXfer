@@ -3,6 +3,11 @@ var db = require('./database.js');
 
 const COLL_COURSES = 'courses';
 const COLL_INSTITUTIONS = 'institutions';
+const COLL_META = '__meta__';
+
+// Increment when we change our dataset (index a new institution)
+const CURRENT_DATASET_VERSION = 1;
+const META_DOC_ID = 'metadata';
 
 /**
  * Retrieves all courses in a given subject
@@ -142,7 +147,9 @@ module.exports.indexInstitutions = function() {
         indexReport = result;
         // Then add those equivalencies to the database
         return bulkUpsert(result.equivalencyContexts);
-    }).then(function(result) {
+    }).then(function() {
+        return upsertMetadata();
+    }).then(function() {
         return indexReport;
     });
 };
@@ -156,6 +163,23 @@ module.exports.dropIfExists = function(collection) {
         }
     });
 };
+
+module.exports.shouldIndex = function() {
+    return db.mongo().collection(COLL_META).findOne({_id: META_DOC_ID}).then(function(meta) {
+        if (meta === null) return true;
+        if (meta.datasetVersion === undefined) return true;
+        return meta.datasetVersion !== CURRENT_DATASET_VERSION;
+    });
+};
+
+function upsertMetadata() {
+    return db.mongo().collection(COLL_META)
+        .updateOne(
+            {_id: META_DOC_ID},
+            { $set: { datasetVersion: CURRENT_DATASET_VERSION } },
+            { upsert: true }
+        );
+}
 
 function bulkUpsert(equivalencyContexts) {
     let operations = [];
