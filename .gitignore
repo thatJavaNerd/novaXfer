@@ -3,4 +3,5 @@ npm-debug.log
 todo.txt
 .cache/
 build/
+.idea
 app/server/public/
