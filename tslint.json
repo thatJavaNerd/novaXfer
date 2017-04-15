@@ -1,0 +1,22 @@
+{
+    "rules": {
+        "max-line-length": {
+            "options": [85]
+        },
+        "no-magic-numbers": true,
+        "prefer-for-of": true,
+        "no-bitwise": true,
+        "no-construct": true,
+        "no-debugger": true,
+        "no-empty": true,
+        "no-eval": true,
+        "no-shadowed-variable": true,
+        "no-string-throw": true,
+        "triple-equals": true,
+        "eofline": true,
+        "indent": [true, "spaces"],
+        "linebreak-style": [true, "LF"],
+        "arrow-return-shorthand": true,
+        "jsdoc-format": true
+    }
+}

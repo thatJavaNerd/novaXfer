@@ -1,0 +1,9 @@
+extends layout
+
+block append stylesheets
+    link(rel='stylesheet', href='/style/scl.min.css')
+
+block content
+    single-course-lookup
+    div.container.text-center
+        a(href='/table') Need bulk equivalencies?
