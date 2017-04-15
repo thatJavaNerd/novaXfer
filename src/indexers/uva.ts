@@ -41,7 +41,7 @@ export default class UvaIndexer extends HtmlIndexer {
             const nvccCourses = [parseCourse($(this), nvccIndex)];
             const uvaCourses = [parseCourse($(this), uvaIndex)];
 
-            const eq = new models.CourseEquivalency(nvccCourses, uvaCourses, EquivType.DIRECT);
+            const eq = new CourseEquivalency(nvccCourses, uvaCourses, EquivType.DIRECT);
 
             if (index + 1 < rows.length) {
                 // Possibility of extraneous row

@@ -65,7 +65,7 @@ export default class VtIndexer extends Indexer<any> {
                 entry.gsx$vccscredits.$t
             );
 
-            const equiv = new models.CourseEquivalency(nvccCourses, vtCourses, util.determineEquivType(vtCourses));
+            const equiv = new CourseEquivalency(nvccCourses, vtCourses, util.determineEquivType(vtCourses));
 
             equivalencies.push(equiv);
         }

@@ -81,7 +81,7 @@ export default class WmIndexer extends PdfIndexer {
 
             let wmMatrix = parseWmCourseMatrix(wmData);
             for (let wm of wmMatrix)
-                equivalencies.push(new models.CourseEquivalency(nvcc, wm, util.determineEquivType(wm, 'ELT')));
+                equivalencies.push(new CourseEquivalency(nvcc, wm, util.determineEquivType(wm, 'ELT')));
 
         }
 
@@ -154,7 +154,7 @@ function parseWmCourseMatrix(raw): Course[][] {
 
     // `credits` is the last capture group, use it if available
     let credits = matches[ matches.length - 1 ] ?
-        parseInt(matches[ matches.length - 1 ]) : models.CREDITS_UNKNOWN;
+        parseInt(matches[ matches.length - 1 ]) : CREDITS_UNKNOWN;
 
     let courses: Course[][] = [ [ {
         subject: matches[ 1 ] as string,
