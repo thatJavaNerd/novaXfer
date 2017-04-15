@@ -1,6 +1,4 @@
-import { HtmlIndexer } from './index';
-import * as models from '../models';
-import * as util from '../util';
+import { HtmlIndexer, normalizeWhitespace, determineEquivType } from './index';
 import {
     Course, CourseEquivalency, EquivType
 } from '../models';
@@ -58,7 +56,7 @@ export default class UvaIndexer extends HtmlIndexer {
                 }
             }
 
-            eq.type = determineEquivType(eq.output);
+            eq.type = findEquivType(eq.output);
 
             equivalencies.push(eq);
         });
@@ -74,7 +72,7 @@ export default class UvaIndexer extends HtmlIndexer {
 }
 
 function parseCourse($tr, index): Course {
-    const baseStr = util.normalizeWhitespace($tr.children(`td:nth-child(${index})`)
+    const baseStr = normalizeWhitespace($tr.children(`td:nth-child(${index})`)
         .text());
     if (baseStr === '(no credit)') {
         // UVA doesn't offer credit for this course, make up our own
@@ -125,13 +123,13 @@ function getRowType($tr) {
     return 'unknown';
 }
 
-function determineEquivType(uvaCourses) {
+function findEquivType(uvaCourses) {
     if (uvaCourses[0].subject === COURSE_NO_EQUIV.subject &&
         uvaCourses[0].number === COURSE_NO_EQUIV.number) {
 
         return EquivType.NONE;
     }
 
-    return util.determineEquivType(uvaCourses, 'T');
+    return determineEquivType(uvaCourses, 'T');
 }
 

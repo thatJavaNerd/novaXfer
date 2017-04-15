@@ -1,10 +1,7 @@
-import { PdfIndexer } from './index';
+import { determineEquivType, PdfIndexer } from './index';
 
-import * as util from '../util';
-import * as models from '../models';
 import {
     Course, CourseEquivalency, CREDITS_UNKNOWN,
-    EquivalencyContext
 } from '../models';
 
 // See http://regexr.com/3eukm for examples
@@ -81,7 +78,7 @@ export default class WmIndexer extends PdfIndexer {
 
             let wmMatrix = parseWmCourseMatrix(wmData);
             for (let wm of wmMatrix)
-                equivalencies.push(new CourseEquivalency(nvcc, wm, util.determineEquivType(wm, 'ELT')));
+                equivalencies.push(new CourseEquivalency(nvcc, wm, determineEquivType(wm, 'ELT')));
 
         }
 

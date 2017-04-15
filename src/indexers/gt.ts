@@ -1,8 +1,9 @@
-import { HtmlIndexer, Indexer } from './index';
 import {
-    Course, CourseEquivalency, CREDITS_UNKNOWN, EquivalencyContext, EquivType,
+    determineEquivType, HtmlIndexer, normalizeWhitespace
+} from './index';
+import {
+    Course, CourseEquivalency, CREDITS_UNKNOWN, EquivType,
 } from '../models';
-import * as util from '../util';
 
 const headerRows = 2;
 const nvccNumberIndex = 2;
@@ -96,7 +97,7 @@ export default class GtIndexer extends HtmlIndexer {
                 }
             }
 
-            const equiv = new CourseEquivalency(nvccCourses, gtCourses, determineEquivType(gtCourses));
+            const equiv = new CourseEquivalency(nvccCourses, gtCourses, findEquivType(gtCourses));
             equivalencies.push(equiv);
         });
 
@@ -110,7 +111,7 @@ export default class GtIndexer extends HtmlIndexer {
     };
 }
 
-function determineEquivType(gtCourses): EquivType {
+function findEquivType(gtCourses): EquivType {
     if (gtCourses[0].subject === 'ET') {
         // ET NOGT means no credit
         if (gtCourses[0].number === 'NOGT')
@@ -122,7 +123,7 @@ function determineEquivType(gtCourses): EquivType {
             return EquivType.SPECIAL;
     }
 
-    return util.determineEquivType(gtCourses);
+    return determineEquivType(gtCourses);
 }
 
 function columnAtIndex(tr, index) {
@@ -133,7 +134,7 @@ function getCourseNumber(tr, colIndex) {
     // The textual representation of course names are
     // {SUBJECT}&nbsp;&nbsp;{NUMBER}, so we replace the two special
     // spaces with one normal one.
-    return util.normalizeWhitespace(columnAtIndex(tr, colIndex).text()).split(' ');
+    return normalizeWhitespace(columnAtIndex(tr, colIndex).text()).split(' ');
 }
 
 function isExtraneousRow(tr) {

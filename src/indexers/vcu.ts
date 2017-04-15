@@ -1,5 +1,4 @@
-import * as util from '../util';
-import { Indexer } from './index';
+import { determineEquivType, Indexer, interpretCreditInput } from './index';
 import { Course, CourseEquivalency } from '../models';
 
 
@@ -22,7 +21,7 @@ export default class VcuIndexer extends Indexer<any> {
             for (let input of inputMatrix) {
                 for (let output of outputMatrix) {
                     equivalencies.push(
-                        new CourseEquivalency(input, output, util.determineEquivType(output)));
+                        new CourseEquivalency(input, output, determineEquivType(output)));
                 }
             }
         }
@@ -106,6 +105,6 @@ function parseCourse(courseStr, creditsStr): Course {
     return {
         subject: parts[0].trim(),
         number: parts[1].trim(),
-        credits: util.interpretCreditInput(creditsStr)[0]
+        credits: interpretCreditInput(creditsStr)[0]
     };
 }

@@ -1,5 +1,4 @@
-import { HtmlIndexer } from './index';
-import * as util from '../util';
+import { determineEquivType, HtmlIndexer } from './index';
 import {
     Course, CourseEquivalency, CREDITS_UNKNOWN, Institution
 } from '../models';
@@ -35,7 +34,7 @@ export default class GmuIndexer extends HtmlIndexer {
             const gmuCourses = parseCourses(vals, gmuNumberIndex, gmuCreditsIndex);
 
             equivalencies.push(new CourseEquivalency(
-                nvccCourses, gmuCourses, util.determineEquivType(gmuCourses, '---')));
+                nvccCourses, gmuCourses, determineEquivType(gmuCourses, '---')));
         });
 
         return equivalencies;

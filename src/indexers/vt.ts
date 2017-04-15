@@ -1,9 +1,9 @@
-import {Indexer} from "./index";
-import * as util from '../util';
+import {
+    determineEquivType, Indexer, interpretCreditInput,
+    normalizeWhitespace
+} from './index';
 import * as models from '../models';
 import { Course, CourseEquivalency } from '../models';
-
-const normalizeWhitespace = util.normalizeWhitespace;
 
 // Detect if a course is "evaluated on an individual basis." One of the entries
 // is misspelled, hence the optional second 'i'.
@@ -17,7 +17,7 @@ const institution = {
 
 export default class VtIndexer extends Indexer<any> {
     protected prepareRequest(): any {
-        return "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json";
+        return 'https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json';
     }
 
     protected parseBody(data: Buffer): Promise<any> {
@@ -34,7 +34,7 @@ export default class VtIndexer extends Indexer<any> {
             // ("MTH 173"), and courses that must be taken together that have a
             // different equivalency than if they were taken individually
             // ("MTH 175 + 176"). Skip entries dedicated to entire subjects.
-            if (entry.gsx$vccscredits.$t === "" || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
+            if (entry.gsx$vccscredits.$t === '' || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
                 continue;
 
             // There is a very specific entry which tells the reader to refer
@@ -65,7 +65,7 @@ export default class VtIndexer extends Indexer<any> {
                 entry.gsx$vccscredits.$t
             );
 
-            const equiv = new CourseEquivalency(nvccCourses, vtCourses, util.determineEquivType(vtCourses));
+            const equiv = new CourseEquivalency(nvccCourses, vtCourses, determineEquivType(vtCourses));
 
             equivalencies.push(equiv);
         }
@@ -108,7 +108,7 @@ function parseCourses(courseStr, creditsStr): Course[] {
         }
     }
 
-    const creditsArray = util.interpretCreditInput(creditsStr);
+    const creditsArray = interpretCreditInput(creditsStr);
 
     // Add all identified courses here. Assume there will be at least one course
     const courses: Course[] = [];
@@ -128,7 +128,7 @@ function parseCourses(courseStr, creditsStr): Course[] {
             // First letter is alphabetic, assume subject
             subject = parts[i];
         } else {
-            throw new Error("Invalid course segment: i=" + i + ", parts[i]=" + parts[i]);
+            throw new Error('Invalid course segment: i=' + i + ', parts[i]=' + parts[i]);
         }
     }
 
