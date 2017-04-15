@@ -1,12 +1,9 @@
 import {Indexer} from "./index";
 import * as util from '../util';
 import * as models from '../models';
-import { Course, CourseEquivalency, EquivalencyContext } from '../models';
+import { Course, CourseEquivalency } from '../models';
 
 const normalizeWhitespace = util.normalizeWhitespace;
-const request = util.request;
-
-const dataUrl = "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json";
 
 // Detect if a course is "evaluated on an individual basis." One of the entries
 // is misspelled, hence the optional second 'i'.
@@ -18,64 +15,65 @@ const institution = {
     location: 'Virginia'
 };
 
-export default class VtIndexer extends Indexer {
-    findAll() {
-        return request(dataUrl, this.institution).then(parseEquivalencies);
+export default class VtIndexer extends Indexer<any> {
+    protected prepareRequest(): any {
+        return "https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json";
+    }
+
+    protected parseBody(data: Buffer): Promise<any> {
+        return JSON.parse(data.toString('utf8'));
+    }
+
+    protected parseEquivalencies(body: any): CourseEquivalency[] {
+        const equivalencies: CourseEquivalency[] = [];
+        const entries = body.feed.entry;
+        for (let i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+
+            // The VT transfer site lists entire subjects ("MTH"), specific courses
+            // ("MTH 173"), and courses that must be taken together that have a
+            // different equivalency than if they were taken individually
+            // ("MTH 175 + 176"). Skip entries dedicated to entire subjects.
+            if (entry.gsx$vccscredits.$t === "" || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
+                continue;
+
+            // There is a very specific entry which tells the reader to refer
+            // to another site for ENGE equivalents. Ignore this entry.
+            if (entry.gsx$vccscoursetitle.$t === '' &&
+                entry.gsx$vtcoursetitle.$t === '')
+                continue;
+
+            let vtCourses = parseCourses(
+                // Some classes that don't have direct equivalents will be
+                // listed as either 'Yxxx' or 'YXXX' (where Y is a positive
+                // integer), make sure our output is uniform
+                entry.gsx$vtcoursenumber.$t.toUpperCase(),
+                entry.gsx$vtcredits.$t
+            );
+
+            if (vtCourses.length === 0 &&
+                individualRegex.test(entry.gsx$vtcoursetitle.$t) ||
+                individualRegex.test(entry.gsx$vtcoursenumber.$t))
+                vtCourses = [{
+                    subject: 'VT',
+                    number: 'XXXX',
+                    credits: -1
+                }];
+
+            const nvccCourses = parseCourses(
+                entry.gsx$vccscoursenumber.$t,
+                entry.gsx$vccscredits.$t
+            );
+
+            const equiv = new models.CourseEquivalency(nvccCourses, vtCourses, util.determineEquivType(vtCourses));
+
+            equivalencies.push(equiv);
+        }
+
+        return equivalencies;
     }
 
     institution = institution;
-}
-
-function parseEquivalencies(body): EquivalencyContext {
-    const equivalencies: CourseEquivalency[] = [];
-    const entries = JSON.parse(body).feed.entry;
-    for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-
-        // The VT transfer site lists entire subjects ("MTH"), specific courses
-        // ("MTH 173"), and courses that must be taken together that have a
-        // different equivalency than if they were taken individually
-        // ("MTH 175 + 176"). Skip entries dedicated to entire subjects.
-        if (entry.gsx$vccscredits.$t === "" || /^[a-z]{2,4}$/i.test(entry.gsx$vccscoursenumber.$t))
-            continue;
-
-        // There is a very specific entry which tells the reader to refer
-        // to another site for ENGE equivalents. Ignore this entry.
-        if (entry.gsx$vccscoursetitle.$t === '' &&
-                entry.gsx$vtcoursetitle.$t === '')
-            continue;
-
-        let vtCourses = parseCourses(
-            // Some classes that don't have direct equivalents will be
-            // listed as either 'Yxxx' or 'YXXX' (where Y is a positive
-            // integer), make sure our output is uniform
-            entry.gsx$vtcoursenumber.$t.toUpperCase(),
-            entry.gsx$vtcredits.$t
-        );
-
-        if (vtCourses.length === 0 &&
-            individualRegex.test(entry.gsx$vtcoursetitle.$t) ||
-            individualRegex.test(entry.gsx$vtcoursenumber.$t))
-            vtCourses = [{
-                subject: 'VT',
-                number: 'XXXX',
-                credits: -1
-            }];
-
-        const nvccCourses = parseCourses(
-            entry.gsx$vccscoursenumber.$t,
-            entry.gsx$vccscredits.$t
-        );
-
-        const equiv = new models.CourseEquivalency(nvccCourses, vtCourses, util.determineEquivType(vtCourses));
-
-        equivalencies.push(equiv);
-    }
-
-    return {
-        institution: institution,
-        equivalencies: equivalencies
-    };
 }
 
 function parseCourses(courseStr, creditsStr): Course[] {

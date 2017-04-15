@@ -1,19 +1,11 @@
-import * as util from '../util';
-import { Indexer } from './index';
+import { PdfIndexer } from './index';
 import {
     Course,
     CourseEquivalency,
     CREDITS_UNKNOWN,
-    EquivalencyContext
 } from '../models';
-import { determineEquivType, request } from '../util';
+import { determineEquivType } from '../util';
 
-const dataUrl = 'https://www.dropbox.com/s/br3di84myslbpqi/cnu.pdf?dl=1';
-const institution = {
-    acronym: 'CNU',
-    fullName: 'Christopher Newport University',
-    location: 'Virginia'
-};
 const subjectRegex = /^[A-Z]{3}$/;
 // Tests if the entirety of a string represents a valid course identifier.
 // Example: http://regexr.com/3estr
@@ -23,50 +15,51 @@ const courseStringTester = /^(?:([A-Z]{2,4} ?)?([0-9LX]{2,4})(?: & |\/ ?)?)+$/;
 const courseStringSeparator = /([A-Z]{3,4} ?)?([0-9LX]{3,4})/g;
 const defaultCnuCourseIndex = 4;
 
-export default class CnuIndexer extends Indexer {
-    findAll(): Promise<EquivalencyContext> {
-        return request(dataUrl, institution).then(util.parsePdf).then(parseEquivalencies);
+export default class CnuIndexer extends PdfIndexer {
+    protected prepareRequest(): any {
+        return 'http://cnu.edu/admission/transfer/_pdf/cnu-vccs-cnu_equivalent_course_table_02152017_kw.pdf';
     }
 
-    institution = institution;
-}
+    protected parseEquivalencies(rows: string[][]): CourseEquivalency[] {
+        const equivalencies: CourseEquivalency[] = [];
+        for (let row of rows) {
+            if (subjectRegex.test(row[0])) {
+                // NVCC is pretty convenient
+                const nvccCourses = parseNvccCourses(row);
 
-function parseEquivalencies(rows): EquivalencyContext {
-    const equivalencies: CourseEquivalency[] = [];
-    for (let row of rows) {
-        if (subjectRegex.test(row[0])) {
-            // NVCC is pretty convenient
-            const nvccCourses = parseNvccCourses(row);
-
-            // CNU isn't
-            let cnuCourses: Course[] | null = null;
-            for (let i = defaultCnuCourseIndex; i < row.length; i++) {
-                // Look for a cell represents the CNU course
-                const base = row[i].trim();
-                if (courseStringTester.test(base)) {
-                    cnuCourses = parseCnuCourses(base);
-                    break;
-                }
-
-                // Sometimes the full identifier can't fit on a single row,
-                // search the next row as well.
-                if (i + 1 < row.length) {
-                    const appended = base + ' ' + row[i + 1].trim();
-                    if (courseStringTester.test(appended)) {
-                        cnuCourses = parseCnuCourses(appended);
+                // CNU isn't
+                let cnuCourses: Course[] | null = null;
+                for (let i = defaultCnuCourseIndex; i < row.length; i++) {
+                    // Look for a cell represents the CNU course
+                    const base = row[i].trim();
+                    if (courseStringTester.test(base)) {
+                        cnuCourses = parseCnuCourses(base);
                         break;
                     }
-                }
-            }
 
-            equivalencies.push(new CourseEquivalency(
-                nvccCourses, cnuCourses!, determineEquivType(cnuCourses!)));
+                    // Sometimes the full identifier can't fit on a single row,
+                    // search the next row as well.
+                    if (i + 1 < row.length) {
+                        const appended = base + ' ' + row[i + 1].trim();
+                        if (courseStringTester.test(appended)) {
+                            cnuCourses = parseCnuCourses(appended);
+                            break;
+                        }
+                    }
+                }
+
+                equivalencies.push(new CourseEquivalency(
+                    nvccCourses, cnuCourses!, determineEquivType(cnuCourses!)));
+            }
         }
+
+        return equivalencies;
     }
 
-    return {
-        institution: institution,
-        equivalencies: equivalencies
+    institution = {
+        acronym: 'CNU',
+        fullName: 'Christopher Newport University',
+        location: 'Virginia'
     };
 }
 

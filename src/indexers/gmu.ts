@@ -1,13 +1,9 @@
-import {Indexer} from "./index";
+import { HtmlIndexer } from './index';
 import * as util from '../util';
 import {
-    Course, CourseEquivalency, CREDITS_UNKNOWN, EquivalencyContext,
-    Institution
+    Course, CourseEquivalency, CREDITS_UNKNOWN, Institution
 } from '../models';
 
-const cheerio = require('cheerio');
-
-const dataUrl = 'http://admissions.gmu.edu/transfer/transfercreditsearch.asp?state=VA&school=USVCCS&course=View+All';
 const institution: Institution = {
     acronym: 'GMU',
     fullName: 'George Mason University',
@@ -20,35 +16,32 @@ const nvccCreditsIndex = 2;
 const gmuNumberIndex = 3;
 const gmuCreditsIndex = 5;
 
-export default class GmuIndexer extends Indexer {
-    findAll(): Promise<EquivalencyContext> {
-        return util.request(dataUrl, institution).then(parseEquivalencies);
+export default class GmuIndexer extends HtmlIndexer {
+    protected prepareRequest(): any {
+        return 'http://admissions.gmu.edu/transfer/transfercreditsearch.asp?state=VA&school=USVCCS&course=View+All';
+    }
+
+    protected parseEquivalencies(body: CheerioStatic): CourseEquivalency[] {
+        const $ = body;
+        const equivalencies: CourseEquivalency[] = [];
+
+        const $rows = $('#contentPrimary tr').slice(headerRows);
+        $rows.each(function() {
+            const vals = $(this).children('td').map(function() {
+                return $(this).text();
+            });
+
+            const nvccCourses = parseCourses(vals, nvccNumberIndex, nvccCreditsIndex);
+            const gmuCourses = parseCourses(vals, gmuNumberIndex, gmuCreditsIndex);
+
+            equivalencies.push(new CourseEquivalency(
+                nvccCourses, gmuCourses, util.determineEquivType(gmuCourses, '---')));
+        });
+
+        return equivalencies;
     }
 
     institution = institution;
-}
-
-function parseEquivalencies(body): EquivalencyContext {
-    const $ = cheerio.load(body);
-    const equivalencies: CourseEquivalency[] = [];
-
-    const $rows = $('#contentPrimary tr').slice(headerRows);
-    $rows.each(function() {
-        const vals = $(this).children('td').map(function () {
-            return $(this).text();
-        });
-
-        const nvccCourses = parseCourses(vals, nvccNumberIndex, nvccCreditsIndex);
-        const gmuCourses = parseCourses(vals, gmuNumberIndex, gmuCreditsIndex);
-
-        equivalencies.push(new CourseEquivalency(
-            nvccCourses, gmuCourses, util.determineEquivType(gmuCourses, '---')));
-    });
-
-    return {
-        institution: institution,
-        equivalencies: equivalencies
-    };
 }
 
 function parseCourses(vals, numberIndex, creditsIndex): Course[] {

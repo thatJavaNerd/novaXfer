@@ -1,21 +1,10 @@
-import {Indexer} from "./index";
-import * as cheerio from 'cheerio';
+import { HtmlIndexer } from './index';
 import * as models from '../models';
 import * as util from '../util';
 import {
-    Course, CourseEquivalency, EquivalencyContext,
-    EquivType
+    Course, CourseEquivalency, EquivType
 } from '../models';
 
-const normalizeWhitespace = util.normalizeWhitespace;
-const request = util.request;
-
-const dataUrl = 'http://ascs8.eservices.virginia.edu/AsEquivs/Home/EquivsShow?schoolId=1001975';
-const institution = {
-    acronym: 'UVA',
-    fullName: 'University of Virginia',
-    location: 'Virginia'
-};
 const headerRows = 2;
 const nvccIndex = 1; // CSS queries are 1-indexed
 const uvaIndex = 2;
@@ -27,64 +16,65 @@ const COURSE_NO_EQUIV = {
     credits: 0
 };
 
-export default class UvaIndexer extends Indexer {
-    findAll(): Promise<EquivalencyContext> {
-        return request(dataUrl, institution).then(parseEquivalencies);
+export default class UvaIndexer extends HtmlIndexer {
+    protected prepareRequest(): any {
+        return 'http://ascs8.eservices.virginia.edu/AsEquivs/Home/EquivsShow?schoolId=1001975';
     }
 
-    institution = institution;
-}
+    protected parseEquivalencies(body: CheerioStatic): CourseEquivalency[] {
+        const $ = body;
+        const equivalencies: CourseEquivalency[] = [];
 
-function parseEquivalencies(body) {
-    const $ = cheerio.load(body);
-    const equivalencies: CourseEquivalency[] = [];
-
-    const rows = $($('table')[3]).find('tr').slice(headerRows);
-    rows.each(function(index) {
-        switch (getRowType($(this))) {
-            case 'unknown':
-                throw new Error("Found row with type 'unknown'");
-            case 'empty':// This is a row to separate courses, skip
-            case 'input':
-            case 'output':
-                // We handle supplement and freebie rows when their base courses
-                // are found
-                return true;
-        }
-
-        const nvccCourses = [parseCourse($(this), nvccIndex)];
-        const uvaCourses = [parseCourse($(this), uvaIndex)];
-
-        const eq = new models.CourseEquivalency(nvccCourses, uvaCourses, EquivType.DIRECT);
-
-        if (index + 1 < rows.length) {
-            // Possibility of extraneous row
-            const nextRowType = getRowType($(rows[index + 1]));
-            if (nextRowType === 'unknown') {
-                throw new Error("Found row with type 'unknown'");
+        const rows = $($('table')[3]).find('tr').slice(headerRows);
+        rows.each(function(index) {
+            switch (getRowType($(this))) {
+                case 'unknown':
+                    throw new Error('Found row with type \'unknown\'');
+                case 'empty':// This is a row to separate courses, skip
+                case 'input':
+                case 'output':
+                    // We handle supplement and freebie rows when their base courses
+                    // are found
+                    return true;
             }
-            if (nextRowType === 'input' || nextRowType === 'output') {
-                // Add a supplement
-                const columnIndex = nvccIndex; // Assume input course
-                if (nextRowType === 'output')
-                    index = uvaIndex;
-                eq[nextRowType].push(parseCourse($(rows[index + 1]), columnIndex));
+
+            const nvccCourses = [parseCourse($(this), nvccIndex)];
+            const uvaCourses = [parseCourse($(this), uvaIndex)];
+
+            const eq = new models.CourseEquivalency(nvccCourses, uvaCourses, EquivType.DIRECT);
+
+            if (index + 1 < rows.length) {
+                // Possibility of extraneous row
+                const nextRowType = getRowType($(rows[index + 1]));
+                if (nextRowType === 'unknown') {
+                    throw new Error('Found row with type \'unknown\'');
+                }
+                if (nextRowType === 'input' || nextRowType === 'output') {
+                    // Add a supplement
+                    const columnIndex = nvccIndex; // Assume input course
+                    if (nextRowType === 'output')
+                        index = uvaIndex;
+                    eq[nextRowType].push(parseCourse($(rows[index + 1]), columnIndex));
+                }
             }
-        }
 
-        eq.type = determineEquivType(eq.output);
+            eq.type = determineEquivType(eq.output);
 
-        equivalencies.push(eq);
-    });
+            equivalencies.push(eq);
+        });
 
-    return {
-        institution: institution,
-        equivalencies: equivalencies
+        return equivalencies;
+    }
+
+    institution = {
+        acronym: 'UVA',
+        fullName: 'University of Virginia',
+        location: 'Virginia'
     };
 }
 
 function parseCourse($tr, index): Course {
-    const baseStr = normalizeWhitespace($tr.children(`td:nth-child(${index})`)
+    const baseStr = util.normalizeWhitespace($tr.children(`td:nth-child(${index})`)
         .text());
     if (baseStr === '(no credit)') {
         // UVA doesn't offer credit for this course, make up our own
@@ -137,7 +127,7 @@ function getRowType($tr) {
 
 function determineEquivType(uvaCourses) {
     if (uvaCourses[0].subject === COURSE_NO_EQUIV.subject &&
-            uvaCourses[0].number === COURSE_NO_EQUIV.number) {
+        uvaCourses[0].number === COURSE_NO_EQUIV.number) {
 
         return EquivType.NONE;
     }

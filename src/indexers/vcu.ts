@@ -1,48 +1,39 @@
 import * as util from '../util';
 import { Indexer } from './index';
-import {
-    Course, CourseEquivalency, EquivalencyContext,
-    Institution
-} from '../models';
+import { Course, CourseEquivalency } from '../models';
 
-const request = util.request;
 
-const institution: Institution = {
-    acronym: 'VCU',
-    fullName: 'Virginia Commonwealth University',
-    location: 'Virginia'
-};
-
-const dataUrl = 'https://apps.sem.vcu.edu/feeds/transfer/courses/VCCS';
-
-export default class VcuIndexer extends Indexer {
-    findAll(): Promise<EquivalencyContext> {
-        return request(dataUrl, this.institution)
-            .then(parseEquivalencies);
+export default class VcuIndexer extends Indexer<any> {
+    protected prepareRequest(): any {
+        return 'https://apps.sem.vcu.edu/feeds/transfer/courses/VCCS';
     }
 
-    institution = institution;
-}
+    protected parseBody(data: Buffer): Promise<any> {
+        return JSON.parse(data.toString('utf8'));
+    }
 
-function parseEquivalencies(body): EquivalencyContext {
-    let parsed = JSON.parse(body.toString('utf8'));
-    const equivalencies: CourseEquivalency[] = [];
+    protected parseEquivalencies(body: any): CourseEquivalency[] {
+        const equivalencies: CourseEquivalency[] = [];
 
-    for (let equivalency of parsed) {
-        const inputMatrix = parseRawCourses(equivalency.Transfer);
-        const outputMatrix = parseRawCourses(equivalency.VCU);
+        for (let equivalency of body) {
+            const inputMatrix = parseRawCourses(equivalency.Transfer);
+            const outputMatrix = parseRawCourses(equivalency.VCU);
 
-        for (let input of inputMatrix) {
-            for (let output of outputMatrix) {
-                equivalencies.push(
-                    new CourseEquivalency(input, output, util.determineEquivType(output)));
+            for (let input of inputMatrix) {
+                for (let output of outputMatrix) {
+                    equivalencies.push(
+                        new CourseEquivalency(input, output, util.determineEquivType(output)));
+                }
             }
         }
+
+        return equivalencies;
     }
 
-    return {
-        institution: institution,
-        equivalencies: equivalencies
+    institution = {
+        acronym: 'VCU',
+        fullName: 'Virginia Commonwealth University',
+        location: 'Virginia'
     };
 }
 

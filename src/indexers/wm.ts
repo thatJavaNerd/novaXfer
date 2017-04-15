@@ -1,4 +1,4 @@
-import { Indexer } from './index';
+import { PdfIndexer } from './index';
 
 import * as util from '../util';
 import * as models from '../models';
@@ -6,14 +6,6 @@ import {
     Course, CourseEquivalency, CREDITS_UNKNOWN,
     EquivalencyContext
 } from '../models';
-
-const request = util.request;
-const dataUrl = 'http://www.wm.edu/offices/registrar/documents/transfer/vccs_transfer_guide_table.pdf';
-const institution = {
-    acronym: 'W&M',
-    fullName: 'William & Mary',
-    location: 'Virginia'
-};
 
 // See http://regexr.com/3eukm for examples
 const nvccPartsRegex = /^([A-Z]{3}) ([0-9]{3}) (?:(?:\+|or) ([0-9]{3}))?/;
@@ -27,80 +19,81 @@ const unclearEquivalencyRegex = /NS/;
 // http://regexr.com/3euo5
 const specialEquivalencyRegex = /^\*+ ?$/;
 
-export default class WmIndexer extends Indexer {
-    findAll() {
-        return request(dataUrl, institution).then(util.parsePdf).then(parseEquivalencies);
+export default class WmIndexer extends PdfIndexer {
+    protected prepareRequest(): any {
+        return 'http://www.wm.edu/offices/registrar/documents/transfer/vccs_transfer_guide_table.pdf';
     }
 
-    institution = institution;
-}
+    protected parseEquivalencies(rows: string[][]): CourseEquivalency[] {
+        const equivalencies: CourseEquivalency[] = [];
 
-function parseEquivalencies(rows): EquivalencyContext {
-    const equivalencies: CourseEquivalency[] = [];
+        let unparsableCount = 0;
+        for (let i = 0; i < rows.length; i++) {
+            let row = rows[ i ];
+            // Test NVCC course description cell (index 0) to see if we can parse
+            // this row as a course
 
-    let unparsableCount = 0;
-    for (let i = 0; i < rows.length; i++) {
-        let row = rows[ i ];
-        // Test NVCC course description cell (index 0) to see if we can parse
-        // this row as a course
+            // Search for the NVCC data. Usually everything can be found in the
+            // first element, but sometimes the PDF parser splits it in two.
+            let nvccData = findGeneratorElement('', row, nvccPartsRegex);
+            if (nvccData === null)
+                continue;
 
-        // Search for the NVCC data. Usually everything can be found in the
-        // first element, but sometimes the PDF parser splits it in two.
-        let nvccData = findGeneratorElement('', row, nvccPartsRegex);
-        if (nvccData === null)
-            continue;
+            let nvcc = parseNvccCourses(nvccData);
 
-        let nvcc = parseNvccCourses(nvccData);
+            let applicableElements = row.slice(1),
+                specialOrUnclearEquivalency = false,
+                wmData = null;
 
-        let applicableElements = row.slice(1),
-            specialOrUnclearEquivalency = false,
-            wmData = null;
+            // Don't operate on special or unclear equivalencies
+            for (let elem of applicableElements) {
+                if (specialEquivalencyRegex.test(elem) ||
+                    unclearEquivalencyRegex.test(elem))
+                    specialOrUnclearEquivalency = true;
+            }
 
-        // Don't operate on special or unclear equivalencies
-        for (let elem of applicableElements) {
-            if (specialEquivalencyRegex.test(elem) ||
-                unclearEquivalencyRegex.test(elem))
-                specialOrUnclearEquivalency = true;
+            // Some classes have very special handlings or unclear equivalencies
+            // ('need syllabus' classes). Skip these
+            if (specialOrUnclearEquivalency)
+                continue;
+
+            wmData = findGeneratorElement('', applicableElements, wmPartsRegex);
+
+            // We haven't been able to find a direct match so far, so we're
+            // gonna look for an indirect match using wmCourseTester. Once we've
+            // found an indirect match, we're gonna look into the next row for
+            // data to concatenate the indirect match to in order to find a
+            // direct match.
+            if (!wmData) {
+                let partialMatch = findGeneratorElement('', applicableElements, wmCourseTester);
+
+                if (partialMatch)
+                    wmData = findGeneratorElement(partialMatch, rows[ i + 1 ], wmPartsRegex);
+            }
+
+            if (!wmData) {
+                // PDF parsing is hell. I've gotten 99% of this data and trying to
+                // parse that one course that is an exception to the exception to
+                // the exception is ludicrous
+                unparsableCount++;
+                continue;
+            }
+
+            let wmMatrix = parseWmCourseMatrix(wmData);
+            for (let wm of wmMatrix)
+                equivalencies.push(new models.CourseEquivalency(nvcc, wm, util.determineEquivType(wm, 'ELT')));
+
         }
 
-        // Some classes have very special handlings or unclear equivalencies
-        // ('need syllabus' classes). Skip these
-        if (specialOrUnclearEquivalency)
-            continue;
+        if (unparsableCount > 0) console.log('W&M: Unable to parse ' + unparsableCount + ' courses');
 
-        wmData = findGeneratorElement('', applicableElements, wmPartsRegex);
-
-        // We haven't been able to find a direct match so far, so we're
-        // gonna look for an indirect match using wmCourseTester. Once we've
-        // found an indirect match, we're gonna look into the next row for
-        // data to concatenate the indirect match to in order to find a
-        // direct match.
-        if (!wmData) {
-            let partialMatch = findGeneratorElement('', applicableElements, wmCourseTester);
-
-            if (partialMatch)
-                wmData = findGeneratorElement(partialMatch, rows[ i + 1 ], wmPartsRegex);
-        }
-
-        if (!wmData) {
-            // PDF parsing is hell. I've gotten 99% of this data and trying to
-            // parse that one course that is an exception to the exception to
-            // the exception is ludicrous
-            unparsableCount++;
-            continue;
-        }
-
-        let wmMatrix = parseWmCourseMatrix(wmData);
-        for (let wm of wmMatrix)
-            equivalencies.push(new models.CourseEquivalency(nvcc, wm, util.determineEquivType(wm, 'ELT')));
-
+        return equivalencies;
     }
 
-    if (unparsableCount > 0) console.log('W&M: Unable to parse ' + unparsableCount + ' courses');
-
-    return {
-        institution: institution,
-        equivalencies: equivalencies
+    institution = {
+        acronym: 'W&M',
+        fullName: 'William & Mary',
+        location: 'Virginia'
     };
 }
 

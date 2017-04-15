@@ -26,7 +26,7 @@ describe('indexers', function() {
 
 const minEquivalencies = 100;
 
-function testIndexerEquivalencies(indexer: Indexer) {
+function testIndexerEquivalencies(indexer: Indexer<any>) {
     return indexer.findAll().then(function(equivalencyContext: EquivalencyContext) {
         validateInstitution(equivalencyContext.institution);
         let equivs = equivalencyContext.equivalencies;
