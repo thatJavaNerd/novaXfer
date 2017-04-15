@@ -5,6 +5,7 @@ import {
 } from '../src/models';
 import { expect } from 'chai';
 import { validateCourseArray, validateInstitution } from './validation';
+import CnuIndexer from '../src/indexers/cnu';
 
 describe('indexers', function() {
     // Increase timeout to 30 seconds because findAll() can be a long-running

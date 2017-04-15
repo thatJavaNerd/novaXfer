@@ -29,8 +29,8 @@ export function validateCourseArray(array: Course[]) {
 
     for (let course of array) {
         // Validate subject and number
-        expect(course.number).to.match(courseNumberRegex);
-        expect(course.subject).to.match(courseSubjectRegex);
+        expect(course.number).to.match(courseNumberRegex, JSON.stringify(course));
+        expect(course.subject).to.match(courseSubjectRegex, JSON.stringify(course));
 
         // Validate credit property
         const cr = course.credits;

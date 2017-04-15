@@ -13,6 +13,8 @@ const courseStringTester = /^(?:([A-Z]{2,4} ?)?([0-9LX]{2,4})(?: & |\/ ?)?)+$/;
 // Capture course identifier parts
 // Example: http://regexr.com/3esti
 const courseStringSeparator = /([A-Z]{3,4} ?)?([0-9LX]{3,4})/g;
+// http://regexr.com/3foll
+const courseNumberTester = /^\d{3}(?: ?[-+] ?\d{3})?$/;
 const defaultCnuCourseIndex = 4;
 
 export default class CnuIndexer extends PdfIndexer {
@@ -63,8 +65,21 @@ export default class CnuIndexer extends PdfIndexer {
     };
 }
 
-function parseNvccCourses(row) {
-    let courseNumbers = row[1].split(/[-+]/);
+function parseNvccCourses(row: string[]) {
+    let offset = 1;
+    let numberRaw: string;
+
+    if (courseNumberTester.test(row[offset].trim() + row[offset + 1].trim())) {
+        // The course number is broken up into two elements
+        numberRaw = row[offset].trim() + row[++offset].trim();
+    } else if (courseNumberTester.test(row[offset].trim())) {
+        // The course number is confined to one element
+        numberRaw = row[offset].trim();
+    } else {
+        throw new Error('Could not identify NVCC number for row ' + row);
+    }
+
+    let courseNumbers = numberRaw.split(/[-+]/);
     const courses: Course[] = [];
     let creditsUsed = false;
     for (let courseNumber of courseNumbers) {
@@ -76,31 +91,31 @@ function parseNvccCourses(row) {
         courses.push({
             subject: row[0],
             number: courseNumber,
-            credits: parseInt(row[2], 10)
+            credits: parseInt(row[1 + offset], 10)
         });
     }
 
     return courses;
 }
 
-function parseCnuCourses(rawString): Course[] {
+function parseCnuCourses(rawString: string): Course[] {
     let matchedCourses = rawString.match(courseStringSeparator);
     const courses: Course[] = [];
 
     // Split each match by a space and flat map. For example:
     // ['CHEM 104', '104L'] => ['CHEM', '104', '104L']
-    matchedCourses = [].concat.apply([], matchedCourses.map(course => separateCourseParts(course)));
+    matchedCourses = [].concat.apply([], matchedCourses!.map(course => separateCourseParts(course)));
 
-    let subject = matchedCourses[0];
-    for (let i = 1; i < matchedCourses.length; i++) {
-        if (/[A-Z]/.test(matchedCourses[i][0])) {
+    let subject = matchedCourses![0];
+    for (let i = 1; i < matchedCourses!.length; i++) {
+        if (/[A-Z]/.test(matchedCourses![i][0])) {
             // First letter is alphabetical, assume subject
-            subject = matchedCourses[i];
+            subject = matchedCourses![i];
         } else {
             // First letter is non-alphabetical, assume course number
             courses.push({
                 subject: subject,
-                number: matchedCourses[i],
+                number: matchedCourses![i],
                 credits: CREDITS_UNKNOWN
             });
         }
