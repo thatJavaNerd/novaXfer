@@ -2,6 +2,7 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const coveralls = require('gulp-coveralls');
 const tslint = require('gulp-tslint');
+const del = require('del');
 
 const tsProject = ts.createProject('tsconfig.json');
 
@@ -25,6 +26,10 @@ gulp.task('lint', () => {
             configuration: 'tslint.json'
         }))
         .pipe(tslint.report())
+});
+
+gulp.task('clean:testPrep', () => {
+    return del(['.cache'])
 });
 
 gulp.task('default', ['watch', 'assets']);

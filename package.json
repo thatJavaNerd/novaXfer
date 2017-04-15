@@ -4,7 +4,7 @@
   "description": "Quick and easy NVCC course equivalencies",
   "main": "server.js",
   "scripts": {
-    "test": "istanbul cover -e .ts _mocha -- --compilers ts:ts-node/register",
+    "test": "gulp clean:testPrep && istanbul cover -e .ts _mocha -- --compilers ts:ts-node/register",
     "start": "node main --use-strict"
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
@@ -39,6 +39,7 @@
     "@types/request": "^0.0.42",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
+    "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-coveralls": "^0.1.4",
     "gulp-tslint": "^8.0.0",
