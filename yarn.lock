@@ -29,6 +29,10 @@
   version "0.22.1"
   resolved "https://registry.yarnpkg.com/@types/cheerio/-/cheerio-0.22.1.tgz#740c4cd8c4d3f3074f83b9ab62e711eac2c764ce"
 
+"@types/colors@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@types/colors/-/colors-1.1.2.tgz#072f8120618f52374d9519888d9226370a98a5e5"
+
 "@types/express-serve-static-core@*":
   version "4.0.44"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.0.44.tgz#a1c3bd5d80e93c72fba91a03f5412c47f21d4ae7"
@@ -772,6 +776,10 @@ expand-tilde@^1.2.1, expand-tilde@^1.2.2:
   resolved "https://registry.yarnpkg.com/expand-tilde/-/expand-tilde-1.2.2.tgz#0b81eba897e5a3d31d1c3d102f8f01441e559449"
   dependencies:
     os-homedir "^1.0.1"
+
+express-list-endpoints@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/express-list-endpoints/-/express-list-endpoints-3.0.0.tgz#59144e76b19957f9b117b6350239288f16ee28b7"
 
 express@^4.15.2:
   version "4.15.2"
