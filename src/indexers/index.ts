@@ -1,5 +1,5 @@
 import { CourseEquivalency, EquivalencyContext, Institution } from '../models';
-import { request } from '../util';
+import request from './request';
 import * as pdf2table from 'pdf2table';
 import * as cheerio from 'cheerio';
 import * as _ from 'lodash';

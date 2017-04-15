@@ -1,9 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
-import { Database, Database as db, Mode } from './Database';
-import * as requestLib from 'request'
-import {Course, CreditRange, EquivType, Institution} from "./models";
+import { Database } from './Database';
+import {Course, CreditRange, EquivType } from "./models";
 
 const nbsp = String.fromCharCode(160);
 
@@ -13,37 +9,6 @@ const nbsp = String.fromCharCode(160);
  */
 export function normalizeWhitespace(text: string): string {
     return text.replace(new RegExp(`(?:\r\n|\r|\n|${nbsp}| )+`, 'g'), ' ').trim();
-}
-
-/** 'Denodeify' fs.access with Promises */
-export function ensureFileExists(file: string): Promise<any> {
-    return new Promise(function(fulfill, reject) {
-        fs.access(file, function(fserr) {
-            if (fserr) reject(fserr);
-            else fulfill(file);
-        });
-    });
-}
-
-/**
- * Specialized request() wrapper for indexers. Utilizes caching when
- * specified by shouldSkipCache().
- */
-export function request(requestData: any, institution: Institution, useCache = true): Promise<Buffer> {
-    if (institution === undefined)
-        return Promise.reject('expecting an institution');
-
-    if (!useCache || shouldSkipCache()) {
-        // Go directly for the fresh data
-        return networkRequest(requestData);
-    } else {
-        // Use fresh data if no cache is available
-        return loadCache(institution).catch(function() {
-            return networkRequest(requestData).then(function(contents) {
-                return saveCache(contents, institution);
-            });
-        });
-    }
 }
 
 /**
@@ -110,100 +75,4 @@ export async function dropIfExists(name: string) {
     // Drop if Mongo reports that a collection with that name exists,
     // otherwise return true
     return colls.length > 0 ? Database.get().mongo().dropCollection(colls[0].name) : true;
-}
-
-/** Uses the request module to send an HTTP request */
-function networkRequest(requestData: any): Promise<Buffer> {
-    return new Promise(function(fulfill, reject) {
-        const chunks: Buffer[] = [];
-        let error: Error | null = null;
-
-        requestLib(requestData)
-        .on('response', function(response) {
-            if (response.statusCode !== 200)
-                error = new Error(`Bad status code: ${response.statusCode}`);
-        }).on('error', function(err) {
-            if (err) error = err;
-        }).on('data', function(chunk: Buffer) {
-            chunks.push(chunk);
-        }).on('end', function() {
-            if (error) return reject(error);
-            else return fulfill(Buffer.concat(chunks));
-        });
-    });
-}
-
-/** Returns true if connected to the test database OR if not connected at all */
-function shouldSkipCache(): boolean {
-    return db.get()._mode() !== Mode.TEST && db.get()._mode() !== null;
-}
-
-/** Saves the given data to the file specified by `cacheFileForIndexer(institution)` */
-function saveCache(contents: Buffer, institution: Institution): Promise<string> {
-    const cache = cacheFileForIndexer(institution);
-    return mkdir(path.dirname(cache)).then(function() {
-        return new Promise(function(fulfill, reject) {
-            fs.writeFile(cacheFileForIndexer(institution), contents, function(err) {
-                if (err) reject(err);
-                else fulfill(contents);
-            });
-        });
-    });
-}
-
-/** Reads the file specified by `cacheFileForIndexer(institution)` */
-function loadCache(institution: Institution): Promise<Buffer> {
-    return new Promise(function(fulfill, reject) {
-        fs.readFile(cacheFileForIndexer(institution), (err, data) => {
-            if (err) reject(err);
-            else fulfill(data);
-        });
-    });
-}
-
-/**
- * Makes a directory if one does not already exist. Rejects if the given file
- * descriptor exists but is not a file.
- */
-function mkdir(dir: string): Promise<string> {
-    // Test if the directory exists
-    return ensureFileExists(dir)
-    .catch(function(err) {
-        return new Promise(function(fulfill, reject) {
-            if (err && err.code === 'ENOENT') {
-                // Catch an error if when accessing a directory that doesn't exist
-                fs.mkdir(dir, function(err) {
-                    // Then make said directory
-                    if (err) return reject(err);
-                    else return fulfill(dir);
-                });
-            } else {
-                // Some other unexpected error
-                return Promise.reject(err);
-            }
-        });
-    }).then(function() {
-        // lstat(2) our fd
-        return lstat(dir);
-    }).then(function(stats) {
-        // Make sure the directory is actually a directory
-        return new Promise(function(fulfill, reject) {
-            if (!stats.isDirectory()) reject('Exists, but not a directory: ' + dir);
-            else fulfill(dir);
-        });
-    });
-}
-
-/** Wraps a Promise around async lstat(2) */
-function lstat(fd): Promise<fs.Stats> {
-    return new Promise(function(fulfill, reject) {
-        fs.lstat(fd, function(err, stats) {
-            if (err) reject(err);
-            else fulfill(stats);
-        });
-    });
-}
-
-function cacheFileForIndexer(institution: Institution): string {
-    return `${path.resolve(__dirname)}/../.cache/${institution.acronym.toLowerCase()}`;
 }
