@@ -4,7 +4,7 @@ This document outlines common database structs.
 
 ## Courses collection
 
-### Course struct
+### Course
 
 Courses are found everywhere in the `courses` collection.
 
@@ -31,7 +31,7 @@ A course can also have a variable amount of credits. This example shows the cour
 }
 ```
 
-### Course equivalency struct
+### CourseEquivalency
 
 This struct defines courses from NVCC and output courses from the other institution. As an example:
 

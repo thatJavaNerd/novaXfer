@@ -7,6 +7,27 @@ export interface Course extends KeyCourse {
     credits?: number | CreditRange;
 }
 
+/**
+ * Shape of the data when fetching from the courses collection through queries
+ * and aggregations
+ */
+export interface CourseEntry {
+    subject: string;
+    number: string;
+    equivalencies: CourseEquivalencyDocument[];
+}
+
+/**
+ * Document representation of a CourseEquivalency when inserted into/pulled from
+ * the database.
+ */
+export interface CourseEquivalencyDocument {
+    institution: string;
+    type: string;
+    input: Course[];
+    output: Course[];
+}
+
 export class CourseEquivalency {
     /** Course to perform lookups on */
     keyCourse: KeyCourse;
@@ -22,6 +43,11 @@ export class CourseEquivalency {
     }
 }
 
+/**
+ * Used for inserting course equivalencies from the same institution into the
+ * database. Equivalencies pulled from the database have the shape of
+ * CourseEquivalencyDocument.
+ */
 export interface EquivalencyContext {
     institution: Institution;
     equivalencies: CourseEquivalency[];
