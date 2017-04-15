@@ -86,6 +86,23 @@ export class Database {
     _mode(): Mode | null {
         return this.__mode;
     }
+
+    /**
+     * Drops a collection from the database if it already exists. Resolves to
+     * true if the collection doesn't exist or if the collection was dropped
+     * successfully. Resolves to false if dropping was unsuccessful.
+     *
+     * @param name Collection name
+     */
+    async dropIfExists(name: string): Promise<boolean> {
+        if (!this.isConnected()) throw new Error('not connected');
+
+        // Find collections with the specified name
+        const colls = await this.__db!.listCollections({name: name}).toArray();
+        // Drop if Mongo reports that a collection with that name exists,
+        // otherwise return true
+        return colls.length > 0 ? await this.__db!.dropCollection(colls[0].name) : true;
+    }
 }
 
 /** Database connection mode */

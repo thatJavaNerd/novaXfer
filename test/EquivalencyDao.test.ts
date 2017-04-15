@@ -2,7 +2,6 @@
 import EquivalencyDao from '../src/queries/EquivalencyDao';
 import { findIndexers } from '../src/indexers/index';
 import * as _ from 'lodash';
-import { dropIfExists } from '../src/util';
 import { expect } from 'chai';
 import {
     CourseEquivalency, CourseEquivalencyDocument,
@@ -99,11 +98,11 @@ describe('EquivalencyDao', () => {
         });
 
 
-        after('drop collection', () => dropIfExists(dao.collectionName))
+        after('drop collection', () => Database.get().dropIfExists(dao.collectionName))
     });
 
     describe('writing and inserting', () => {
-        beforeEach('drop collection', () => dropIfExists(dao.collectionName));
+        beforeEach('drop collection', () => Database.get().dropIfExists(dao.collectionName));
 
         describe('get() and put()', async () => {
             it('should pull out data that is symbolically the same as what was put in', async () => {
@@ -132,7 +131,7 @@ describe('EquivalencyDao', () => {
     });
 
     after('clean collection and disconnect', async () => {
-        await dropIfExists(dao.collectionName);
+        await Database.get().dropIfExists(dao.collectionName);
         return Database.get().disconnect();
     });
 });

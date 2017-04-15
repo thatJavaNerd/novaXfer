@@ -4,7 +4,6 @@ import { Database, Mode } from '../src/Database';
 import InstitutionDao from '../src/queries/InstitutionDao';
 import { findIndexers } from '../src/indexers/index';
 import * as _ from 'lodash';
-import { dropIfExists } from '../src/util';
 import { validateInstitution } from './validation';
 import { Institution } from '../src/models';
 
@@ -31,11 +30,11 @@ describe('InstitutionDao', () => {
             });
         });
 
-        after('drop collection', () => dropIfExists(dao.collectionName))
+        after('drop collection', () => Database.get().dropIfExists(dao.collectionName))
     });
 
     describe('inserting and writing', () => {
-        beforeEach('drop collection', () => dropIfExists(dao.collectionName));
+        beforeEach('drop collection', () => Database.get().dropIfExists(dao.collectionName));
 
         describe('get() and put()', () => {
             it('should pull out the same data that was put in', async () => {

@@ -1,8 +1,8 @@
 
 import Dao from './Dao';
 import { Institution } from '../models';
-import { dropIfExists } from '../util';
 import { ObjectID } from 'bson';
+import { Database } from '../Database';
 
 export default class InstitutionDao extends Dao<Institution, Institution> {
     constructor() {
@@ -10,7 +10,7 @@ export default class InstitutionDao extends Dao<Institution, Institution> {
     }
 
     protected async _put(data: Institution[]): Promise<ObjectID[]> {
-        await dropIfExists(this.coll().collectionName);
+        await Database.get().dropIfExists(this.coll().collectionName);
         return (await this.coll().insertMany(data)).insertedIds;
     }
 

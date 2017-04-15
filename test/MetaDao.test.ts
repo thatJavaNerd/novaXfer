@@ -2,14 +2,13 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { Database, Mode } from '../src/Database';
 import MetaDao, { META_COLL } from '../src/queries/MetaDao';
-import { dropIfExists } from '../src/util';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 describe('MetaDao', () => {
     before('connect to database', () => Database.get().connect(Mode.TEST));
-    beforeEach('drop collection', () => dropIfExists(META_COLL));
+    beforeEach('drop collection', () => Database.get().dropIfExists(META_COLL));
 
     describe('updateDatasetVersion()', () => {
         it('should be able to update and insert the dataset version', async () => {
@@ -35,7 +34,7 @@ describe('MetaDao', () => {
     });
 
     describe('shouldIndex()', () => {
-        beforeEach('drop collection', () => dropIfExists(META_COLL));
+        beforeEach('drop collection', () => Database.get().dropIfExists(META_COLL));
 
         it('should return true when there is no meta document', async () => {
             const dao = new MetaDao();

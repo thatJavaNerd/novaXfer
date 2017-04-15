@@ -1,4 +1,3 @@
-import { Database } from './Database';
 import {Course, CreditRange, EquivType } from "./models";
 
 const nbsp = String.fromCharCode(160);
@@ -69,10 +68,3 @@ export function determineEquivType(courses: Course[], numberEnding = 'XX'): Equi
     return containsGeneric ? EquivType.GENERIC: EquivType.DIRECT;
 }
 
-export async function dropIfExists(name: string) {
-    // Find collections with the specified name
-    const colls = await Database.get().mongo().listCollections({name: name}).toArray();
-    // Drop if Mongo reports that a collection with that name exists,
-    // otherwise return true
-    return colls.length > 0 ? Database.get().mongo().dropCollection(colls[0].name) : true;
-}
