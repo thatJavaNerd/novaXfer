@@ -7,10 +7,10 @@ import {Course, CreditRange, EquivType, Institution} from "./models";
 
 const nbsp = String.fromCharCode(160);
 
-    /**
-     * Replaces all sequences of new line, nbsp, and space characters with a
-     * single space and trims.
-     */
+/**
+ * Replaces all sequences of new line, nbsp, and space characters with a
+ * single space and trims.
+ */
 export function normalizeWhitespace(text: string): string {
     return text.replace(new RegExp(`(?:\r\n|\r|\n|${nbsp}| )+`, 'g'), ' ').trim();
 }
@@ -205,5 +205,5 @@ function lstat(fd): Promise<fs.Stats> {
 }
 
 function cacheFileForIndexer(institution: Institution): string {
-    return `${path.resolve(__dirname)}/../../../.cache/${institution.acronym.toLowerCase()}`;
+    return `${path.resolve(__dirname)}/../.cache/${institution.acronym.toLowerCase()}`;
 }
