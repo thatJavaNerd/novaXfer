@@ -106,7 +106,7 @@ export function findIndexers(): Indexer<any>[] {
 /**
  * Finds all courses from all known Indexers.
  */
-export async function index(): Promise<IndexReport> {
+export async function indexAll(): Promise<IndexReport> {
     // Find all of the Indexers and wait for them all to find their equivalencies
     const contexts = await Promise.all(_.map(findIndexers(), i => i.findAll()));
 

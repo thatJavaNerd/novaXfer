@@ -6,6 +6,7 @@ import { findIndexers } from '../src/indexers/index';
 import * as _ from 'lodash';
 import { validateInstitution } from './validation';
 import { Institution } from '../src/models';
+import { QueryError, QueryErrorType } from '../src/queries/errors';
 
 describe('InstitutionDao', () => {
     let dao: InstitutionDao;
@@ -27,6 +28,28 @@ describe('InstitutionDao', () => {
                 const data = await dao.getAll();
                 // Validate all institutions
                 _.each(data, validateInstitution)
+            });
+        });
+
+        describe('getByAcronym()', () => {
+            it('should return only one document', async () => {
+                const acronym = findIndexers()[0].institution.acronym;
+                const institution = await dao.getByAcronym(acronym);
+
+                expect(institution).to.exist;
+                expect(institution!.acronym).to.equal(acronym);
+            });
+
+            it('should reject for a non-existent institution', async () => {
+                try {
+                    await dao.getByAcronym('non-existent');
+
+                    // If we got here something went wrong
+                    expect(true, 'should have rejected').to.be.false;
+                } catch (ex) {
+                    expect(ex).is.an.instanceof(QueryError);
+                    expect((ex as QueryError).type).to.equal(QueryErrorType.MISSING);
+                }
             });
         });
 

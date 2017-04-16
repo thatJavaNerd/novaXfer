@@ -1,23 +1,34 @@
-
 import * as logger from 'morgan';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
+import api from './routes/api';
+import { findIndexers, indexAll, IndexReport } from './indexers/index';
+import InstitutionDao from './queries/InstitutionDao';
+import EquivalencyDao from './queries/EquivalencyDao';
+import MetaDao from './queries/MetaDao';
+import * as _ from 'lodash';
+import { Request, Response } from 'express';
 
-export default function createServer(): express.Application {
+export function createServer(): express.Application {
     const app = express();
-    installMiddleware(app);
-    addRoutes(app);
+    app.use(logger('dev'));
+    app.use(bodyParser.json());
+    app.use('/api/v1', api());
 
     return app;
 }
 
-const installMiddleware = (app: express.Application): void => {
-    app.use(logger('dev'));
-    app.use(bodyParser.json());
-};
+export async function doFullIndex(): Promise<IndexReport> {
+    const instDao = new InstitutionDao(),
+        equivDao = new EquivalencyDao(),
+        metaDao = new MetaDao();
 
-const addRoutes = (app: express.Application): void => {
-    app.get('/', (req, res) => {
-        res.json({hello: 'world'});
-    });
-};
+    const indexReport = await indexAll();
+    await Promise.all([
+        equivDao.put(indexReport.equivalencyContexts),
+        instDao.put(_.map(findIndexers(), i => i.institution)),
+        metaDao.updateDatasetVersion()
+    ]);
+
+    return indexReport;
+}

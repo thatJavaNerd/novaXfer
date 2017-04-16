@@ -18,7 +18,7 @@ describe('Database', () => {
 
         await db.connect(mode);
         expect(db.mongo()).to.not.be.null;
-        expect(db.url()).to.equal('mongodb://localhost:27017/highlights_test');
+        expect(db.url()).to.equal('mongodb://localhost:27017/novaxfer_test');
         expect(db.isConnected()).to.be.true;
         expect(db.mode()).to.be.equal(mode);
     });

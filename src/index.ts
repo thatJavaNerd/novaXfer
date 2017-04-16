@@ -8,7 +8,9 @@ import * as _ from 'lodash';
 import * as colors from 'colors/safe';
 
 import * as listEndpoints from 'express-list-endpoints';
-import createApp from './server';
+import { createServer, doFullIndex } from './server';
+import { Database, Mode } from './Database';
+import MetaDao from './queries/MetaDao';
 
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf8'));
 
@@ -38,17 +40,41 @@ bootstrap({
 async function bootstrap(options: BootstrapOptions) {
     console.log(colors.bold('Starting novaXfer v' + packageJson.version));
 
-    let app = await createApp();
-    logEndpoints(app);
+    try {
+        await Database.get().connect(Mode.PROD);
+    } catch (ex) {
+        console.error('Could not connect to database: ' + ex.message);
+    }
 
-    await app.listen(options.port);
+    if (options.forceIndex || await (new MetaDao().shouldIndex())) {
+        try {
+            console.log('Indexing all institutions...');
+            const report = await doFullIndex();
+            console.log(`Indexed ${report.coursesIndexed} equivalencies from ${report.institutionsIndexed} institutions`);
+        } catch (ex) {
+            console.error('Could not complete full index');
+            throw ex;
+        }
+    }
 
-    console.log('\nMagic is happening on port ' + colors.bold(options.port.toString()));
+    try {
+        let app = await createServer();
+        logEndpoints(app);
+        await app.listen(options.port);
+        console.log('\nMagic is happening on port ' + colors.bold(options.port.toString()));
+    } catch(ex) {
+        // Don't try to handle the error, let it be printed to stderr. We do
+        // want to make sure we're disconnected from the database though.
+        await Database.get().disconnect();
+
+        throw ex;
+    }
+
 }
 
 function printHelp() {
     let script = path.basename(__filename);
-    console.log(colors.bold(`novaXfer v${packageJson.version}`));
+    console.log(colors.bold(`${packageJson.name} v${packageJson.version}`));
     console.log('\nUsage:');
     console.log(`$ ${script} [--force-index] [--help]`);
     console.log('  --force-index: Forces fresh data to be imported from the Indexers');
