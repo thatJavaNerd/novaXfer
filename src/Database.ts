@@ -1,6 +1,6 @@
 import { MongoClient, Db } from 'mongodb';
 
-const BASE_URL = 'mongodb://localhost:27017/highlights';
+const BASE_URL = 'mongodb://localhost:27017/novaxfer';
 
 /**
  * Singleton that manages a connection to a MongoDB database
