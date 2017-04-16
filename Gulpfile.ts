@@ -32,4 +32,4 @@ gulp.task('clean:testPrep', () => {
     return del(['src/indexers/.cache']);
 });
 
-gulp.task('default', ['watch', 'assets']);
+gulp.task('default', ['scripts', 'watch']);
