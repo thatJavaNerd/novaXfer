@@ -6,6 +6,7 @@ import {
     EquivType, KeyCourse
 } from '../models';
 import { ObjectID } from 'bson';
+import { QueryError, QueryErrorType } from './errors';
 
 export interface InstitutionFocusedEquivalency {
     institution: string;
@@ -13,15 +14,73 @@ export interface InstitutionFocusedEquivalency {
 }
 
 export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext> {
+    public static readonly COLLECTION = 'courses';
+
     constructor() {
-        super('courses');
+        super(EquivalencyDao.COLLECTION);
     }
 
-    coursesInSubject(subject: string): Promise<CourseEntry[]> {
-        return this.coll()
-            .find({ subject: EquivalencyDao.subjectRegex(subject) })
+    /**
+     * Gets an object mapping course subjects to the amount of courses in that
+     * subject. Sorted alphabetically by subject.
+     * @returns {Promise<{}>}
+     */
+    async subjects(): Promise<any> {
+        const aggrResult = await this.coll().aggregate([
+            {
+                // Group all courses by subject and count
+                $group: {
+                    _id: '$subject',
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                // Sort by _id, which in this case is the subject
+                $sort: { _id: 1 }
+            }
+        ]).toArray();
+
+        // Map _id to count
+        const result = {};
+        for (let doc of aggrResult) {
+            result[doc._id] = doc.count;
+        }
+
+        return result;
+    }
+
+    /**
+     * Fetches all KeyCourses for a given subject
+     * @param subject
+     * @returns {Promise<any[]>}
+     */
+    async keyCourses(subject: string): Promise<KeyCourse[]> {
+        const courses = await this.coll()
+            .find({ subject: subject })
+            .project({ _id: 0, subject: 1, number: 1 })
             .sort({ number: 1 })
             .toArray();
+
+        if (courses.length === 0)
+            throw new QueryError(QueryErrorType.MISSING);
+
+        return courses;
+    }
+
+    /**
+     * Fetches a specific CourseEntry based on its KeyCourse subject and number
+     * @param subject
+     * @param number
+     * @returns {Promise<any>}
+     */
+    async course(subject: string, number: string): Promise<CourseEntry> {
+        const course = await this.coll()
+            .findOne({ subject: subject, number: number });
+
+        if (course === null)
+            throw new QueryError(QueryErrorType.MISSING);
+
+        return course;
     }
 
     /**
@@ -36,7 +95,7 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
 
         const docs = await this.coll().aggregate([
             // Match first document with the given subject and number
-            { $match: { subject: EquivalencyDao.subjectRegex(courseSubject), number: courseNumber} },
+            { $match: { subject: courseSubject, number: courseNumber} },
             { $limit: 1 },
             // Create seperate documents for each equivalency (all have same ID)
             { $unwind: '$equivalencies' },
@@ -81,7 +140,7 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
         // Create an array of filters to pass to $or
         let courseMatch: any[] = [];
         for (let c of courses) {
-            courseMatch.push({subject: EquivalencyDao.subjectRegex(c.subject), number: c.number});
+            courseMatch.push({subject: c.subject, number: c.number});
         }
 
 
@@ -173,9 +232,5 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
         }
 
         return (await this.coll().bulkWrite(operations)).upsertedIds;
-    }
-
-    private static subjectRegex(subj: string): RegExp {
-        return new RegExp('^' + subj + '$', 'i');
     }
 }

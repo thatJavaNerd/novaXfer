@@ -7,8 +7,9 @@ import {
     CourseEquivalency, CourseEquivalencyDocument,
     EquivalencyContext, EquivType, KeyCourse
 } from '../src/models';
-import { validateCourseArray } from './validation';
+import { validateCourseArray, validateSubject } from './validation';
 import { Database, Mode } from '../src/Database';
+import { QueryError, QueryErrorType } from '../src/queries/errors';
 
 describe('EquivalencyDao', () => {
     let dao: EquivalencyDao;
@@ -20,6 +21,16 @@ describe('EquivalencyDao', () => {
     });
 
     describe('queries and aggregations', () => {
+        const expectQueryError = async (fn: () => Promise<any>, type: QueryErrorType = QueryErrorType.MISSING) => {
+            try {
+                await fn();
+                expect(true, 'should have thrown QueryError').to.be.false;
+            } catch (ex) {
+                expect(ex).to.be.instanceof(QueryError);
+                expect(ex.type).to.equal(type);
+            }
+        };
+
         before('insert equivalencies', async function() {
             // Allow plenty of time for the Indexers to do their thing
             this.timeout(30000);
@@ -31,25 +42,51 @@ describe('EquivalencyDao', () => {
             return dao.put(equivs);
         });
 
-        describe('coursesInSubject()', () => {
-            const queryAndTest = async (subj: string) => {
-                const data = await dao.coursesInSubject(subj);
+        describe('subjects()', () => {
+            it('should return an array mapping subject names to the amount of key courses in them', async () => {
+                const subjects = await dao.subjects();
+
+                // Validate all subjects
+                _.each(Object.keys(subjects), validateSubject);
+
+                for (let subj of Object.keys(subjects)) {
+                    expect(subjects[subj]).to.be.at.least(0);
+                }
+            });
+        });
+
+        describe('keyCourses()', () => {
+            it('should only return courses in the given subject', async () => {
+                const subject = Object.keys(await dao.subjects())[0];
+                const data = await dao.keyCourses(subject);
                 expect(data).to.have.length.above(0);
 
                 for (let equiv of data) {
-                    expect(equiv.subject).to.equal(subj.toUpperCase());
+                    expect(equiv.subject).to.equal(subject);
                     expect(equiv.number).to.exist;
-                    validateCourseEquivalencies(equiv.equivalencies);
                 }
-            };
-
-            it('should only return courses in the given subject', () => {
-                return queryAndTest('ENG');
             });
 
-            it('should allow case-insensitive input', () => {
-                return queryAndTest('eng');
+            it('should reject with a QueryError when given a subject that doesn\'t exist', () =>
+                expectQueryError(() => dao.keyCourses('foobar'))
+            );
+        });
+
+        describe('course()', () => {
+            it('should return a course entry', async () => {
+                const subject: string = Object.keys((await dao.subjects()))[0];
+                const keyCourse: KeyCourse = (await dao.keyCourses(subject))[0];
+                const course = await dao.course(keyCourse.subject, keyCourse.number);
+
+                expect(course.subject).to.equal(keyCourse.subject);
+                expect(course.number).to.equal(keyCourse.number);
+
+                validateCourseEquivalencies(course.equivalencies);
             });
+
+            it('should reject with a QueryError when given invalid details', () =>
+                expectQueryError(() => dao.course('foo', 'bar'))
+            );
         });
 
         describe('forCourse()', () => {
