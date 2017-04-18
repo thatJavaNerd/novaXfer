@@ -6,6 +6,8 @@ import { Application } from 'express';
 import * as _ from 'lodash';
 import { findIndexers } from '../src/indexers/index';
 import * as request from 'supertest';
+import { KeyCourse } from '../src/models';
+import EquivalencyDao from '../src/queries/EquivalencyDao';
 
 describe('API v1', () => {
     let app: Application;
@@ -81,6 +83,91 @@ describe('API v1', () => {
         it('should allow case-insensitive input', () => {
             const inst = findIndexers()[0].institution.acronym.toLowerCase();
             return apiRequest('/institution/' + inst, 200, undefined);
+        });
+    });
+
+    describe('GET /api/v1/course', () => {
+        it('should return object mapping a subject to the amount of courses in that subject', () => {
+            return apiRequest('/course', 200, undefined, (data) => {
+                expect(data).to.be.an('object');
+
+                for (let subj of Object.keys(data)) {
+                    // Make sure subject is uppercase
+                    expect(subj.toUpperCase()).to.equal(subj);
+                    // The value of each property represents the amount of
+                    // courses in that subject, which logically should be a
+                    // number greater than 0
+                    expect(data[subj]).to.be.above(0);
+                }
+            });
+        });
+    });
+
+    describe('GET /api/v1/course/:subject', () => {
+        const verifyData = (data: any, subject: string) => {
+            expect(Array.isArray(data)).to.be.true;
+
+            for (let courseEntry of data) {
+                expect(courseEntry.subject).to.equal(subject.toUpperCase());
+                expect(courseEntry.number).to.be.a('string');
+            }
+        };
+        it('should return courses only in the given subject', () => {
+            return apiRequest('/course/MTH', 200, undefined, (data: any) => {
+                verifyData(data, 'MTH');
+            });
+        });
+
+        it('should return 404 when given a non-existent subject', () => {
+            return apiRequest('/course/FOO', 404, undefined, (error: any) => {
+                expect(error.input).to.deep.equal({ subject: 'FOO' });
+            });
+        });
+
+        it('should\'t care about case', () => {
+            return apiRequest('/course/mth', 200, undefined, (data) => {
+                verifyData(data, 'mth');
+            });
+        });
+    });
+
+    describe('GET /api/v1/course/:subject/:number', () => {
+        let course: KeyCourse;
+
+        before('find a course', async () => {
+            const data = await Database.get().mongo()
+                .collection(EquivalencyDao.COLLECTION)
+                .findOne({});
+
+            expect(data.subject).to.be.a('string');
+            expect(data.number).to.be.a('string');
+
+            course = Object.freeze({
+                subject: data.subject,
+                number: data.number
+            });
+        });
+
+        it('should return a single course entry', () => {
+            return apiRequest(`/course/${course.subject}/${course.number}`, 200, undefined, (data: any) => {
+                expect(data.subject).to.equal(course.subject);
+                expect(data.number).to.equal(course.number);
+            });
+        });
+
+        it('should not care about case', async () => {
+            const matrix = [
+                [course.subject.toLowerCase(), course.number.toUpperCase()],
+                [course.subject.toUpperCase(), course.number.toLowerCase()],
+                [course.subject.toLowerCase(), course.number.toLowerCase()]
+            ];
+
+            for (let param of matrix) {
+                await apiRequest(`/course/${param[0]}/${param[1]}`, 200, undefined, (data: any) => {
+                    expect(data.subject).to.equal(param[0].toUpperCase());
+                    expect(data.number).to.equal(param[1].toUpperCase())
+                });
+            }
         });
     });
 

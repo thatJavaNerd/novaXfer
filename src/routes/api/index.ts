@@ -1,12 +1,14 @@
 import { Request, Response, Router } from 'express';
 import institution from './institution';
+import course from './course';
 import { ErrorResponse } from './responses';
 
 export default function(): Router {
     const router = Router();
 
     const modules: (() => [string, Router])[] = [
-        institution
+        institution,
+        course
     ];
 
     for (let m of modules) {

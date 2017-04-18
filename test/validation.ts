@@ -14,6 +14,10 @@ const courseSubjectRegex = /^[A-Z]{2,5}$/;
 // Entire string must be alphabetic
 const institutionLocationRegex = /^[A-Z]+$/i;
 
+export function validateSubject(subj: string) {
+    expect(subj).to.match(courseSubjectRegex);
+}
+
 export function validateInstitution(inst: Institution) {
     expect(inst.acronym).to.match(acronymRegex);
     expect(inst.fullName).to.match(fullNameRegex);
