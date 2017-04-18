@@ -2,7 +2,7 @@
 import EquivalencyDao from '../src/queries/EquivalencyDao';
 import { findIndexers } from '../src/indexers/index';
 import * as _ from 'lodash';
-import { expect } from 'chai';
+import { expect, AssertionError } from 'chai';
 import {
     CourseEquivalency, CourseEquivalencyDocument,
     EquivalencyContext, EquivType, KeyCourse
@@ -23,9 +23,15 @@ describe('EquivalencyDao', () => {
     describe('queries and aggregations', () => {
         const expectQueryError = async (fn: () => Promise<any>, type: QueryErrorType = QueryErrorType.MISSING) => {
             try {
-                await fn();
+                console.log(await fn());
                 expect(true, 'should have thrown QueryError').to.be.false;
             } catch (ex) {
+                if (ex instanceof AssertionError) {
+                    // In case we accidentally catch the AssertionError thrown
+                    // by the expect() in the try block
+                    throw ex;
+                }
+
                 expect(ex).to.be.instanceof(QueryError);
                 expect(ex.type).to.equal(type);
             }
@@ -115,6 +121,10 @@ describe('EquivalencyDao', () => {
                 expect(data.number).to.equal('202');
                 expect(Array.isArray(data.equivalencies)).to.be.true;
                 expect(data.equivalencies).to.have.lengthOf(0);
+            });
+
+            it('should reject with a QueryError when given invalid course details', () => {
+                return expectQueryError(() => dao.forCourse('foo', 'bar', ['UVA']));
             });
         });
 

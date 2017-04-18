@@ -116,20 +116,17 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
             } }
         ]).toArray();
 
-        if (docs.length === 0) {
-            return {
-                subject: courseSubject.toUpperCase(),
-                number: courseNumber,
-                equivalencies: []
-            };
-        } else if (docs.length === 1) {
-            return {
-                subject: docs[0].subject,
-                number: docs[0].number,
-                equivalencies: docs[0].equivalencies
-            };
-        } else {
-            throw new Error(`Expecting 1 result, got ${docs.length}`);
+        switch (docs.length) {
+            case 0:
+                throw new QueryError(QueryErrorType.MISSING);
+            case 1:
+                return {
+                    subject: docs[0].subject,
+                    number: docs[0].number,
+                    equivalencies: docs[0].equivalencies
+                };
+            default:
+                throw new Error(`Expecting 1 result, got ${docs.length}`);
         }
     }
 
