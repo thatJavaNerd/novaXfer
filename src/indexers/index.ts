@@ -10,13 +10,15 @@ import * as _ from 'lodash';
 
 export abstract class Indexer<T> {
     async findAll(): Promise<EquivalencyContext> {
-        const equivalencies = this.parseEquivalencies(
+        const [equivalencies, unparseable] = this.parseEquivalencies(
             await this.parseBody(
                 await request(this.prepareRequest(), this.institution)));
 
         return {
             institution: this.institution,
-            equivalencies: equivalencies
+            equivalencies: equivalencies,
+            unparseable: unparseable,
+            parseSuccessRate: (equivalencies.length - unparseable) / equivalencies.length
         };
     }
 
@@ -40,7 +42,7 @@ export abstract class Indexer<T> {
     protected abstract parseBody(data: Buffer): Promise<T>
 
     /** Parses the body of the network request into an EquivalencyContext */
-    protected abstract parseEquivalencies(body: T): CourseEquivalency[]
+    protected abstract parseEquivalencies(body: T): [CourseEquivalency[], number]
 }
 
 /**
@@ -85,6 +87,7 @@ export interface IndexReport {
     equivalencyContexts: EquivalencyContext[];
     institutionsIndexed: number;
     coursesIndexed: number;
+    weightedSuccessRate: number;
 }
 
 /**
@@ -110,15 +113,14 @@ export async function indexAll(): Promise<IndexReport> {
     // Find all of the Indexers and wait for them all to find their equivalencies
     const contexts = await Promise.all(_.map(findIndexers(), i => i.findAll()));
 
-    let totalCourses = 0;
-    for (let context of contexts) {
-        totalCourses += context.equivalencies.length;
-    }
+    const totalCourses = _.sumBy(contexts, c => c.equivalencies.length);
+    const totalUnparseables = _.sumBy(contexts, c => c.unparseable);
 
     return {
         equivalencyContexts: contexts,
         institutionsIndexed: contexts.length,
-        coursesIndexed: totalCourses
+        coursesIndexed: totalCourses,
+        weightedSuccessRate: (totalCourses - totalUnparseables) / totalCourses
     };
 }
 

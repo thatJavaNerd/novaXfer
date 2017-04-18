@@ -10,7 +10,9 @@ import {
 import { validateCourseArray } from './validation';
 import { Database, Mode } from '../src/Database';
 import { QueryError, QueryErrorType } from '../src/queries/errors';
-import { validateSubject } from '../src/routes/api/v1/validation';
+import {
+    courseSubjectRegex
+} from '../src/routes/api/v1/validation';
 
 describe('EquivalencyDao', () => {
     let dao: EquivalencyDao;
@@ -53,10 +55,8 @@ describe('EquivalencyDao', () => {
             it('should return an object mapping subject names to the amount of key courses in them', async () => {
                 const subjects = await dao.subjects();
 
-                // Validate all subjects
-                _.each(Object.keys(subjects), validateSubject);
-
                 for (let subj of Object.keys(subjects)) {
+                    expect(subj).to.match(courseSubjectRegex);
                     expect(subjects[subj]).to.be.at.least(0);
                 }
             });
@@ -202,7 +202,8 @@ const createInsertionFixture = (): EquivalencyContext => ({
     institution: {
         acronym: 'XYZ',
         fullName: 'Some College',
-        location: 'Earth'
+        location: 'Earth',
+        parseSuccessThreshold: 1.00
     },
     equivalencies: [
         new CourseEquivalency(
@@ -231,5 +232,7 @@ const createInsertionFixture = (): EquivalencyContext => ({
             }],
             EquivType.GENERIC
         )
-    ]
+    ],
+    unparseable: 0,
+    parseSuccessRate: 1.00
 });

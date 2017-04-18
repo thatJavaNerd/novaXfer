@@ -19,7 +19,7 @@ export default class UvaIndexer extends HtmlIndexer {
         return 'http://ascs8.eservices.virginia.edu/AsEquivs/Home/EquivsShow?schoolId=1001975';
     }
 
-    protected parseEquivalencies(body: CheerioStatic): CourseEquivalency[] {
+    protected parseEquivalencies(body: CheerioStatic): [CourseEquivalency[], number] {
         const $ = body;
         const equivalencies: CourseEquivalency[] = [];
 
@@ -61,13 +61,14 @@ export default class UvaIndexer extends HtmlIndexer {
             equivalencies.push(eq);
         });
 
-        return equivalencies;
+        return [equivalencies, 0];
     }
 
     institution = {
         acronym: 'UVA',
         fullName: 'University of Virginia',
-        location: 'Virginia'
+        location: 'Virginia',
+        parseSuccessThreshold: 1.00
     };
 }
 

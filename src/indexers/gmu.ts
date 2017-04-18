@@ -6,7 +6,8 @@ import {
 const institution: Institution = {
     acronym: 'GMU',
     fullName: 'George Mason University',
-    location: 'Virginia'
+    location: 'Virginia',
+    parseSuccessThreshold: 1.00
 };
 const headerRows = 8;
 
@@ -20,7 +21,7 @@ export default class GmuIndexer extends HtmlIndexer {
         return 'http://admissions.gmu.edu/transfer/transfercreditsearch.asp?state=VA&school=USVCCS&course=View+All';
     }
 
-    protected parseEquivalencies(body: CheerioStatic): CourseEquivalency[] {
+    protected parseEquivalencies(body: CheerioStatic): [CourseEquivalency[], number] {
         const $ = body;
         const equivalencies: CourseEquivalency[] = [];
 
@@ -37,7 +38,7 @@ export default class GmuIndexer extends HtmlIndexer {
                 nvccCourses, gmuCourses, determineEquivType(gmuCourses, '---')));
         });
 
-        return equivalencies;
+        return [equivalencies, 0];
     }
 
     institution = institution;

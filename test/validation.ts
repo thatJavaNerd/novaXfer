@@ -15,7 +15,8 @@ const institutionLocationRegex = /^[A-Z]+$/i;
 export function validateInstitution(inst: Institution) {
     expect(inst.acronym).to.match(acronymRegex);
     expect(inst.fullName).to.match(fullNameRegex);
-    expect(inst.location).to.match(institutionLocationRegex)
+    expect(inst.location).to.match(institutionLocationRegex);
+    expect(inst.parseSuccessThreshold).to.be.within(0, 1);
 }
 
 const isCreditRange = function(x: any): x is CreditRange {

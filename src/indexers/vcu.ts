@@ -11,7 +11,7 @@ export default class VcuIndexer extends Indexer<any> {
         return JSON.parse(data.toString('utf8'));
     }
 
-    protected parseEquivalencies(body: any): CourseEquivalency[] {
+    protected parseEquivalencies(body: any): [CourseEquivalency[], number] {
         const equivalencies: CourseEquivalency[] = [];
 
         for (let equivalency of body) {
@@ -26,13 +26,14 @@ export default class VcuIndexer extends Indexer<any> {
             }
         }
 
-        return equivalencies;
+        return [equivalencies, 0];
     }
 
     institution = {
         acronym: 'VCU',
         fullName: 'Virginia Commonwealth University',
-        location: 'Virginia'
+        location: 'Virginia',
+        parseSuccessThreshold: 1.00
     };
 }
 

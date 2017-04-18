@@ -51,12 +51,15 @@ export class CourseEquivalency {
 export interface EquivalencyContext {
     institution: Institution;
     equivalencies: CourseEquivalency[];
+    unparseable: number;
+    parseSuccessRate: number;
 }
 
 export interface Institution {
     acronym: string;
     fullName: string;
     location: string;
+    parseSuccessThreshold: number;
 }
 
 export interface CreditRange {

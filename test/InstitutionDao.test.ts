@@ -64,7 +64,8 @@ describe('InstitutionDao', () => {
                 const institution: Institution = {
                     acronym: 'XYZ',
                     fullName: 'Some College',
-                    location: 'Earth'
+                    location: 'Earth',
+                    parseSuccessThreshold: 0.99
                 };
 
                 const id = (await dao.put(institution))[0];

@@ -12,7 +12,8 @@ const individualRegex = /indivi?dual/i;
 const institution = {
     acronym: 'VT',
     fullName: 'Virginia Tech',
-    location: 'Virginia'
+    location: 'Virginia',
+    parseSuccessThreshold: 1.00
 };
 
 export default class VtIndexer extends Indexer<any> {
@@ -24,7 +25,7 @@ export default class VtIndexer extends Indexer<any> {
         return JSON.parse(data.toString('utf8'));
     }
 
-    protected parseEquivalencies(body: any): CourseEquivalency[] {
+    protected parseEquivalencies(body: any): [CourseEquivalency[], number] {
         const equivalencies: CourseEquivalency[] = [];
         const entries = body.feed.entry;
         for (let i = 0; i < entries.length; i++) {
@@ -70,7 +71,7 @@ export default class VtIndexer extends Indexer<any> {
             equivalencies.push(equiv);
         }
 
-        return equivalencies;
+        return [equivalencies, 0];
     }
 
     institution = institution;

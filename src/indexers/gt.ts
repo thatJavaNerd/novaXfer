@@ -48,7 +48,7 @@ export default class GtIndexer extends HtmlIndexer {
         };
     }
 
-    protected parseEquivalencies(body: CheerioStatic): CourseEquivalency[] {
+    protected parseEquivalencies(body: CheerioStatic): [CourseEquivalency[], number] {
         const $ = body;
         const equivalencies: CourseEquivalency[] = [];
 
@@ -101,13 +101,14 @@ export default class GtIndexer extends HtmlIndexer {
             equivalencies.push(equiv);
         });
 
-        return equivalencies;
+        return [equivalencies, 0];
     }
 
     institution = {
         fullName: 'Georgia Tech',
         acronym: 'GT',
-        location: 'Georgia'
+        location: 'Georgia',
+        parseSuccessThreshold: 1.00
     };
 }
 

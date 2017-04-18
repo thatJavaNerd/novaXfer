@@ -50,7 +50,10 @@ async function bootstrap(options: BootstrapOptions) {
         try {
             console.log('Indexing all institutions...');
             const report = await doFullIndex();
-            console.log(`Indexed ${report.coursesIndexed} equivalencies from ${report.institutionsIndexed} institutions`);
+            const rate = (report.weightedSuccessRate * 100).toFixed(4);
+            console.log(`Indexed ${report.coursesIndexed} equivalencies from ` +
+                `${report.institutionsIndexed} institutions (${rate}% success rate)`);
+
         } catch (ex) {
             console.error('Could not complete full index');
             throw ex;

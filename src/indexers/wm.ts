@@ -21,7 +21,7 @@ export default class WmIndexer extends PdfIndexer {
         return 'http://www.wm.edu/offices/registrar/documents/transfer/vccs_transfer_guide_table.pdf';
     }
 
-    protected parseEquivalencies(rows: string[][]): CourseEquivalency[] {
+    protected parseEquivalencies(rows: string[][]): [CourseEquivalency[], number] {
         const equivalencies: CourseEquivalency[] = [];
 
         let unparsableCount = 0;
@@ -82,15 +82,14 @@ export default class WmIndexer extends PdfIndexer {
 
         }
 
-        if (unparsableCount > 0) console.log('W&M: Unable to parse ' + unparsableCount + ' courses');
-
-        return equivalencies;
+        return [equivalencies, unparsableCount];
     }
 
     institution = {
         acronym: 'W&M',
         fullName: 'William & Mary',
-        location: 'Virginia'
+        location: 'Virginia',
+        parseSuccessThreshold: 0.9965
     };
 }
 

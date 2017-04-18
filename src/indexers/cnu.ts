@@ -21,7 +21,7 @@ export default class CnuIndexer extends PdfIndexer {
         return 'http://cnu.edu/admission/transfer/_pdf/cnu-vccs-cnu_equivalent_course_table_02152017_kw.pdf';
     }
 
-    protected parseEquivalencies(rows: string[][]): CourseEquivalency[] {
+    protected parseEquivalencies(rows: string[][]): [CourseEquivalency[], number] {
         const equivalencies: CourseEquivalency[] = [];
         for (let row of rows) {
             if (subjectRegex.test(row[0])) {
@@ -54,13 +54,14 @@ export default class CnuIndexer extends PdfIndexer {
             }
         }
 
-        return equivalencies;
+        return [equivalencies, 0];
     }
 
     institution = {
         acronym: 'CNU',
         fullName: 'Christopher Newport University',
-        location: 'Virginia'
+        location: 'Virginia',
+        parseSuccessThreshold: 1.00
     };
 }
 
