@@ -70,7 +70,7 @@ export async function runQuery(parameters: Parameter[],
     }
 }
 
-interface ErrorData {
+export interface ErrorData {
     message: string;
     input: object;
 }

@@ -1,27 +1,55 @@
-
 import { Request, Response, Router } from 'express';
-import { SuccessResponse } from './responses';
 import Parameter = require('pinput')
+
+import { SuccessResponse } from './responses';
 import { runQuery } from './util';
 import EquivalencyDao from '../../../queries/EquivalencyDao';
+import {
+    validateCourseNumber, validateInstitutionAcronym,
+    validateSubject
+} from './validation';
 
 export default function(): [string, Router] {
     const dao = new EquivalencyDao();
 
     const r = Router();
 
-    const subjectParam = (req: Request) => {
-        return new Parameter({
+    const subjectParam = (req: Request) =>
+        new Parameter({
             name: 'subject',
             rawInput: req.params.subject,
-            validate: (acronym) => acronym.length >= 2 &&
-                acronym.length <= 3 &&
-                /^[A-Za-z]{2,4}$/.test(acronym),
+            validate: validateSubject,
             preprocess: val => val.trim(),
             // Make sure we give the query the uppercase value
             postprocess: val => val.toUpperCase()
         });
+
+    const numberParam = (req: Request) =>
+        new Parameter({
+            name: 'number',
+            rawInput: req.params.number,
+            validate: validateCourseNumber,
+            preprocess: val => val.trim(),
+            // Make sure we give the query the uppercase value
+            postprocess: val => val.toUpperCase()
+        });
+
+    const validateInstitutions = (institutions: string[]) => {
+        for (let i of institutions) {
+            if (!validateInstitutionAcronym(i)) return false;
+        }
+
+        return true;
     };
+
+    const institutionsParam = (req: Request) =>
+        new Parameter({
+            name: 'institutions',
+            rawInput: req.params.institutions,
+            validate: validateInstitutions,
+            preprocess: (inst) => inst.toUpperCase(),
+            array: true
+        });
 
     r.get('/', async (req: Request, res: Response) => {
         const resp: SuccessResponse = {
@@ -41,21 +69,24 @@ export default function(): [string, Router] {
     });
 
     r.get('/:subject/:number', async (req: Request, res: Response) => {
-        const params = [
-            subjectParam(req),
-            new Parameter({
-                name: 'number',
-                rawInput: req.params.number,
-                validate: (number: string) => /^[A-Za-z0-9]+$/.test(number),
-                preprocess: val => val.trim(),
-                // Make sure we give the query the uppercase value
-                postprocess: val => val.toUpperCase()
-            })
-        ];
-
         return runQuery(
-            params,
+            // parameters
+            [subjectParam(req), numberParam(req)],
+            // query function
             (subj: string, number: string) => dao.course(subj, number),
+            // response
+            res
+        );
+    });
+
+    r.get('/:subject/:number/:institutions', async (req: Request, res: Response) => {
+        return runQuery(
+            // parameters
+            [subjectParam(req), numberParam(req), institutionsParam(req)],
+            // query function
+            (subj: string, num: string, institutions: string[]) =>
+                dao.forCourse(subj, num, institutions),
+            // response
             res
         );
     });

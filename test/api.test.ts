@@ -1,13 +1,17 @@
 
-import { expect } from 'chai'
+import { expect, AssertionError } from 'chai'
 import { Database, Mode } from '../src/Database';
 import { createServer, doFullIndex } from '../src/server';
 import { Application } from 'express';
 import * as _ from 'lodash';
 import { findIndexers } from '../src/indexers/index';
 import * as request from 'supertest';
-import { KeyCourse } from '../src/models';
+import {
+    CourseEntry, CourseEquivalencyDocument,
+    KeyCourse
+} from '../src/models';
 import EquivalencyDao from '../src/queries/EquivalencyDao';
+import { ErrorData } from '../src/routes/api/v1/util';
 
 describe('API v1', () => {
     let app: Application;
@@ -172,6 +176,116 @@ describe('API v1', () => {
                     expect(data.number).to.equal(param[1].toUpperCase())
                 });
             }
+        });
+    });
+
+    describe('GET /api/v1/course/:subject/:number/:institutions', () => {
+
+        const makeRequest = (institutions: string,
+                             code: number,
+                             validate?: (data: CourseEquivalencyDocument[]) => void) =>
+            apiRequest(
+                // relative path
+                `/course/${course.subject}/${course.number}/${institutions}`,
+                // expected HTTP status code
+                code,
+                // query
+                undefined,
+                // validation function
+                (dataOrError) => {
+                    if (code >= 200 && code < 300) {
+                        // Dealing with successful response data, verify the
+                        // basics and let validate() validate the equivalencies
+                        const data = dataOrError as CourseEntry;
+
+                        expect(data.subject).to.equal(course.subject);
+                        expect(data.number).to.equal(course.number);
+
+                        if (validate === undefined)
+                            throw new AssertionError('successful response but validate was undefined');
+
+                        validate(data.equivalencies);
+                    } else {
+                        const error = dataOrError as ErrorData;
+                        // Got an unsuccessful response, validate it
+
+                        // Make sure we have an error message at least 5
+                        // characters long (5 is arbitrarily chosen)
+                        expect(error.message).to.be.a('string');
+                        expect(error.message).to.have.length.above(5);
+
+                        // Ensure input is properly represented
+                        expect(error.input).to.deep.equal({
+                            subject: course.subject,
+                            number: course.number,
+                            institutions: _.map(_.split(institutions, ','), i => i.trim())
+                        });
+                    }
+                }
+            );
+
+        let course: CourseEntry;
+        let institutions: string[];
+
+        before('find course data', async () => {
+            // Hand pick this course because it has a lot of equivalencies and
+            // 3 from VCU, which we can make sure to test
+            course = await new EquivalencyDao().course('CSC', '110');
+            institutions = _.uniq(_.map(course.equivalencies, e => e.institution));
+        });
+
+        it('should only return equivalencies for the given institution', () => {
+            const institution = institutions[0];
+
+            return makeRequest(institution, 200, (equivs: CourseEquivalencyDocument[]) => {
+                expect(equivs).to.have.length(1);
+                expect(equivs[0].institution).to.equal(institution.toUpperCase());
+            });
+        });
+
+        it('should support multiple institutions separated by commas', () => {
+            const selectedInsts = _.slice(institutions, 0, institutions.length - 1);
+            const joined = _.join(selectedInsts, ',');
+
+            return makeRequest(joined, 200, (equivs: CourseEquivalencyDocument[]) => {
+                expect(equivs).to.have.length.at.least(selectedInsts.length);
+                for (let equiv of equivs) {
+                    expect(selectedInsts).to.include(equiv.institution);
+                }
+            });
+        });
+
+        it('should not care about case', () => {
+            const institution = institutions[0].toLowerCase();
+
+            return makeRequest(institution, 200, (equivs: CourseEquivalencyDocument[]) => {
+                // We only asked for 1 institution but that institution
+                expect(equivs).to.have.length.at.least(1);
+                for (let equiv of equivs) {
+                    expect(equiv.institution).to.equal(institution.toUpperCase());
+                }
+            });
+        });
+
+        it('should not care about whitespace', () => {
+            const whitespaced = institutions[0] + ' , ' + institutions[1];
+
+            return makeRequest(whitespaced, 200, (equivs: CourseEquivalencyDocument[]) => {
+                expect(equivs).to.have.length.at.least(2);
+                for (let equiv of equivs) {
+                    expect(equiv.institution).to.be.oneOf([institutions[0], institutions[1]]);
+                }
+            });
+        });
+
+        it('should 404 when given a non-existent course', () => {
+            return apiRequest('/course/foo/bar/uva', 404, undefined, (error: ErrorData) => {
+                expect(error.input).to.deep.equal({
+                    subject: 'FOO',
+                    number: 'BAR',
+                    institutions: ['UVA']
+                });
+            });
         });
     });
 
