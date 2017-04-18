@@ -147,6 +147,13 @@ describe('EquivalencyDao', () => {
                     }
                 }
             });
+
+            it('should reject with a QueryError when given an invalid institution', () => {
+                return expectQueryError(() => dao.forInstitution('FOO', [{
+                    subject: 'CSC',
+                    number: '201'
+                }]));
+            });
         });
 
 

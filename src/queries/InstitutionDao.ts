@@ -6,8 +6,10 @@ import { Database } from '../Database';
 import { QueryError, QueryErrorType } from './errors';
 
 export default class InstitutionDao extends Dao<Institution, Institution> {
+    public static readonly COLLECTION = 'institutions';
+
     constructor() {
-        super('institutions');
+        super(InstitutionDao.COLLECTION);
     }
 
     protected async _put(data: Institution[]): Promise<ObjectID[]> {

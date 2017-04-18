@@ -7,6 +7,7 @@ import {
 } from '../models';
 import { ObjectID } from 'bson';
 import { QueryError, QueryErrorType } from './errors';
+import InstitutionDao from './InstitutionDao';
 
 export interface InstitutionFocusedEquivalency {
     institution: string;
@@ -152,6 +153,15 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
      */
     async forInstitution(institution: string, courses: KeyCourse[]):
         Promise<InstitutionFocusedEquivalency> {
+
+        const exists = (await this.db.collection(InstitutionDao.COLLECTION)
+            .find({ acronym: institution })
+            .limit(1)
+            .count(true)) > 0;
+
+        if (!exists) {
+            throw new QueryError(QueryErrorType.MISSING);
+        }
 
         // Create an array of filters to pass to $or
         let courseMatch: any[] = [];
