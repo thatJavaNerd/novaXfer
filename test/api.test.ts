@@ -177,6 +177,15 @@ describe('API v1', () => {
                 });
             }
         });
+
+        it('should 404 when given a non-existent course', () => {
+            return apiRequest('/course/FOO/BAR', 404, undefined, (error: ErrorData) => {
+                expect(error.input).to.deep.equal({
+                    subject: 'FOO',
+                    number: 'BAR'
+                });
+            });
+        });
     });
 
     describe('GET /api/v1/course/:subject/:number/:institutions', () => {
