@@ -7,12 +7,14 @@ import InstitutionDao from './queries/InstitutionDao';
 import EquivalencyDao from './queries/EquivalencyDao';
 import MetaDao from './queries/MetaDao';
 import * as _ from 'lodash';
+import * as helmet from 'helmet';
 
 export function createServer(): express.Application {
     const app = express();
     app.use(logger('dev'));
     app.use(bodyParser.json());
     app.use('/api', api());
+    app.use(helmet());
 
     return app;
 }
