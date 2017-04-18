@@ -13,7 +13,7 @@ describe('routes', () => {
         it('should redirect to the docs on GitHub', () =>
             request(app)
                 .get('/api')
-                .expect(301)
+                .expect(302)
                 .expect('Location', /github\.com/)
         );
     });
