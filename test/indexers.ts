@@ -90,7 +90,6 @@ const minEquivalencies = 100;
 function testIndexerEquivalencies(indexer: Indexer<any>) {
     return indexer.findAll().then(function(equivalencyContext: EquivalencyContext) {
         validateInstitution(equivalencyContext.institution);
-        console.log(equivalencyContext.parseSuccessRate);
         expect(equivalencyContext.parseSuccessRate)
             .to.be.at.least(equivalencyContext.institution.parseSuccessThreshold);
         let equivs = equivalencyContext.equivalencies;
