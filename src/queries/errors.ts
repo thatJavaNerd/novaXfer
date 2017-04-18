@@ -10,8 +10,3 @@ export class QueryError extends Error {
 export enum QueryErrorType {
     MISSING
 }
-
-export interface ErrorData {
-    message: string;
-    input: object;
-}
