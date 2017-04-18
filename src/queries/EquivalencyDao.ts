@@ -1,4 +1,3 @@
-
 import Dao from './Dao';
 import {
     CourseEntry, CourseEquivalencyDocument,
@@ -96,33 +95,35 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
     async forCourse(courseSubject: string, courseNumber: string, institutions: string[]): Promise<CourseEntry> {
         const matchEquivalencies: any[] = [];
         for (let i = 0; i < institutions.length; i++) {
-            matchEquivalencies.push({'equivalencies.institution': institutions[i]});
+            matchEquivalencies.push({ 'equivalencies.institution': institutions[i] });
         }
 
         const exists = (await this.coll()
-            .find({ subject: courseSubject, number: courseNumber })
-            .limit(1)
-            .count(true)) > 0;
+                .find({ subject: courseSubject, number: courseNumber })
+                .limit(1)
+                .count(true)) > 0;
 
         if (!exists)
             throw new QueryError(QueryErrorType.MISSING);
 
         const docs = await this.coll().aggregate([
             // Match first document with the given subject and number
-            { $match: { subject: courseSubject, number: courseNumber} },
+            { $match: { subject: courseSubject, number: courseNumber } },
             { $limit: 1 },
             // Create separate documents for each equivalency (all have same ID)
             { $unwind: '$equivalencies' },
             // Filter out all but the given institutions
             { $match: { $or: matchEquivalencies } },
             // Recombine the documents with only the required equivalencies
-            { $group: {
-                _id: '$_id',
-                // Is there a better way to include these fields?
-                subject: { $first: '$subject' },
-                number: { $first: '$number' },
-                equivalencies: {$push: '$equivalencies'}
-            } }
+            {
+                $group: {
+                    _id: '$_id',
+                    // Is there a better way to include these fields?
+                    subject: { $first: '$subject' },
+                    number: { $first: '$number' },
+                    equivalencies: { $push: '$equivalencies' }
+                }
+            }
         ]).toArray();
 
         switch (docs.length) {
@@ -155,9 +156,9 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
         Promise<InstitutionFocusedEquivalency> {
 
         const exists = (await this.db.collection(InstitutionDao.COLLECTION)
-            .find({ acronym: institution })
-            .limit(1)
-            .count(true)) > 0;
+                .find({ acronym: institution })
+                .limit(1)
+                .count(true)) > 0;
 
         if (!exists) {
             throw new QueryError(QueryErrorType.MISSING);
@@ -166,50 +167,56 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
         // Create an array of filters to pass to $or
         let courseMatch: any[] = [];
         for (let c of courses) {
-            courseMatch.push({subject: c.subject, number: c.number});
+            courseMatch.push({ subject: c.subject, number: c.number });
         }
 
 
         const docs = await this.coll().aggregate([
-            {$match: { $or: courseMatch }},
+            { $match: { $or: courseMatch } },
             // Break down equivalencies array
-            {$unwind: '$equivalencies'},
+            { $unwind: '$equivalencies' },
             // Filter array so we only match GMU equivalencies
-            {$match: {'equivalencies.institution': institution}},
+            { $match: { 'equivalencies.institution': institution } },
             // Reassemble the equivalency
-            {$group: {
-                _id: '$_id',
-                // Store institution as a temporary value that way it gets
-                // evaluated as a string rather than an array during the next
-                // $group
-                temp_institution: {$first: '$equivalencies.institution'},
-                number: {$first: '$number'},
-                subject: {$first: '$subject'},
-                equivalencies: {$push: '$equivalencies'}
-            }},
-            {$group: {
-                // Group all resulting documents together
-                _id: null,
-                institution: {$first: '$temp_institution'},
-                // Push each original document as a subdocument of 'courses'
-                courses: {$push: '$$ROOT'}
-            }},
-            {$project: {
-                _id: false,
-                // Remove all institution references because it's a root value
-                institution: true,
-                'courses.number': true,
-                'courses.subject': true,
-                'courses._id': true,
-                'courses.equivalencies.input': true,
-                'courses.equivalencies.output': true,
-                'courses.equivalencies.institution': true,
-                'courses.equivalencies.type': true
+            {
+                $group: {
+                    _id: '$_id',
+                    // Store institution as a temporary value that way it gets
+                    // evaluated as a string rather than an array during the next
+                    // $group
+                    temp_institution: { $first: '$equivalencies.institution' },
+                    number: { $first: '$number' },
+                    subject: { $first: '$subject' },
+                    equivalencies: { $push: '$equivalencies' }
+                }
+            },
+            {
+                $group: {
+                    // Group all resulting documents together
+                    _id: null,
+                    institution: { $first: '$temp_institution' },
+                    // Push each original document as a subdocument of 'courses'
+                    courses: { $push: '$$ROOT' }
+                }
+            },
+            {
+                $project: {
+                    _id: false,
+                    // Remove all institution references because it's a root value
+                    institution: true,
+                    'courses.number': true,
+                    'courses.subject': true,
+                    'courses._id': true,
+                    'courses.equivalencies.input': true,
+                    'courses.equivalencies.output': true,
+                    'courses.equivalencies.institution': true,
+                    'courses.equivalencies.type': true
 
-                // MongoDB doesn't like excluding non-root _id fields, so we have to
-                // whitelist properties instead of blacklist them
-                // 'courses.temp_institution': 0
-            }}
+                    // MongoDB doesn't like excluding non-root _id fields, so we have to
+                    // whitelist properties instead of blacklist them
+                    // 'courses.temp_institution': 0
+                }
+            }
         ]).toArray();
 
         if (docs.length === 0) {
