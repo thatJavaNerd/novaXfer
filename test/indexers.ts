@@ -26,7 +26,7 @@ describe('indexers', function() {
     }
 
     describe('utilities', function() {
-        describe('#normalizeWhitespace', function() {
+        describe('normalizeWhitespace()', function() {
             const test = (input: string, expectedOutput: string) => {
                 expect(normalizeWhitespace(input)).to.equal(expectedOutput);
             };
@@ -42,7 +42,7 @@ describe('indexers', function() {
             });
         });
 
-        describe('#findEquivType', function() {
+        describe('findEquivType()', function() {
             it('should determine direct courses appropriately', function() {
                 const courses = [
                     {
