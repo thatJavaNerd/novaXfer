@@ -98,6 +98,14 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
             matchEquivalencies.push({'equivalencies.institution': institutions[i]});
         }
 
+        const exists = (await this.coll()
+            .find({ subject: courseSubject, number: courseNumber })
+            .limit(1)
+            .count(true)) > 0;
+
+        if (!exists)
+            throw new QueryError(QueryErrorType.MISSING);
+
         const docs = await this.coll().aggregate([
             // Match first document with the given subject and number
             { $match: { subject: courseSubject, number: courseNumber} },
@@ -118,7 +126,13 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
 
         switch (docs.length) {
             case 0:
-                throw new QueryError(QueryErrorType.MISSING);
+                // Return a skeleton. This course exists, there's just no
+                // equivalencies for it for the requested institutions
+                return {
+                    subject: courseSubject,
+                    number: courseNumber,
+                    equivalencies: []
+                };
             case 1:
                 return {
                     subject: docs[0].subject,

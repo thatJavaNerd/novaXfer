@@ -7,9 +7,10 @@ import {
     CourseEquivalency, CourseEquivalencyDocument,
     EquivalencyContext, EquivType, KeyCourse
 } from '../src/models';
-import { validateCourseArray, validateSubject } from './validation';
+import { validateCourseArray } from './validation';
 import { Database, Mode } from '../src/Database';
 import { QueryError, QueryErrorType } from '../src/queries/errors';
+import { validateSubject } from '../src/routes/api/v1/validation';
 
 describe('EquivalencyDao', () => {
     let dao: EquivalencyDao;
