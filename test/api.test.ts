@@ -104,17 +104,21 @@ describe('API v1', () => {
     });
 
     describe('GET /api/v1/course/:subject', () => {
-        const verifyData = (data: any, subject: string) => {
-            expect(Array.isArray(data)).to.be.true;
+        const verifyData = (data: any) => {
+            expect(data).to.be.an('object');
+            expect(Object.keys(data)).to.have.length.above(0);
 
-            for (let courseEntry of data) {
-                expect(courseEntry.subject).to.equal(subject.toUpperCase());
-                expect(courseEntry.number).to.be.a('string');
+            for (let courseNumber of Object.keys(data)) {
+                expect(courseNumber).to.be.a('string');
+                // There should logically be at least 1 institution if its in
+                // the database
+                expect(data[courseNumber]).to.be.above(0);
             }
         };
-        it('should return courses only in the given subject', () => {
+
+        it('should return an object mapping course numbers to the amount of institutions that have equivalencies', () => {
             return apiRequest('/course/MTH', 200, undefined, (data: any) => {
-                verifyData(data, 'MTH');
+                verifyData(data);
             });
         });
 
@@ -126,7 +130,7 @@ describe('API v1', () => {
 
         it('should\'t care about case', () => {
             return apiRequest('/course/mth', 200, undefined, (data) => {
-                verifyData(data, 'mth');
+                verifyData(data);
             });
         });
     });

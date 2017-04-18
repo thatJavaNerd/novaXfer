@@ -43,7 +43,7 @@ describe('EquivalencyDao', () => {
         });
 
         describe('subjects()', () => {
-            it('should return an array mapping subject names to the amount of key courses in them', async () => {
+            it('should return an object mapping subject names to the amount of key courses in them', async () => {
                 const subjects = await dao.subjects();
 
                 // Validate all subjects
@@ -55,31 +55,35 @@ describe('EquivalencyDao', () => {
             });
         });
 
-        describe('keyCourses()', () => {
-            it('should only return courses in the given subject', async () => {
+        describe('numbersForSubject()', () => {
+            it('should return an object mapping course numbers to the amount of equivalencies in them', async () => {
                 const subject = Object.keys(await dao.subjects())[0];
-                const data = await dao.keyCourses(subject);
-                expect(data).to.have.length.above(0);
+                const data = await dao.numbersForSubject(subject);
+                expect(data).to.be.an('object');
 
-                for (let equiv of data) {
-                    expect(equiv.subject).to.equal(subject);
-                    expect(equiv.number).to.exist;
+                for (let num of Object.keys(data)) {
+                    expect(num).to.be.a('string');
+                    expect(num).to.have.length.above(1);
+
+                    // There should logically be at least 1 equivalency for this
+                    // course
+                    expect(data[num]).to.be.above(0);
                 }
             });
 
             it('should reject with a QueryError when given a subject that doesn\'t exist', () =>
-                expectQueryError(() => dao.keyCourses('foobar'))
+                expectQueryError(() => dao.numbersForSubject('foobar'))
             );
         });
 
         describe('course()', () => {
             it('should return a course entry', async () => {
                 const subject: string = Object.keys((await dao.subjects()))[0];
-                const keyCourse: KeyCourse = (await dao.keyCourses(subject))[0];
-                const course = await dao.course(keyCourse.subject, keyCourse.number);
+                const number: string = Object.keys(await dao.numbersForSubject(subject))[0];
+                const course = await dao.course(subject, number);
 
-                expect(course.subject).to.equal(keyCourse.subject);
-                expect(course.number).to.equal(keyCourse.number);
+                expect(course.subject).to.equal(subject);
+                expect(course.number).to.equal(number);
 
                 validateCourseEquivalencies(course.equivalencies);
             });

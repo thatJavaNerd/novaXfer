@@ -50,21 +50,26 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
     }
 
     /**
-     * Fetches all KeyCourses for a given subject
+     * Gets an object mapping course numbers to the amount of institutions that
+     * have equivalencies for that course
      * @param subject
-     * @returns {Promise<any[]>}
+     * @returns {Promise<any>}
      */
-    async keyCourses(subject: string): Promise<KeyCourse[]> {
-        const courses = await this.coll()
-            .find({ subject: subject })
-            .project({ _id: 0, subject: 1, number: 1 })
-            .sort({ number: 1 })
-            .toArray();
+    async numbersForSubject(subject: string): Promise<any> {
+        const courses = await this.coll().aggregate([
+            { $match: { subject: subject } },
+            { $project: { number: 1, count: { $size: '$equivalencies' } } }
+        ]).toArray();
 
         if (courses.length === 0)
             throw new QueryError(QueryErrorType.MISSING);
 
-        return courses;
+
+        const result = {};
+        for (let doc of courses)
+            result[doc.number] = doc.count;
+
+        return result;
     }
 
     /**

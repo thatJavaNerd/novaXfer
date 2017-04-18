@@ -35,7 +35,7 @@ export default function(): [string, Router] {
     r.get('/:subject', async (req: Request, res: Response) => {
         return runQuery(
             [subjectParam(req)],
-            (subj : string) => dao.keyCourses(subj),
+            (subj : string) => dao.numbersForSubject(subj),
             res
         );
     });
