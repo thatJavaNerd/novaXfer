@@ -102,7 +102,7 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
             // Match first document with the given subject and number
             { $match: { subject: courseSubject, number: courseNumber} },
             { $limit: 1 },
-            // Create seperate documents for each equivalency (all have same ID)
+            // Create separate documents for each equivalency (all have same ID)
             { $unwind: '$equivalencies' },
             // Filter out all but the given institutions
             { $match: { $or: matchEquivalencies } },
