@@ -4,8 +4,9 @@ import InstitutionDao from '../../../queries/InstitutionDao';
 import { SuccessResponse } from './responses';
 import Parameter = require('pinput')
 import { runQuery } from './util';
+import RouteModule from '../../RouteModule';
 
-export default function(): [string, Router] {
+export default function(): RouteModule {
     const dao = new InstitutionDao();
 
     const r = Router();
@@ -35,5 +36,8 @@ export default function(): [string, Router] {
             res);
     });
 
-    return ['/institution', r];
+    return {
+        mountPoint: '/institution',
+        router: r
+    };
 }

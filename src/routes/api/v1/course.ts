@@ -8,8 +8,9 @@ import {
     validateCourseNumber, validateInstitutionAcronym,
     validateSubject
 } from './validation';
+import RouteModule from '../../RouteModule';
 
-export default function(): [string, Router] {
+export default function(): RouteModule {
     const dao = new EquivalencyDao();
 
     const r = Router();
@@ -91,5 +92,8 @@ export default function(): [string, Router] {
         );
     });
 
-    return ['/course', r];
+    return {
+        mountPoint: '/course',
+        router: r
+    };
 }

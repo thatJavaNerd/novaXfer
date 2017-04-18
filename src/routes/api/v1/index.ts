@@ -2,19 +2,20 @@ import { Request, Response, Router } from 'express';
 import institution from './institution';
 import course from './course';
 import { ErrorResponse } from './responses';
+import RouteModule from '../../RouteModule';
 
-export default function(): [string, Router] {
+export default function(): RouteModule {
     const router = Router();
 
-    const modules: (() => [string, Router])[] = [
+    const modules: (() => RouteModule)[] = [
         institution,
         course
     ];
 
     for (let m of modules) {
-        const data = m();
+        const mod = m();
         // data[0] is the mount point, data[1] is the Router
-        router.use(data[0], data[1]);
+        router.use(mod.mountPoint, mod.router);
     }
 
     // Catch all requests to the API not handled by an API module to ensure the
@@ -31,5 +32,8 @@ export default function(): [string, Router] {
         res.status(resp.status).json(resp);
     });
 
-    return ['/v1', router];
+    return {
+        mountPoint: '/v1',
+        router: router
+    };
 }
