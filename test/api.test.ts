@@ -7,10 +7,10 @@ import * as _ from 'lodash';
 import { findIndexers } from '../src/indexers/index';
 import * as request from 'supertest';
 import {
-    CourseEntry, CourseEquivalencyDocument,
+    CourseEntry, CourseEquivalencyDocument, Institution,
     KeyCourse
 } from '../src/models';
-import EquivalencyDao from '../src/queries/EquivalencyDao';
+import EquivalencyDao, { InstitutionFocusedEquivalency } from '../src/queries/EquivalencyDao';
 import { ErrorData } from '../src/routes/api/v1/util';
 
 describe('API v1', () => {
@@ -53,7 +53,7 @@ describe('API v1', () => {
         });
     });
 
-    describe('GET /api/v1/institution/:id', () => {
+    describe('GET /api/v1/institution/:acronym', () => {
         it('should return only a single institution', async () => {
             const institutions = _.map(findIndexers(), i => i.institution);
 
@@ -91,6 +91,66 @@ describe('API v1', () => {
         it('should allow case-insensitive input', () => {
             const inst = findIndexers()[0].institution.acronym.toLowerCase();
             return apiRequest('/institution/' + inst, 200, undefined);
+        });
+    });
+
+    describe('GET /api/v1/institution/:acronym/:courses', () => {
+        // Hand-pick GMU because it has a lot of equivalencies
+        const institution = 'GMU';
+
+        it('should return an InstitutionFocusedEquivalency', () => {
+            return apiRequest(`/institution/${institution}/CSC:202`, 200, undefined, (data: InstitutionFocusedEquivalency) => {
+                expect(data.institution).to.equal(institution);
+                expect(data.courses).to.exist;
+                expect(Array.isArray(data.courses)).to.be.true;
+
+                // We only requested 1 course
+                expect(data.courses).to.have.lengthOf(1);
+
+                expect(data.courses[0].subject).to.equal('CSC');
+                expect(data.courses[0].number).to.equal('202');
+                for (let equiv of data.courses[0].equivalencies) {
+                    expect(equiv.institution).to.equal(institution);
+                }
+            });
+        });
+
+        it('should 404 when given a non-existent institution', () => {
+            return apiRequest('/institution/FOO/CSC:202', 404, undefined, (error: ErrorData) => {
+                expect(error.input).to.deep.equal({
+                    acronym: 'FOO',
+                    courses: [{
+                        subject: 'CSC',
+                        number: '202'
+                    }]
+                });
+            });
+        });
+
+        it('should return a skeleton when the courses don\'t exist', () => {
+            return apiRequest(`/institution/${institution}/FOO:BAR`, 200, undefined, (data: InstitutionFocusedEquivalency) => {
+                expect(data.institution).to.equal(institution);
+                expect(Array.isArray(data.courses)).to.be.true;
+                expect(data.courses).to.have.lengthOf(0);
+            });
+        });
+
+        it('should not care about case', async () => {
+            const route = `/institution/${institution}/CSC:202`;
+            let responseData: InstitutionFocusedEquivalency;
+
+            await apiRequest(route, 200, undefined, (data: InstitutionFocusedEquivalency) => {
+                // If we don't get any courses returned it's probably because we
+                // choose a bad institution/course to test against
+                expect(data.courses).to.have.length.above(0);
+                responseData = data;
+            });
+
+            return apiRequest(route.toLowerCase(), 200, undefined, (data) => {
+                // Just make sure the response we got sending parameters in
+                // lowercase is the same is the 'normal' response data
+                expect(data).to.deep.equal(responseData);
+            });
         });
     });
 
