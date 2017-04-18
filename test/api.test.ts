@@ -55,12 +55,16 @@ describe('API v1', () => {
 
     describe('GET /api/v1/institution/:id', () => {
         it('should return only a single institution', async () => {
-            const institution = findIndexers()[0].institution;
-            return apiRequest(`/institution/${institution.acronym}`, 200, undefined, (data: any) => {
-                expect(data.acronym).to.equal(institution.acronym);
-                expect(data.fullName).to.equal(institution.fullName);
-                expect(data.location).to.equal(institution.location);
-            });
+            const institutions = _.map(findIndexers(), i => i.institution);
+
+            // Query every institution directly to make sure we can
+            for (let institution of institutions) {
+                await apiRequest(`/institution/${institution.acronym}`, 200, undefined, (data: any) => {
+                    expect(data.acronym).to.equal(institution.acronym);
+                    expect(data.fullName).to.equal(institution.fullName);
+                    expect(data.location).to.equal(institution.location);
+                });
+            }
         });
 
         it('should error when given an invalid acronym', async () => {

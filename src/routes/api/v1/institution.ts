@@ -5,6 +5,7 @@ import { SuccessResponse } from './responses';
 import Parameter = require('pinput')
 import { runQuery } from './util';
 import RouteModule from '../../RouteModule';
+import { validateInstitutionAcronym } from './validation';
 
 export default function(): RouteModule {
     const dao = new InstitutionDao();
@@ -24,9 +25,7 @@ export default function(): RouteModule {
         const acronym = new Parameter({
             name: 'acronym',
             rawInput: req.params.acronym,
-            validate: (acronym) => acronym.length >= 2 &&
-                acronym.length <= 3 &&
-                /^[A-Za-z]{2,3}$/.test(acronym),
+            validate: validateInstitutionAcronym,
             // Make sure we give the query the uppercase value
             postprocess: (value) => value.toUpperCase()
         });

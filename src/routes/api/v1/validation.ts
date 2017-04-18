@@ -18,7 +18,7 @@ export function validateCourseNumber(num: string, strict = false): boolean {
 }
 
 // Match only uppercase letters and ampersands throughout the entire string
-export const acronymRegex = /^[A-Z&]+$/;
+export const acronymRegex = /^[A-Z&]{2,3}$/;
 
 export function validateInstitutionAcronym(acr: string, strict = false): boolean {
     return regexValidator(strict ? acr : acr.toUpperCase(), acronymRegex);
