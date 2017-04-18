@@ -3,7 +3,7 @@ import { Request, Response, Router } from 'express';
 import { SuccessResponse } from './responses';
 import Parameter = require('pinput')
 import { runQuery } from './util';
-import EquivalencyDao from '../../queries/EquivalencyDao';
+import EquivalencyDao from '../../../queries/EquivalencyDao';
 
 export default function(): [string, Router] {
     const dao = new EquivalencyDao();

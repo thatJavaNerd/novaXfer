@@ -1,6 +1,6 @@
 
 import { Request, Response, NextFunction, Router } from 'express';
-import InstitutionDao from '../../queries/InstitutionDao';
+import InstitutionDao from '../../../queries/InstitutionDao';
 import { SuccessResponse } from './responses';
 import Parameter = require('pinput')
 import { runQuery } from './util';

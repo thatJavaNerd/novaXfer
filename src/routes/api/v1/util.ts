@@ -3,7 +3,7 @@ import Contract = require('pinput/contract');
 import { Response } from 'express';
 import { ErrorResponse, ResponseBase, SuccessResponse } from './responses';
 import * as _ from 'lodash';
-import { QueryError, QueryErrorType } from '../../queries/errors';
+import { QueryError, QueryErrorType } from '../../../queries/errors';
 
 /**
  * Runs a query and sends the result as JSON to the response. Takes input
