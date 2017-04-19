@@ -28,7 +28,7 @@ gulp.task('views', () => {
         .pipe(gulp.dest('dist/public/views'));
 });
 
-gulp.task('watch', ['build:server'], () => {
+gulp.task('watch', () => {
     gulp.watch('server/src/**/*.ts', ['build:server']);
 });
 
