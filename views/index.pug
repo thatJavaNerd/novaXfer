@@ -1,4 +1,7 @@
-extends layout
+extends layout.pug
 
 block content
     p Hello, world
+
+block append stylesheets
+    link(rel='style/index.css')

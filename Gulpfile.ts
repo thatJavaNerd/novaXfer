@@ -2,12 +2,16 @@ import * as del from 'del';
 import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as coveralls from 'gulp-coveralls';
+import * as cssMin from 'gulp-css';
 import * as nodemon from 'gulp-nodemon';
 import * as pug from 'gulp-pug';
 import tslint from 'gulp-tslint';
 import * as tsc from 'gulp-typescript';
+import * as runSequence from 'run-sequence';
 
-gulp.task('default', ['build', 'watch', 'start']);
+gulp.task('default', ['build'], (cb) => {
+    runSequence('start', cb);
+});
 
 ////// BUILDING //////
 gulp.task('build:server', () => {
@@ -28,12 +32,20 @@ gulp.task('views', () => {
         .pipe(gulp.dest('dist/views'));
 });
 
+gulp.task('css', () => {
+    return gulp.src('client/style/**/*.css')
+        .pipe(cssMin())
+        .pipe(gulp.dest('dist/server/public/style'));
+});
+
 gulp.task('watch', () => {
     gulp.watch('server/src/**/*.ts', ['build:server']);
     gulp.watch('views/**/*.pug', ['views']);
 });
 
-gulp.task('build', ['build:server', 'views']);
+gulp.task('build', (cb) => {
+    runSequence('clean', 'build:server', 'views', 'css', 'watch', cb);
+});
 
 gulp.task('start', () => {
     // Read from standard config so devs can also run `nodemon` from the console
@@ -43,6 +55,10 @@ gulp.task('start', () => {
 });
 
 ////// TESTING AND LINTING //////
+gulp.task('clean', ['clean:testPrep'], () => {
+    return del(['dist']);
+});
+
 gulp.task('clean:testPrep', () => {
     return del(['server/src/indexers/.cache', 'server/src/views']);
 });

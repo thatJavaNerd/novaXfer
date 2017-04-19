@@ -3,6 +3,8 @@ import * as express from 'express';
 import * as helmet from 'helmet';
 import * as _ from 'lodash';
 import * as logger from 'morgan';
+import * as path from 'path';
+
 import { findIndexers, indexAll, IndexReport } from './indexers/index';
 import EquivalencyDao from './queries/EquivalencyDao';
 import InstitutionDao from './queries/InstitutionDao';
@@ -16,6 +18,7 @@ export function createServer(): express.Application {
     app.use(bodyParser.json());
     app.use('/api', api());
     app.use('/', html());
+    app.use(express.static(path.join(__dirname, 'public')));
     app.use(helmet());
 
     return app;
