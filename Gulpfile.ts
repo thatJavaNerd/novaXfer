@@ -6,6 +6,9 @@ import * as nodemon from 'gulp-nodemon';
 import tslint from 'gulp-tslint';
 import * as tsc from 'gulp-typescript';
 
+gulp.task('default', ['build:server', 'watch', 'start']);
+
+////// BUILDING //////
 gulp.task('build:server', () => {
     const proj = tsc.createProject('server/tsconfig.json');
     const result = gulp.src('server/src/**/*.ts')
@@ -16,6 +19,18 @@ gulp.task('build:server', () => {
 
 gulp.task('watch', ['build:server'], () => {
     gulp.watch('server/src/**/*.ts', ['build:server']);
+});
+
+gulp.task('start', () => {
+    // Read from standard config so devs can also run `nodemon` from the console
+    // and have it work the same way as it does here
+    const config = JSON.parse(fs.readFileSync('nodemon.json', 'utf8'));
+    nodemon(config);
+});
+
+////// TESTING AND LINTING //////
+gulp.task('clean:testPrep', () => {
+    return del(['src/indexers/.cache']);
 });
 
 gulp.task('coveralls', () => {
@@ -31,15 +46,3 @@ gulp.task('lint', () => {
         .pipe(tslint.report());
 });
 
-gulp.task('start', () => {
-    // Read from standard config so devs can also run `nodemon` from the console
-    // and have it work the same way as it does here
-    const config = JSON.parse(fs.readFileSync('nodemon.json', 'utf8'));
-    nodemon(config);
-});
-
-gulp.task('clean:testPrep', () => {
-    return del(['src/indexers/.cache']);
-});
-
-gulp.task('default', ['build:server', 'watch', 'start']);
