@@ -139,5 +139,5 @@ function getCourseNumber(tr, colIndex) {
 }
 
 function isExtraneousRow(tr) {
-    return columnAtIndex(tr, extraneousRowIndicatorIndex).text() == extraneousRowIndicatorText;
+    return columnAtIndex(tr, extraneousRowIndicatorIndex).text() === extraneousRowIndicatorText;
 }

@@ -4,7 +4,7 @@ import {
     findIndexers, Indexer,
     normalizeWhitespace
 } from '../src/indexers/index';
-import { EquivalencyContext, EquivType } from '../src/models';
+import { EquivType } from '../src/models';
 import { validateCourseArray, validateInstitution } from './validation';
 
 describe('indexers', function() {

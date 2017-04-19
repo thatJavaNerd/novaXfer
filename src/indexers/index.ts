@@ -152,13 +152,13 @@ export function interpretCreditInput(str: string): Array<number | CreditRange> {
 
     for (const segment of parts) {
         // A hyphen indicates that the credit is a range (ex: "3-4")
-        if (segment.indexOf('-') != -1) {
+        if (segment.indexOf('-') !== -1) {
             const creditSegments = segment.split('-');
             const a = parseInt(creditSegments[0], 10);
             const b = parseInt(creditSegments[1], 10);
 
             // For some odd reason?
-            if (a == b) {
+            if (a === b) {
                 credits.push(a);
             } else {
                 credits.push({
