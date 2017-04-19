@@ -13,6 +13,7 @@ import { QueryError, QueryErrorType } from '../src/queries/errors';
 import {
     courseSubjectRegex
 } from '../src/routes/api/v1/validation';
+import { doFullIndex } from '../src/server';
 
 describe('EquivalencyDao', () => {
     let dao: EquivalencyDao;
@@ -44,11 +45,8 @@ describe('EquivalencyDao', () => {
             // Allow plenty of time for the Indexers to do their thing
             this.timeout(30000);
 
-            // Find all EquivalencyContexts from all Indexers
-            const equivs = await Promise.all(_.map(findIndexers(), i => i.findAll()));
-
-            // Insert them into the database
-            return dao.put(equivs);
+            // Add both equivalencies and institutions to the database
+            await doFullIndex();
         });
 
         describe('subjects()', () => {
