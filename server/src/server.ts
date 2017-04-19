@@ -10,7 +10,7 @@ import EquivalencyDao from './queries/EquivalencyDao';
 import InstitutionDao from './queries/InstitutionDao';
 import MetaDao from './queries/MetaDao';
 import api from './routes/api';
-import html from './routes/html';
+import html from './routes/front';
 
 export function createServer(): express.Application {
     const app = express();
