@@ -7,7 +7,7 @@ import * as pug from 'gulp-pug';
 import tslint from 'gulp-tslint';
 import * as tsc from 'gulp-typescript';
 
-gulp.task('default', ['build:server', 'watch', 'start']);
+gulp.task('default', ['build', 'watch', 'start']);
 
 ////// BUILDING //////
 gulp.task('build:server', () => {
@@ -31,6 +31,8 @@ gulp.task('views', () => {
 gulp.task('watch', () => {
     gulp.watch('server/src/**/*.ts', ['build:server']);
 });
+
+gulp.task('build', ['build:server', 'views']);
 
 gulp.task('start', () => {
     // Read from standard config so devs can also run `nodemon` from the console
