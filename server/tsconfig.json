@@ -3,10 +3,5 @@
         "target": "es6",
         "module": "commonjs",
         "strictNullChecks": true
-    },
-    "include": [
-      "src/**/*.ts",
-      "test/**/*.ts"
-    ],
-    "exclude": ["node_modules"]
+    }
 }

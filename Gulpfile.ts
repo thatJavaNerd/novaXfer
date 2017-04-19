@@ -4,9 +4,8 @@ import * as gulp from 'gulp';
 import * as tsc from 'gulp-typescript';
 import tslint from 'gulp-tslint';
 
-const tsProject = tsc.createProject('tsconfig.json');
-
 gulp.task('scripts', () => {
+    const tsProject = tsc.createProject('tsconfig.json');
     const tsResult = tsProject.src().pipe(tsProject());
     return tsResult.js.pipe(gulp.dest('dist'));
 });
