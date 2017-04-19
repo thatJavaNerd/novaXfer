@@ -9,6 +9,15 @@ describe('routes', () => {
         app = createServer();
     });
 
+    describe('GET /', () => {
+        it('should respond with HTML', () =>
+            request(app)
+                .get('/')
+                .expect(200)
+                .expect('Content-Type', /html/)
+        );
+    });
+
     describe('GET /api', () => {
         it('should redirect to the docs on GitHub', () =>
             request(app)

@@ -4,7 +4,7 @@
   "description": "Quick and easy NVCC course equivalencies",
   "main": "server.js",
   "scripts": {
-    "test": "gulp clean:testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts",
+    "test": "gulp testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts",
     "start": "node --use-strict dist/server/index.js"
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",

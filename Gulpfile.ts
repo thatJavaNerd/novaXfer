@@ -25,7 +25,7 @@ gulp.task('views', () => {
                 year: new Date().getFullYear()
             }
         }))
-        .pipe(gulp.dest('dist/public/views'));
+        .pipe(gulp.dest('dist/views'));
 });
 
 gulp.task('watch', () => {
@@ -44,8 +44,15 @@ gulp.task('start', () => {
 
 ////// TESTING AND LINTING //////
 gulp.task('clean:testPrep', () => {
-    return del(['src/indexers/.cache']);
+    return del(['server/src/indexers/.cache', 'server/src/views']);
 });
+
+gulp.task('views:testPrep', ['views'], () => {
+    return gulp.src('dist/views/**/*.html')
+        .pipe(gulp.dest('server/src/views'));
+});
+
+gulp.task('testPrep', ['clean:testPrep', 'views:testPrep']);
 
 gulp.task('coveralls', () => {
     gulp.src('coverage/lcov.info').pipe(coveralls());

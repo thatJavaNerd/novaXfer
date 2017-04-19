@@ -8,12 +8,14 @@ import EquivalencyDao from './queries/EquivalencyDao';
 import InstitutionDao from './queries/InstitutionDao';
 import MetaDao from './queries/MetaDao';
 import api from './routes/api';
+import html from './routes/html';
 
 export function createServer(): express.Application {
     const app = express();
     app.use(logger('dev'));
     app.use(bodyParser.json());
     app.use('/api', api());
+    app.use('/', html());
     app.use(helmet());
 
     return app;
