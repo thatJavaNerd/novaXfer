@@ -86,11 +86,13 @@ gulp.task('clean:testPrep', () => {
 });
 
 gulp.task('views:testPrep', ['views'], () => {
-    return gulp.src('dist/views/**/*.html')
+    return gulp.src('dist/server/views/**/*.html')
         .pipe(gulp.dest('server/src/views'));
 });
 
-gulp.task('testPrep', ['clean:testPrep', 'views:testPrep']);
+gulp.task('testPrep', (cb) => {
+    return runSequence('clean:testPrep', 'views:testPrep', cb);
+});
 
 gulp.task('coveralls', () => {
     gulp.src('coverage/lcov.info').pipe(coveralls());
