@@ -12,7 +12,7 @@ gulp.task('build:server', () => {
     return result.js.pipe(gulp.dest('dist/server'));
 });
 
-gulp.task('watch', ['scripts'], () => {
+gulp.task('watch', ['build:server'], () => {
     gulp.watch('src/**/*.ts', ['scripts']);
 });
 
