@@ -13,6 +13,12 @@ html
             link(rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u' crossorigin='anonymous')
             link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic')
 
+        block scripts
+            script(src='/jspm_packages/system.js')
+            script(src='/jspm.config.js')
+            script.
+                System.import('app');
+
     body
         block header
             header: a(href='/') novaXfer

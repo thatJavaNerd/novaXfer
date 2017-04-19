@@ -22,6 +22,21 @@ gulp.task('build:server', () => {
     return result.js.pipe(gulp.dest('dist/server'));
 });
 
+gulp.task('build:client', ['css', 'jspm', 'jspm:config'], () => {
+    return gulp.src('client/app/**/*.ts')
+        .pipe(gulp.dest('dist/server/public/app'));
+});
+
+gulp.task('jspm', () => {
+    return gulp.src(['client/jspm_packages/**/*'])
+        .pipe(gulp.dest('dist/server/public/jspm_packages'));
+});
+
+gulp.task('jspm:config', () => {
+    return gulp.src('client/jspm.config.js')
+        .pipe(gulp.dest('dist/server/public'));
+});
+
 gulp.task('views', () => {
     return gulp.src('views/*.pug')
         .pipe(pug({
@@ -29,7 +44,7 @@ gulp.task('views', () => {
                 year: new Date().getFullYear()
             }
         }))
-        .pipe(gulp.dest('dist/views'));
+        .pipe(gulp.dest('dist/server/views'));
 });
 
 gulp.task('css', () => {
@@ -39,12 +54,19 @@ gulp.task('css', () => {
 });
 
 gulp.task('watch', () => {
-    gulp.watch('server/src/**/*.ts', ['build:server']);
-    gulp.watch('views/**/*.pug', ['views']);
+    const conf = {
+        'server/src/**/*.ts': ['build:server'],
+        'views/**/*.pug': ['views'],
+        'client/app/jspm.config.js': ['jspm:config'],
+        'client/app/**/*.ts': ['build:client']
+    };
+    for (const src of Object.keys(conf)) {
+        gulp.watch(src, conf[src]);
+    }
 });
 
 gulp.task('build', (cb) => {
-    runSequence('clean', 'build:server', 'views', 'css', 'watch', cb);
+    runSequence('clean', 'build:server', 'build:client', 'views', 'watch', cb);
 });
 
 gulp.task('start', () => {
