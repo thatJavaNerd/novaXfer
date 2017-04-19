@@ -1,4 +1,4 @@
 {
-  "watch": ["dist/server/**/*.ts"],
+  "watch": ["dist/server/**/*.js"],
   "exec": "node dist/server/index.js"
 }

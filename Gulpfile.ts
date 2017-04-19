@@ -38,7 +38,7 @@ gulp.task('jspm:config', () => {
 });
 
 gulp.task('views', () => {
-    return gulp.src('views/*.pug')
+    return gulp.src('views/**/*.pug')
         .pipe(pug({
             data: {
                 year: new Date().getFullYear()
@@ -66,7 +66,7 @@ gulp.task('watch', () => {
 });
 
 gulp.task('build', (cb) => {
-    runSequence('clean', 'build:server', 'build:client', 'views', 'watch', cb);
+    runSequence('clean', 'build:server', 'build:client', 'views', 'views:testPrep', 'watch', cb);
 });
 
 gulp.task('start', () => {
