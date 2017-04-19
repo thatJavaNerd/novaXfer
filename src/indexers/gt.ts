@@ -1,9 +1,9 @@
 import {
-    determineEquivType, HtmlIndexer, normalizeWhitespace
-} from './index';
-import {
     Course, CourseEquivalency, CREDITS_UNKNOWN, EquivType,
 } from '../models';
+import {
+    determineEquivType, HtmlIndexer, normalizeWhitespace
+} from './index';
 
 const headerRows = 2;
 const nvccNumberIndex = 2;
@@ -13,6 +13,13 @@ const extraneousRowIndicatorIndex = 7;
 const extraneousRowIndicatorText = "And";
 
 export default class GtIndexer extends HtmlIndexer {
+    public institution = {
+        fullName: 'Georgia Tech',
+        acronym: 'GT',
+        location: 'Georgia',
+        parseSuccessThreshold: 1.00
+    };
+
     protected prepareRequest(): any {
         const dataUrl = 'https://oscar.gatech.edu/pls/bprod/wwsktrna.P_find_subj_levl_classes';
 
@@ -30,14 +37,14 @@ export default class GtIndexer extends HtmlIndexer {
         };
 
         // Totally didn't copy+paste this nice one liner off StackOverflow
-        let formQuery = Object.keys(basicFormData).reduce(function (a: any[], k) {
+        let formQuery = Object.keys(basicFormData).reduce((a: any[], k) => {
             a.push(k + '=' + encodeURIComponent(basicFormData[k]));
             return a;
         }, []).join('&');
 
         // Append our subjects to the query
-        for (let i = 0; i < subjects.length; i++) {
-            formQuery += '&sel_subj=' +  subjects[i];
+        for (const subj of subjects) {
+            formQuery += '&sel_subj=' + subj;
         }
 
         return {
@@ -55,7 +62,7 @@ export default class GtIndexer extends HtmlIndexer {
         // Access the main table
         const cssQuery = 'table.datadisplaytable tr';
         const tableRows = $(cssQuery).slice(headerRows);
-        tableRows.each(function(index) {
+        tableRows.each((index) => {
             const row = $(tableRows[index]);
             if (isExtraneousRow(row)) {
                 // Skip this row, it's been handled by the row previous
@@ -71,7 +78,7 @@ export default class GtIndexer extends HtmlIndexer {
             }
 
             const gtNumber = getCourseNumber(row, gtNumberIndex);
-            const gtCredits = parseInt(columnAtIndex(row, gtCreditIndex).text().trim());
+            const gtCredits = parseInt(columnAtIndex(row, gtCreditIndex).text().trim(), 10);
 
             const nvccCourses: Course[] = [{
                 subject: nvccNumber[0],
@@ -103,13 +110,6 @@ export default class GtIndexer extends HtmlIndexer {
 
         return [equivalencies, 0];
     }
-
-    institution = {
-        fullName: 'Georgia Tech',
-        acronym: 'GT',
-        location: 'Georgia',
-        parseSuccessThreshold: 1.00
-    };
 }
 
 function findEquivType(gtCourses): EquivType {
@@ -141,4 +141,3 @@ function getCourseNumber(tr, colIndex) {
 function isExtraneousRow(tr) {
     return columnAtIndex(tr, extraneousRowIndicatorIndex).text() == extraneousRowIndicatorText;
 }
-

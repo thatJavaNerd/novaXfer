@@ -1,16 +1,16 @@
 
-import { Request, Response, NextFunction, Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import InstitutionDao from '../../../queries/InstitutionDao';
 import { SuccessResponse } from './responses';
-import Parameter = require('pinput')
-import { runQuery } from './util';
+import Parameter = require('pinput');
+import { KeyCourse } from '../../../models';
+import EquivalencyDao from '../../../queries/EquivalencyDao';
 import RouteModule from '../../RouteModule';
+import { runQuery } from './util';
 import {
     validateCourseNumber, validateInstitutionAcronym,
     validateSubject
 } from './validation';
-import EquivalencyDao from '../../../queries/EquivalencyDao';
-import { KeyCourse } from '../../../models';
 
 export default function(): RouteModule {
     const dao = new InstitutionDao();
@@ -52,7 +52,7 @@ export default function(): RouteModule {
             array: true,
             preprocess: (val: string) => val.toUpperCase().split(':'),
             validate: (courseParts: string[][]) => {
-                for (let course of courseParts) {
+                for (const course of courseParts) {
                     if (!(validateSubject(course[0]) && validateCourseNumber(course[1])))
                         return false;
                 }
@@ -62,7 +62,7 @@ export default function(): RouteModule {
                 return {
                     subject: courseParts[0],
                     number: courseParts[1]
-                }
+                };
             }
         });
 

@@ -1,14 +1,14 @@
 import { Request, Response, Router } from 'express';
-import Parameter = require('pinput')
+import Parameter = require('pinput');
 
+import EquivalencyDao from '../../../queries/EquivalencyDao';
+import RouteModule from '../../RouteModule';
 import { SuccessResponse } from './responses';
 import { runQuery } from './util';
-import EquivalencyDao from '../../../queries/EquivalencyDao';
 import {
     validateCourseNumber, validateInstitutionAcronym,
     validateSubject
 } from './validation';
-import RouteModule from '../../RouteModule';
 
 export default function(): RouteModule {
     const dao = new EquivalencyDao();
@@ -20,9 +20,9 @@ export default function(): RouteModule {
             name: 'subject',
             rawInput: req.params.subject,
             validate: validateSubject,
-            preprocess: val => val.trim(),
+            preprocess: (val) => val.trim(),
             // Make sure we give the query the uppercase value
-            postprocess: val => val.toUpperCase()
+            postprocess: (val) => val.toUpperCase()
         });
 
     const numberParam = (req: Request) =>
@@ -30,13 +30,13 @@ export default function(): RouteModule {
             name: 'number',
             rawInput: req.params.number,
             validate: validateCourseNumber,
-            preprocess: val => val.trim(),
+            preprocess: (val) => val.trim(),
             // Make sure we give the query the uppercase value
-            postprocess: val => val.toUpperCase()
+            postprocess: (val) => val.toUpperCase()
         });
 
     const validateInstitutions = (institutions: string[]) => {
-        for (let i of institutions) {
+        for (const i of institutions) {
             if (!validateInstitutionAcronym(i)) return false;
         }
 
@@ -64,7 +64,7 @@ export default function(): RouteModule {
     r.get('/:subject', async (req: Request, res: Response) => {
         return runQuery(
             [subjectParam(req)],
-            (subj : string) => dao.numbersForSubject(subj),
+            (subj: string) => dao.numbersForSubject(subj),
             res
         );
     });
@@ -74,7 +74,7 @@ export default function(): RouteModule {
             // parameters
             [subjectParam(req), numberParam(req)],
             // query function
-            (subj: string, number: string) => dao.course(subj, number),
+            (subj: string, numb: string) => dao.course(subj, numb),
             // response
             res
         );

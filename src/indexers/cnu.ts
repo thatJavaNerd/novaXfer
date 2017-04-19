@@ -1,9 +1,9 @@
-import { determineEquivType, PdfIndexer } from './index';
 import {
     Course,
     CourseEquivalency,
     CREDITS_UNKNOWN,
 } from '../models';
+import { determineEquivType, PdfIndexer } from './index';
 
 const subjectRegex = /^[A-Z]{3}$/;
 // Tests if the entirety of a string represents a valid course identifier.
@@ -17,13 +17,20 @@ const courseNumberTester = /^\d{3}(?: ?[-+] ?\d{3})?$/;
 const defaultCnuCourseIndex = 4;
 
 export default class CnuIndexer extends PdfIndexer {
+    public institution = {
+        acronym: 'CNU',
+        fullName: 'Christopher Newport University',
+        location: 'Virginia',
+        parseSuccessThreshold: 1.00
+    };
+
     protected prepareRequest(): any {
         return 'http://cnu.edu/admission/transfer/_pdf/cnu-vccs-cnu_equivalent_course_table_02152017_kw.pdf';
     }
 
     protected parseEquivalencies(rows: string[][]): [CourseEquivalency[], number] {
         const equivalencies: CourseEquivalency[] = [];
-        for (let row of rows) {
+        for (const row of rows) {
             if (subjectRegex.test(row[0])) {
                 // NVCC is pretty convenient
                 const nvccCourses = parseNvccCourses(row);
@@ -56,13 +63,6 @@ export default class CnuIndexer extends PdfIndexer {
 
         return [equivalencies, 0];
     }
-
-    institution = {
-        acronym: 'CNU',
-        fullName: 'Christopher Newport University',
-        location: 'Virginia',
-        parseSuccessThreshold: 1.00
-    };
 }
 
 function parseNvccCourses(row: string[]) {
@@ -79,13 +79,13 @@ function parseNvccCourses(row: string[]) {
         throw new Error('Could not identify NVCC number for row ' + row);
     }
 
-    let courseNumbers = numberRaw.split(/[-+]/);
+    const courseNumbers = numberRaw.split(/[-+]/);
     const courses: Course[] = [];
     let creditsUsed = false;
-    for (let courseNumber of courseNumbers) {
+    for (const courseNumber of courseNumbers) {
         let credits = CREDITS_UNKNOWN;
         if (!creditsUsed) {
-            credits = parseInt(row[2]);
+            credits = parseInt(row[2], 10);
             creditsUsed = true;
         }
         courses.push({
@@ -104,7 +104,7 @@ function parseCnuCourses(rawString: string): Course[] {
 
     // Split each match by a space and flat map. For example:
     // ['CHEM 104', '104L'] => ['CHEM', '104', '104L']
-    matchedCourses = [].concat.apply([], matchedCourses!.map(course => separateCourseParts(course)));
+    matchedCourses = [].concat.apply([], matchedCourses!.map((course) => separateCourseParts(course)));
 
     let subject = matchedCourses![0];
     for (let i = 1; i < matchedCourses!.length; i++) {
@@ -114,7 +114,7 @@ function parseCnuCourses(rawString: string): Course[] {
         } else {
             // First letter is non-alphabetical, assume course number
             courses.push({
-                subject: subject,
+                subject,
                 number: matchedCourses![i],
                 credits: CREDITS_UNKNOWN
             });
@@ -133,4 +133,3 @@ function separateCourseParts(raw) {
         return [raw];
     return [raw.slice(0, firstNumber), raw.slice(firstNumber)];
 }
-

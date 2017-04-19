@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 
-import { Database, Mode } from '../src/Database';
-import InstitutionDao from '../src/queries/InstitutionDao';
-import { findIndexers } from '../src/indexers/index';
 import * as _ from 'lodash';
-import { validateInstitution } from './validation';
+import { Database, Mode } from '../src/Database';
+import { findIndexers } from '../src/indexers/index';
 import { Institution } from '../src/models';
 import { QueryError, QueryErrorType } from '../src/queries/errors';
+import InstitutionDao from '../src/queries/InstitutionDao';
+import { validateInstitution } from './validation';
 
 describe('InstitutionDao', () => {
     let dao: InstitutionDao;
@@ -20,14 +20,14 @@ describe('InstitutionDao', () => {
     describe('queries', () => {
         before('insert institutions', async () => {
             // Insert all institutions into the database
-            return dao.put(_.map(findIndexers(), i => i.institution));
+            return dao.put(_.map(findIndexers(), (i) => i.institution));
         });
 
         describe('getAll()', () => {
             it('should produce valid Institutions', async () => {
                 const data = await dao.getAll();
                 // Validate all institutions
-                _.each(data, validateInstitution)
+                _.each(data, validateInstitution);
             });
         });
 
@@ -53,7 +53,7 @@ describe('InstitutionDao', () => {
             });
         });
 
-        after('drop collection', () => Database.get().dropIfExists(dao.collectionName))
+        after('drop collection', () => Database.get().dropIfExists(dao.collectionName));
     });
 
     describe('inserting and writing', () => {

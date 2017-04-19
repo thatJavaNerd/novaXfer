@@ -1,4 +1,4 @@
-import { MongoClient, Db } from 'mongodb';
+import { Db, MongoClient } from 'mongodb';
 
 const BASE_URL = 'mongodb://localhost:27017/novaxfer';
 
@@ -9,20 +9,11 @@ export class Database {
     private static instance: Database;
 
     /** Mongo Db reference */
-    private __db: Db | null = null;
-    private __url: string | null = null;
-    private __mode: Mode | null = null;
+    private dbInt: Db | null = null;
+    private urlInt: string | null = null;
+    private modeInt: Mode | null = null;
 
     private constructor() {}
-
-    /** Gets the singleton instance */
-    static get() {
-        if (!Database.instance) {
-            Database.instance = new Database();
-        }
-
-        return Database.instance;
-    }
 
     /**
      * Connects to a database. The given mode determines the database's name.
@@ -30,61 +21,61 @@ export class Database {
      * database named 'highlights_test'. There is similar functionality for
      * every value in the Mode enum.
      */
-    async connect(mode) {
-        if (this.__mode !== null && mode !== this.__mode) {
+    public async connect(mode) {
+        if (this.modeInt !== null && mode !== this.modeInt) {
             throw new Error('already connected with mode ' + Mode[mode]);
         }
-        if (this.__db !== null) {
+        if (this.dbInt !== null) {
             return;
         }
 
-        this.__mode = mode;
-        this.__url = BASE_URL + '_' + Mode[mode].toLowerCase();
-        this.__db = await MongoClient.connect(this.__url);
+        this.modeInt = mode;
+        this.urlInt = BASE_URL + '_' + Mode[mode].toLowerCase();
+        this.dbInt = await MongoClient.connect(this.urlInt);
     }
 
     /** Disconnects from the database if connected */
-    async disconnect() {
+    public async disconnect() {
         // Nothing to be done
-        if (this.__db === null) return;
+        if (this.dbInt === null) return;
 
-        await this.__db.close();
-        this.__db = null;
-        this.__url = null;
-        this.__mode = null;
+        await this.dbInt.close();
+        this.dbInt = null;
+        this.urlInt = null;
+        this.modeInt = null;
     }
 
     /** Gets the mongodb.Db instance */
-    mongo(): Db {
-        if (this.__db === null) throw new Error('not connected');
-        return this.__db;
+    public mongo(): Db {
+        if (this.dbInt === null) throw new Error('not connected');
+        return this.dbInt;
     }
 
     /** Gets the connection URI (mongodb://<whatever>) */
-    url(): string {
-        if (this.__url === null) throw new Error('not connected');
-        return this.__url;
+    public url(): string {
+        if (this.urlInt === null) throw new Error('not connected');
+        return this.urlInt;
     }
 
-    mode(): Mode {
-        if (this.__mode === null) throw new Error('not connected');
-        return this.__mode;
+    public mode(): Mode {
+        if (this.modeInt === null) throw new Error('not connected');
+        return this.modeInt;
     }
 
-    isConnected(): boolean {
-        return this.__db !== null;
+    public isConnected(): boolean {
+        return this.dbInt !== null;
     }
 
-    _mongo(): Db | null {
-        return this.__db;
+    public _mongo(): Db | null {
+        return this.dbInt;
     }
 
-    _url(): string | null {
-        return this.__url;
+    public _url(): string | null {
+        return this.urlInt;
     }
 
-    _mode(): Mode | null {
-        return this.__mode;
+    public _mode(): Mode | null {
+        return this.modeInt;
     }
 
     /**
@@ -94,14 +85,23 @@ export class Database {
      *
      * @param name Collection name
      */
-    async dropIfExists(name: string): Promise<boolean> {
+    public async dropIfExists(name: string): Promise<boolean> {
         if (!this.isConnected()) throw new Error('not connected');
 
         // Find collections with the specified name
-        const colls = await this.__db!.listCollections({name: name}).toArray();
+        const colls = await this.dbInt!.listCollections({name}).toArray();
         // Drop if Mongo reports that a collection with that name exists,
         // otherwise return true
-        return colls.length > 0 ? await this.__db!.dropCollection(colls[0].name) : true;
+        return colls.length > 0 ? await this.dbInt!.dropCollection(colls[0].name) : true;
+    }
+
+    /** Gets the singleton instance */
+    public static get() {
+        if (!Database.instance) {
+            Database.instance = new Database();
+        }
+
+        return Database.instance;
     }
 }
 

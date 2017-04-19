@@ -1,10 +1,10 @@
-const gulp = require('gulp');
-const ts = require('gulp-typescript');
-const coveralls = require('gulp-coveralls');
-const tslint = require('gulp-tslint');
-const del = require('del');
+import * as coveralls from 'gulp-coveralls';
+import * as del from 'del';
+import * as gulp from 'gulp';
+import * as tsc from 'gulp-typescript';
+import tslint from 'gulp-tslint';
 
-const tsProject = ts.createProject('tsconfig.json');
+const tsProject = tsc.createProject('tsconfig.json');
 
 gulp.task('scripts', () => {
     const tsResult = tsProject.src().pipe(tsProject());
@@ -22,10 +22,10 @@ gulp.task('coveralls', () => {
 gulp.task('lint', () => {
     gulp.src('src/**/*.ts')
         .pipe(tslint({
-            formatter: 'verbose',
-            configuration: 'tslint.json'
+            configuration: 'tslint.json',
+            formatter: 'prose'
         }))
-        .pipe(tslint.report())
+        .pipe(tslint.report());
 });
 
 gulp.task('clean:testPrep', () => {

@@ -1,26 +1,29 @@
 
-import { expect, AssertionError } from 'chai'
-import { Database, Mode } from '../src/Database';
-import { createServer, doFullIndex } from '../src/server';
+import { AssertionError, expect } from 'chai';
 import { Application } from 'express';
 import * as _ from 'lodash';
-import { findIndexers } from '../src/indexers/index';
 import * as request from 'supertest';
+import { Database, Mode } from '../src/Database';
+import { findIndexers } from '../src/indexers/index';
 import {
     CourseEntry, CourseEquivalencyDocument, Institution,
     KeyCourse
 } from '../src/models';
 import EquivalencyDao, { InstitutionFocusedEquivalency } from '../src/queries/EquivalencyDao';
 import { ErrorData } from '../src/routes/api/v1/util';
+import { createServer, doFullIndex } from '../src/server';
 
 describe('API v1', () => {
     let app: Application;
-    const apiRequest = (relPath: string, expectedStatus: number, query?: object, validate?: (dataOrError: any) => void) => {
+    const apiRequest = (relPath: string,
+                        expectedStatus: number,
+                        query?: object,
+                        validate?: (dataOrError: any) => void) => {
         return request(app)
             .get('/api/v1' + relPath + createQuery(query))
             .expect('Content-Type', /json/)
             .expect(expectedStatus)
-            .then(res => {
+            .then((res) => {
                 verifyResponse(res.body, expectedStatus);
 
                 if (validate !== undefined)
@@ -55,10 +58,10 @@ describe('API v1', () => {
 
     describe('GET /api/v1/institution/:acronym', () => {
         it('should return only a single institution', async () => {
-            const institutions = _.map(findIndexers(), i => i.institution);
+            const institutions = _.map(findIndexers(), (i) => i.institution);
 
             // Query every institution directly to make sure we can
-            for (let institution of institutions) {
+            for (const institution of institutions) {
                 await apiRequest(`/institution/${institution.acronym}`, 200, undefined, (data: any) => {
                     expect(data.acronym).to.equal(institution.acronym);
                     expect(data.fullName).to.equal(institution.fullName);
@@ -75,7 +78,7 @@ describe('API v1', () => {
                 'A' // at least 2 characters
             ];
 
-            for (let name of badNames) {
+            for (const name of badNames) {
                 await apiRequest('/institution/' + name, 400, undefined, (error: any) => {
                     expect(error.input).to.deep.equal({ acronym: name });
                 });
@@ -99,7 +102,9 @@ describe('API v1', () => {
         const institution = 'GMU';
 
         it('should return an InstitutionFocusedEquivalency', () => {
-            return apiRequest(`/institution/${institution}/CSC:202`, 200, undefined, (data: InstitutionFocusedEquivalency) => {
+            return apiRequest(`/institution/${institution}/CSC:202`, 200, undefined,
+                (data: InstitutionFocusedEquivalency) => {
+
                 expect(data.institution).to.equal(institution);
                 expect(data.courses).to.exist;
                 expect(Array.isArray(data.courses)).to.be.true;
@@ -109,7 +114,7 @@ describe('API v1', () => {
 
                 expect(data.courses[0].subject).to.equal('CSC');
                 expect(data.courses[0].number).to.equal('202');
-                for (let equiv of data.courses[0].equivalencies) {
+                for (const equiv of data.courses[0].equivalencies) {
                     expect(equiv.institution).to.equal(institution);
                 }
             });
@@ -120,15 +125,17 @@ describe('API v1', () => {
                 expect(error.input).to.deep.equal({
                     acronym: 'FOO',
                     courses: [{
-                        subject: 'CSC',
-                        number: '202'
+                        number: '202',
+                        subject: 'CSC'
                     }]
                 });
             });
         });
 
         it('should return a skeleton when the courses don\'t exist', () => {
-            return apiRequest(`/institution/${institution}/FOO:BAR`, 200, undefined, (data: InstitutionFocusedEquivalency) => {
+            return apiRequest(`/institution/${institution}/FOO:BAR`, 200, undefined,
+                (data: InstitutionFocusedEquivalency) => {
+
                 expect(data.institution).to.equal(institution);
                 expect(Array.isArray(data.courses)).to.be.true;
                 expect(data.courses).to.have.lengthOf(0);
@@ -159,7 +166,7 @@ describe('API v1', () => {
             return apiRequest('/course', 200, undefined, (data) => {
                 expect(data).to.be.an('object');
 
-                for (let subj of Object.keys(data)) {
+                for (const subj of Object.keys(data)) {
                     // Make sure subject is uppercase
                     expect(subj.toUpperCase()).to.equal(subj);
                     // The value of each property represents the amount of
@@ -176,7 +183,7 @@ describe('API v1', () => {
             expect(data).to.be.an('object');
             expect(Object.keys(data)).to.have.length.above(0);
 
-            for (let courseNumber of Object.keys(data)) {
+            for (const courseNumber of Object.keys(data)) {
                 expect(courseNumber).to.be.a('string');
                 // There should logically be at least 1 institution if its in
                 // the database
@@ -184,7 +191,9 @@ describe('API v1', () => {
             }
         };
 
-        it('should return an object mapping course numbers to the amount of institutions that have equivalencies', () => {
+        it('should return an object mapping course numbers to the amount of ' +
+            'institutions that have equivalencies', () => {
+
             return apiRequest('/course/MTH', 200, undefined, (data: any) => {
                 verifyData(data);
             });
@@ -234,10 +243,10 @@ describe('API v1', () => {
                 [course.subject.toLowerCase(), course.number.toLowerCase()]
             ];
 
-            for (let param of matrix) {
+            for (const param of matrix) {
                 await apiRequest(`/course/${param[0]}/${param[1]}`, 200, undefined, (data: any) => {
                     expect(data.subject).to.equal(param[0].toUpperCase());
-                    expect(data.number).to.equal(param[1].toUpperCase())
+                    expect(data.number).to.equal(param[1].toUpperCase());
                 });
             }
         });
@@ -291,7 +300,7 @@ describe('API v1', () => {
                         expect(error.input).to.deep.equal({
                             subject: course.subject,
                             number: course.number,
-                            institutions: _.map(_.split(institutions, ','), i => i.trim())
+                            institutions: _.map(_.split(institutions, ','), (i) => i.trim())
                         });
                     }
                 }
@@ -304,7 +313,7 @@ describe('API v1', () => {
             // Hand pick this course because it has a lot of equivalencies and
             // 3 from VCU, which we can make sure to test
             course = await new EquivalencyDao().course('CSC', '110');
-            institutions = _.uniq(_.map(course.equivalencies, e => e.institution));
+            institutions = _.uniq(_.map(course.equivalencies, (e) => e.institution));
         });
 
         it('should only return equivalencies for the given institution', () => {
@@ -322,7 +331,7 @@ describe('API v1', () => {
 
             return makeRequest(joined, 200, (equivs: CourseEquivalencyDocument[]) => {
                 expect(equivs).to.have.length.at.least(selectedInsts.length);
-                for (let equiv of equivs) {
+                for (const equiv of equivs) {
                     expect(selectedInsts).to.include(equiv.institution);
                 }
             });
@@ -334,7 +343,7 @@ describe('API v1', () => {
             return makeRequest(institution, 200, (equivs: CourseEquivalencyDocument[]) => {
                 // We only asked for 1 institution but that institution
                 expect(equivs).to.have.length.at.least(1);
-                for (let equiv of equivs) {
+                for (const equiv of equivs) {
                     expect(equiv.institution).to.equal(institution.toUpperCase());
                 }
             });
@@ -345,7 +354,7 @@ describe('API v1', () => {
 
             return makeRequest(whitespaced, 200, (equivs: CourseEquivalencyDocument[]) => {
                 expect(equivs).to.have.length.at.least(2);
-                for (let equiv of equivs) {
+                for (const equiv of equivs) {
                     expect(equiv.institution).to.be.oneOf([institutions[0], institutions[1]]);
                 }
             });
@@ -365,10 +374,10 @@ describe('API v1', () => {
     after('disconnect from database', () => Database.get().disconnect());
 });
 
-let createQuery = (params: object | undefined) => {
+const createQuery = (params: object | undefined) => {
     if (params === undefined) return '';
 
-    let usableProps = _.filter(Object.keys(params), key => params[key] !== undefined);
+    const usableProps = _.filter(Object.keys(params), (key) => params[key] !== undefined);
     if (usableProps.length === 0) return '';
 
     let query = '?';
@@ -380,7 +389,7 @@ let createQuery = (params: object | undefined) => {
     return query;
 };
 
-const verifyResponse = function(response: any, expectedStatus: number) {
+const verifyResponse = (response: any, expectedStatus: number) => {
     expect(response, 'response was null or undefined').to.exist;
     expect(response.status).to.equal(expectedStatus, 'unexpected status property value');
 

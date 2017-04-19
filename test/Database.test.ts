@@ -1,4 +1,4 @@
-import  * as chai from 'chai';
+import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 
 import {Database as Db, Mode} from '../src/Database';
@@ -12,8 +12,8 @@ describe('Database', () => {
     beforeEach('disconnect if necessary', () => {
         return db.disconnect();
     });
-    
-    it('should be able to connect', async function() {
+
+    it('should be able to connect', async () => {
         const mode = Mode.TEST;
 
         await db.connect(mode);
@@ -36,7 +36,7 @@ describe('Database', () => {
         expect(db.connect(Mode.PROD)).to.eventually.be.rejected;
     });
 
-    it('should disconnect properly', async function() {
+    it('should disconnect properly', async () => {
         function expectDisconnected() {
             // We have to use underscore-prefixed functions for nullable return
             // types.

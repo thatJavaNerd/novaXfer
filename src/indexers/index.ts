@@ -1,29 +1,29 @@
+import * as cheerio from 'cheerio';
+import * as _ from 'lodash';
+import * as pdf2table from 'pdf2table';
 import {
     Course,
     CourseEquivalency, CreditRange, EquivalencyContext, EquivType,
     Institution
 } from '../models';
 import request from './request';
-import * as pdf2table from 'pdf2table';
-import * as cheerio from 'cheerio';
-import * as _ from 'lodash';
 
 export abstract class Indexer<T> {
-    async findAll(): Promise<EquivalencyContext> {
+    /** The Institution from which this indexer is finding equivalencies for */
+    public abstract institution: Institution;
+
+    public async findAll(): Promise<EquivalencyContext> {
         const [equivalencies, unparseable] = this.parseEquivalencies(
             await this.parseBody(
                 await request(this.prepareRequest(), this.institution)));
 
         return {
             institution: this.institution,
-            equivalencies: equivalencies,
-            unparseable: unparseable,
+            equivalencies,
+            unparseable,
             parseSuccessRate: (equivalencies.length - unparseable) / equivalencies.length
         };
     }
-
-    /** The Institution from which this indexer is finding equivalencies for */
-    abstract institution: Institution;
 
     /**
      * Creates an object to send to request(). The return value of this
@@ -39,10 +39,10 @@ export abstract class Indexer<T> {
      * @data A buffer of the data from the network request sent with the
      *       configuration created by prepareRequest()
      */
-    protected abstract parseBody(data: Buffer): Promise<T>
+    protected abstract parseBody(data: Buffer): Promise<T>;
 
     /** Parses the body of the network request into an EquivalencyContext */
-    protected abstract parseEquivalencies(body: T): [CourseEquivalency[], number]
+    protected abstract parseEquivalencies(body: T): [CourseEquivalency[], number];
 }
 
 /**
@@ -60,8 +60,8 @@ export abstract class HtmlIndexer extends Indexer<CheerioStatic> {
  */
 export abstract class PdfIndexer extends Indexer<string[][]> {
     protected parseBody(data: Buffer): Promise<string[][]> {
-        return new Promise(function(fulfill, reject) {
-            pdf2table.parse(data, function(err, rows) {
+        return new Promise((fulfill, reject) => {
+            pdf2table.parse(data, (err, rows) => {
                 if (err) reject(err);
                 else fulfill(rows);
             });
@@ -75,9 +75,9 @@ import CnuIndexer from './cnu';
 import GmuIndexer from "./gmu";
 import GtIndexer from "./gt";
 import UvaIndexer from "./uva";
+import VcuIndexer from "./vcu";
 import VtIndexer from "./vt";
 import WmIndexer from "./wm";
-import VcuIndexer from "./vcu";
 
 /**
  * A report that includes all equivalency contexts and some basic stats about
@@ -94,7 +94,7 @@ export interface IndexReport {
  * Finds the names of all the built in university indexers (JS files in
  * <root>/app/indexers/).
  */
-export function findIndexers(): Indexer<any>[] {
+export function findIndexers(): Array<Indexer<any>> {
     return [
         new CnuIndexer(),
         new GmuIndexer(),
@@ -103,7 +103,7 @@ export function findIndexers(): Indexer<any>[] {
         new VcuIndexer(),
         new VtIndexer(),
         new WmIndexer()
-    ]
+    ];
 }
 
 /**
@@ -111,10 +111,10 @@ export function findIndexers(): Indexer<any>[] {
  */
 export async function indexAll(): Promise<IndexReport> {
     // Find all of the Indexers and wait for them all to find their equivalencies
-    const contexts = await Promise.all(_.map(findIndexers(), i => i.findAll()));
+    const contexts = await Promise.all(_.map(findIndexers(), (i) => i.findAll()));
 
-    const totalCourses = _.sumBy(contexts, c => c.equivalencies.length);
-    const totalUnparseables = _.sumBy(contexts, c => c.unparseable);
+    const totalCourses = _.sumBy(contexts, (c) => c.equivalencies.length);
+    const totalUnparseables = _.sumBy(contexts, (c) => c.unparseable);
 
     return {
         equivalencyContexts: contexts,
@@ -150,13 +150,12 @@ export function interpretCreditInput(str: string): Array<number | CreditRange> {
     const parts = str.replace(' ', '').split(',');
     const credits: Array<number | CreditRange> = [];
 
-    for (let i = 0; i < parts.length; i++) {
+    for (const segment of parts) {
         // A hyphen indicates that the credit is a range (ex: "3-4")
-        const segment = parts[i];
         if (segment.indexOf('-') != -1) {
             const creditSegments = segment.split('-');
-            const a = parseInt(creditSegments[0]);
-            const b = parseInt(creditSegments[1]);
+            const a = parseInt(creditSegments[0], 10);
+            const b = parseInt(creditSegments[1], 10);
 
             // For some odd reason?
             if (a == b) {
@@ -182,13 +181,12 @@ export function determineEquivType(courses: Course[], numberEnding = 'XX'): Equi
         throw new Error('No courses passed');
 
     let containsGeneric = false;
-    for (let course of courses) {
+    for (const course of courses) {
         if (course.number.endsWith(numberEnding)) {
             containsGeneric = true;
             break;
         }
     }
 
-    return containsGeneric ? EquivType.GENERIC: EquivType.DIRECT;
+    return containsGeneric ? EquivType.GENERIC : EquivType.DIRECT;
 }
-

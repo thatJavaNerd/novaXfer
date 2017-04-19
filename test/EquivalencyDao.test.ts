@@ -1,19 +1,17 @@
 
-import EquivalencyDao from '../src/queries/EquivalencyDao';
-import { findIndexers } from '../src/indexers/index';
-import * as _ from 'lodash';
-import { expect, AssertionError } from 'chai';
+import { AssertionError, expect } from 'chai';
+import { Database, Mode } from '../src/Database';
 import {
     CourseEquivalency, CourseEquivalencyDocument,
     EquivalencyContext, EquivType, KeyCourse
 } from '../src/models';
-import { validateCourseArray } from './validation';
-import { Database, Mode } from '../src/Database';
+import EquivalencyDao from '../src/queries/EquivalencyDao';
 import { QueryError, QueryErrorType } from '../src/queries/errors';
 import {
     courseSubjectRegex
 } from '../src/routes/api/v1/validation';
 import { doFullIndex } from '../src/server';
+import { validateCourseArray } from './validation';
 
 describe('EquivalencyDao', () => {
     let dao: EquivalencyDao;
@@ -27,7 +25,7 @@ describe('EquivalencyDao', () => {
     describe('queries and aggregations', () => {
         const expectQueryError = async (fn: () => Promise<any>, type: QueryErrorType = QueryErrorType.MISSING) => {
             try {
-                console.log(await fn());
+                await fn();
                 expect(true, 'should have thrown QueryError').to.be.false;
             } catch (ex) {
                 if (ex instanceof AssertionError) {
@@ -53,7 +51,7 @@ describe('EquivalencyDao', () => {
             it('should return an object mapping subject names to the amount of key courses in them', async () => {
                 const subjects = await dao.subjects();
 
-                for (let subj of Object.keys(subjects)) {
+                for (const subj of Object.keys(subjects)) {
                     expect(subj).to.match(courseSubjectRegex);
                     expect(subjects[subj]).to.be.at.least(0);
                 }
@@ -66,7 +64,7 @@ describe('EquivalencyDao', () => {
                 const data = await dao.numbersForSubject(subject);
                 expect(data).to.be.an('object');
 
-                for (let num of Object.keys(data)) {
+                for (const num of Object.keys(data)) {
                     expect(num).to.be.a('string');
                     expect(num).to.have.length.above(1);
 
@@ -84,11 +82,11 @@ describe('EquivalencyDao', () => {
         describe('course()', () => {
             it('should return a course entry', async () => {
                 const subject: string = Object.keys((await dao.subjects()))[0];
-                const number: string = Object.keys(await dao.numbersForSubject(subject))[0];
-                const course = await dao.course(subject, number);
+                const numb: string = Object.keys(await dao.numbersForSubject(subject))[0];
+                const course = await dao.course(subject, numb);
 
                 expect(course.subject).to.equal(subject);
-                expect(course.number).to.equal(number);
+                expect(course.number).to.equal(numb);
 
                 validateCourseEquivalencies(course.equivalencies);
             });
@@ -139,8 +137,8 @@ describe('EquivalencyDao', () => {
                 const data = await dao.forInstitution(institution, courses);
                 expect(data.institution).to.equal(institution);
 
-                for (let entry of data.courses) {
-                    for (let equiv of entry.equivalencies) {
+                for (const entry of data.courses) {
+                    for (const equiv of entry.equivalencies) {
                         expect(equiv.institution).to.equal(institution);
                     }
                 }
@@ -148,14 +146,13 @@ describe('EquivalencyDao', () => {
 
             it('should reject with a QueryError when given an invalid institution', () => {
                 return expectQueryError(() => dao.forInstitution('FOO', [{
-                    subject: 'CSC',
-                    number: '201'
+                    number: '201',
+                    subject: 'CSC'
                 }]));
             });
         });
 
-
-        after('drop collection', () => Database.get().dropIfExists(dao.collectionName))
+        after('drop collection', () => Database.get().dropIfExists(dao.collectionName));
     });
 
     describe('writing and inserting', () => {
@@ -171,10 +168,9 @@ describe('EquivalencyDao', () => {
 
                 // Verify that every document we inserted can be pulled out as
                 // a valid CourseEquivalencyDocument
-                for (let i = 0; i < ids.length; i++) {
+                for (const id of ids) {
                     // We're assuming that Mongo inserts these documents in the
                     // same order as they were specified in the EquivalencyContext
-                    const id = ids[i];
                     const out = await dao.get(id);
                     expect(out).to.exist;
 
@@ -193,8 +189,8 @@ describe('EquivalencyDao', () => {
     });
 });
 
-const validateCourseEquivalencies = function(eqs: CourseEquivalencyDocument[]) {
-    for (let e of eqs) {
+const validateCourseEquivalencies = (eqs: CourseEquivalencyDocument[]) => {
+    for (const e of eqs) {
         expect(e.institution).to.be.a('string');
         expect(e.institution).to.have.length.above(0);
         expect(e.type).to.be.a('string');

@@ -4,25 +4,25 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import * as _ from 'lodash';
 import * as colors from 'colors/safe';
+import * as _ from 'lodash';
 
 import * as listEndpoints from 'express-list-endpoints';
-import { createServer, doFullIndex } from './server';
 import { Database, Mode } from './Database';
 import MetaDao from './queries/MetaDao';
+import { createServer, doFullIndex } from './server';
 
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf8'));
 
 // Catch unhandled Promises
-process.on('unhandledRejection', function(reason, p) {
+process.on('unhandledRejection', (reason, p) => {
     console.error("Unhandled Promise rejection: ");
     throw reason;
 });
 
 interface BootstrapOptions {
-    port: number,
-    forceIndex: boolean
+    port: number;
+    forceIndex: boolean;
 }
 
 if (hasArgument('--help')) {
@@ -61,11 +61,11 @@ async function bootstrap(options: BootstrapOptions) {
     }
 
     try {
-        let app = await createServer();
+        const app = await createServer();
         logEndpoints(app);
         await app.listen(options.port);
         console.log('\nMagic is happening on port ' + colors.bold(options.port.toString()));
-    } catch(ex) {
+    } catch (ex) {
         // Don't try to handle the error, let it be printed to stderr. We do
         // want to make sure we're disconnected from the database though.
         await Database.get().disconnect();
@@ -76,7 +76,7 @@ async function bootstrap(options: BootstrapOptions) {
 }
 
 function printHelp() {
-    let script = path.basename(__filename);
+    const script = path.basename(__filename);
     console.log(colors.bold(`${packageJson.name} v${packageJson.version}`));
     console.log('\nUsage:');
     console.log(`$ ${script} [--force-index] [--help]`);
@@ -92,8 +92,8 @@ function printHelp() {
  */
 function logEndpoints(app) {
     console.log('Available endpoints:\n');
-    let endpoints = _.sortBy(listEndpoints(app), (e: any) => e.path);
-    for (let e of endpoints) {
+    const endpoints = _.sortBy(listEndpoints(app), (e: any) => e.path);
+    for (const e of endpoints) {
         console.log(`  ${_.join(e.methods, ', ')} ${e.path}`);
     }
 }
@@ -105,7 +105,7 @@ function logEndpoints(app) {
 function hasArgument(names: string[] | string): boolean {
     const arr = Array.isArray(names) ? names : [names];
 
-    for (let name of arr) {
+    for (const name of arr) {
         if (process.argv.indexOf(name) >= 0)
             return true;
     }

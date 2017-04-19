@@ -1,8 +1,14 @@
-import { determineEquivType, Indexer, interpretCreditInput } from './index';
 import { Course, CourseEquivalency } from '../models';
-
+import { determineEquivType, Indexer, interpretCreditInput } from './index';
 
 export default class VcuIndexer extends Indexer<any> {
+    public institution = {
+        acronym: 'VCU',
+        fullName: 'Virginia Commonwealth University',
+        location: 'Virginia',
+        parseSuccessThreshold: 1.00
+    };
+
     protected prepareRequest(): any {
         return 'https://apps.sem.vcu.edu/feeds/transfer/courses/VCCS';
     }
@@ -14,12 +20,12 @@ export default class VcuIndexer extends Indexer<any> {
     protected parseEquivalencies(body: any): [CourseEquivalency[], number] {
         const equivalencies: CourseEquivalency[] = [];
 
-        for (let equivalency of body) {
+        for (const equivalency of body) {
             const inputMatrix = parseRawCourses(equivalency.Transfer);
             const outputMatrix = parseRawCourses(equivalency.VCU);
 
-            for (let input of inputMatrix) {
-                for (let output of outputMatrix) {
+            for (const input of inputMatrix) {
+                for (const output of outputMatrix) {
                     equivalencies.push(
                         new CourseEquivalency(input, output, determineEquivType(output)));
                 }
@@ -28,13 +34,6 @@ export default class VcuIndexer extends Indexer<any> {
 
         return [equivalencies, 0];
     }
-
-    institution = {
-        acronym: 'VCU',
-        fullName: 'Virginia Commonwealth University',
-        location: 'Virginia',
-        parseSuccessThreshold: 1.00
-    };
 }
 
 function parseRawCourses(courseListStruct) {
@@ -66,21 +65,22 @@ function parseRawCourses(courseListStruct) {
 function parseCourses(courseStr, creditsStr) {
     const courses = courseStr.split(/ ?(?:and|or) ?/i);
 
-    let containsOr = courseStr.indexOf('or') !== -1;
-    let containsAnd = courseStr.indexOf('and') !== -1;
+    const containsOr = courseStr.indexOf('or') !== -1;
+    const containsAnd = courseStr.indexOf('and') !== -1;
     if (containsOr && !containsAnd) {
         // All ors, no ands
-        return courses.map(course => [parseCourse(course, creditsStr)]);
+        return courses.map((course) => [parseCourse(course, creditsStr)]);
     } else if (!containsOr && containsAnd) {
         // All ands, no ors
-        return [courses.map(course => parseCourse(course, creditsStr))];
+        return [courses.map((course) => parseCourse(course, creditsStr))];
     } else if (!containsOr && !containsAnd) {
         // Single course
         return [[parseCourse(courseStr, creditsStr)]];
     } else {
         // Split by 'or' and flat map each section to recursively call this
         // function as a smaller segment
-        const unbalancedCourses = [].concat.apply([], courseStr.split(/ ?or ?/i).map(course => parseCourses(course, creditsStr)));
+        const unbalancedCourses = [].concat.apply([], courseStr.split(/ ?or ?/i)
+            .map((course) => parseCourses(course, creditsStr)));
 
         // In practice only two elements in array. The base is all of the
         // courses up until the course right before the 'or'. Example:

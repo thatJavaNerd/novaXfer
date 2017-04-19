@@ -1,24 +1,24 @@
+import { Course, CourseEquivalency } from '../models';
 import {
     determineEquivType, Indexer, interpretCreditInput,
     normalizeWhitespace
 } from './index';
-import * as models from '../models';
-import { Course, CourseEquivalency } from '../models';
 
 // Detect if a course is "evaluated on an individual basis." One of the entries
 // is misspelled, hence the optional second 'i'.
 const individualRegex = /indivi?dual/i;
 
-const institution = {
-    acronym: 'VT',
-    fullName: 'Virginia Tech',
-    location: 'Virginia',
-    parseSuccessThreshold: 1.00
-};
-
 export default class VtIndexer extends Indexer<any> {
+    public institution = {
+        acronym: 'VT',
+        fullName: 'Virginia Tech',
+        location: 'Virginia',
+        parseSuccessThreshold: 1.00
+    };
+
     protected prepareRequest(): any {
-        return 'https://spreadsheets.google.com/feeds/list/1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json';
+        return 'https://spreadsheets.google.com/feeds/list/' +
+            '1an6vCkT9eKy7mvYHF8RSpkUKFaYK5DCjFC6sua3QaNU/od6/public/values?alt=json';
     }
 
     protected parseBody(data: Buffer): Promise<any> {
@@ -28,9 +28,7 @@ export default class VtIndexer extends Indexer<any> {
     protected parseEquivalencies(body: any): [CourseEquivalency[], number] {
         const equivalencies: CourseEquivalency[] = [];
         const entries = body.feed.entry;
-        for (let i = 0; i < entries.length; i++) {
-            const entry = entries[i];
-
+        for (const entry of entries) {
             // The VT transfer site lists entire subjects ("MTH"), specific courses
             // ("MTH 173"), and courses that must be taken together that have a
             // different equivalency than if they were taken individually
@@ -73,8 +71,6 @@ export default class VtIndexer extends Indexer<any> {
 
         return [equivalencies, 0];
     }
-
-    institution = institution;
 }
 
 function parseCourses(courseStr, creditsStr): Course[] {
@@ -102,7 +98,7 @@ function parseCourses(courseStr, creditsStr): Course[] {
     // http://regexr.com/3euqg
     const unbindingRegex = /^([A-Z]{2,4})([0-9]{2,4})$/;
     for (let i = 0; i < parts.length; i++) {
-        let match = parts[i].match(unbindingRegex);
+        const match = parts[i].match(unbindingRegex);
         if (match) {
             parts[i++] = match[1];
             parts.splice(i, 0, match[2]);
@@ -121,9 +117,9 @@ function parseCourses(courseStr, creditsStr): Course[] {
             // First letter is numeric, assume course number
             const credits = courses.length >= creditsArray.length ? -1 : creditsArray[courses.length];
             courses.push({
-                subject: subject,
+                subject,
                 number: parts[i],
-                credits: credits
+                credits
             });
         } else if (/[a-z]/i.test(parts[i][0])) {
             // First letter is alphabetic, assume subject
@@ -135,4 +131,3 @@ function parseCourses(courseStr, creditsStr): Course[] {
 
     return courses;
 }
-

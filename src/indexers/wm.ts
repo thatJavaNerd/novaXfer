@@ -1,7 +1,7 @@
 import { determineEquivType, PdfIndexer } from './index';
 
 import {
-    Course, CourseEquivalency, CREDITS_UNKNOWN,
+    Course, CourseEquivalency, CREDITS_UNKNOWN
 } from '../models';
 
 // See http://regexr.com/3eukm for examples
@@ -17,6 +17,13 @@ const unclearEquivalencyRegex = /NS/;
 const specialEquivalencyRegex = /^\*+ ?$/;
 
 export default class WmIndexer extends PdfIndexer {
+    public institution = {
+        acronym: 'W&M',
+        fullName: 'William & Mary',
+        location: 'Virginia',
+        parseSuccessThreshold: 0.9965
+    };
+
     protected prepareRequest(): any {
         return 'http://www.wm.edu/offices/registrar/documents/transfer/vccs_transfer_guide_table.pdf';
     }
@@ -26,24 +33,24 @@ export default class WmIndexer extends PdfIndexer {
 
         let unparsableCount = 0;
         for (let i = 0; i < rows.length; i++) {
-            let row = rows[ i ];
+            const row = rows[i];
             // Test NVCC course description cell (index 0) to see if we can parse
             // this row as a course
 
             // Search for the NVCC data. Usually everything can be found in the
             // first element, but sometimes the PDF parser splits it in two.
-            let nvccData = findGeneratorElement('', row, nvccPartsRegex);
+            const nvccData = findGeneratorElement('', row, nvccPartsRegex);
             if (nvccData === null)
                 continue;
 
-            let nvcc = parseNvccCourses(nvccData);
+            const nvcc = parseNvccCourses(nvccData);
 
-            let applicableElements = row.slice(1),
-                specialOrUnclearEquivalency = false,
+            const applicableElements = row.slice(1);
+            let specialOrUnclearEquivalency = false,
                 wmData = null;
 
             // Don't operate on special or unclear equivalencies
-            for (let elem of applicableElements) {
+            for (const elem of applicableElements) {
                 if (specialEquivalencyRegex.test(elem) ||
                     unclearEquivalencyRegex.test(elem))
                     specialOrUnclearEquivalency = true;
@@ -62,10 +69,10 @@ export default class WmIndexer extends PdfIndexer {
             // data to concatenate the indirect match to in order to find a
             // direct match.
             if (!wmData) {
-                let partialMatch = findGeneratorElement('', applicableElements, wmCourseTester);
+                const partialMatch = findGeneratorElement('', applicableElements, wmCourseTester);
 
                 if (partialMatch)
-                    wmData = findGeneratorElement(partialMatch, rows[ i + 1 ], wmPartsRegex);
+                    wmData = findGeneratorElement(partialMatch, rows[i + 1], wmPartsRegex);
             }
 
             if (!wmData) {
@@ -76,21 +83,14 @@ export default class WmIndexer extends PdfIndexer {
                 continue;
             }
 
-            let wmMatrix = parseWmCourseMatrix(wmData);
-            for (let wm of wmMatrix)
+            const wmMatrix = parseWmCourseMatrix(wmData);
+            for (const wm of wmMatrix)
                 equivalencies.push(new CourseEquivalency(nvcc, wm, determineEquivType(wm, 'ELT')));
 
         }
 
         return [equivalencies, unparsableCount];
     }
-
-    institution = {
-        acronym: 'W&M',
-        fullName: 'William & Mary',
-        location: 'Virginia',
-        parseSuccessThreshold: 0.9965
-    };
 }
 
 /**
@@ -99,19 +99,19 @@ export default class WmIndexer extends PdfIndexer {
  * second, the second to the third, etc.
  */
 function* testStringGenerator(base, elements) {
-    for (let elem of elements)
+    for (const elem of elements)
         yield base + elem;
 
     for (let i = 0; i < elements.length - 1; i++) {
-        yield base + elements[ i ] + elements[ i + 1 ];
-        yield base + elements[ i ] + ' ' + elements[ i + 1 ];
+        yield base + elements[i] + elements[i + 1];
+        yield base + elements[i] + ' ' + elements[i + 1];
     }
 }
 
 function findGeneratorElement(base, elements, regex) {
-    let gen = testStringGenerator(base, elements);
+    const gen = testStringGenerator(base, elements);
     while (true) {
-        let next = gen.next();
+        const next = gen.next();
         if (next.done) break;
 
         if (regex.test(next.value)) {
@@ -125,17 +125,17 @@ function findGeneratorElement(base, elements, regex) {
 function parseNvccCourses(raw): Course[] {
     // [0] is full matched text, [1] through [length] are subjects/numbers
     const parts = raw.match(nvccPartsRegex);
-    const subject = parts[ 1 ];
-    const courses: Course[] = [ {
-        subject: subject,
-        number: parts[ 2 ],
+    const subject = parts[1];
+    const courses: Course[] = [{
+        subject,
+        number: parts[2],
         credits: CREDITS_UNKNOWN
-    } ];
+    }];
 
-    if (parts[ 3 ] !== undefined) {
+    if (parts[3] !== undefined) {
         courses.push({
-            subject: subject,
-            number: parts[ 3 ],
+            subject,
+            number: parts[3],
             credits: CREDITS_UNKNOWN
         });
     }
@@ -144,35 +144,35 @@ function parseNvccCourses(raw): Course[] {
 }
 
 function parseWmCourseMatrix(raw): Course[][] {
-    let matches = raw.match(wmPartsRegex);
+    const matches = raw.match(wmPartsRegex);
 
-    if (!matches) throw `No matches on '${raw}'`;
+    if (!matches) throw new Error(`No matches on '${raw}'`);
 
     // `credits` is the last capture group, use it if available
-    let credits = matches[ matches.length - 1 ] ?
-        parseInt(matches[ matches.length - 1 ]) : CREDITS_UNKNOWN;
+    const credits = matches[matches.length - 1] ?
+        parseInt(matches[matches.length - 1], 10) : CREDITS_UNKNOWN;
 
-    let courses: Course[][] = [ [ {
-        subject: matches[ 1 ] as string,
-        number: matches[ 2 ] as string,
-        credits: credits
-    } ] ];
+    const courses: Course[][] = [[{
+        subject: matches[1] as string,
+        number: matches[2] as string,
+        credits
+    }]];
 
     // 4th index is the course number. If defined, matches[4] is the subject. If
     // not, matches[4] is the course number, matches[1]is the subject.
-    let subject = matches[ 4 ] ? matches[ 3 ] : matches[ 1 ];
-    let number = matches[ 5 ] ? matches[ 4 ] : matches[ 3 ];
-    let secondCourse: Course = {
-        subject: subject,
-        number: number,
-        credits: credits
+    const subject = matches[4] ? matches[3] : matches[1];
+    const numb = matches[5] ? matches[4] : matches[3];
+    const secondCourse: Course = {
+        subject,
+        number: numb,
+        credits
     };
     // Create another output array for a whole new equivalency
     if (raw.indexOf(' or ') !== -1) {
-        courses.push([ secondCourse ]);
+        courses.push([secondCourse]);
     } else if (raw.indexOf(', ') !== -1 || raw.indexOf('/') !== -1) {
         // Simply append to the existing output array
-        courses[ 0 ].push(secondCourse);
+        courses[0].push(secondCourse);
     }
 
     return courses;

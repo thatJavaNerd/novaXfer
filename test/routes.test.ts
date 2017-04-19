@@ -1,11 +1,11 @@
 import { Application } from 'express';
-import { createServer } from '../src/server';
 import * as request from 'supertest';
+import { createServer } from '../src/server';
 
 describe('routes', () => {
     let app: Application;
 
-    before('create app', function() {
+    before('create app', () => {
         app = createServer();
     });
 

@@ -1,18 +1,18 @@
 import { Request, Response, Router } from 'express';
-import institution from './institution';
-import course from './course';
-import { ErrorResponse } from './responses';
 import RouteModule from '../../RouteModule';
+import course from './course';
+import institution from './institution';
+import { ErrorResponse } from './responses';
 
 export default function(): RouteModule {
     const router = Router();
 
-    const modules: (() => RouteModule)[] = [
+    const modules: Array<() => RouteModule> = [
         institution,
         course
     ];
 
-    for (let m of modules) {
+    for (const m of modules) {
         const mod = m();
         // data[0] is the mount point, data[1] is the Router
         router.use(mod.mountPoint, mod.router);
@@ -34,6 +34,6 @@ export default function(): RouteModule {
 
     return {
         mountPoint: '/v1',
-        router: router
+        router
     };
 }

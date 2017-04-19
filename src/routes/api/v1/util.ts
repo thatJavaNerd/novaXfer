@@ -1,9 +1,9 @@
 import Parameter = require('pinput');
 import Contract = require('pinput/contract');
 import { Response } from 'express';
-import { ErrorResponse, ResponseBase, SuccessResponse } from './responses';
 import * as _ from 'lodash';
 import { QueryError, QueryErrorType } from '../../../queries/errors';
+import { ErrorResponse, ResponseBase, SuccessResponse } from './responses';
 
 /**
  * Runs a query and sends the result as JSON to the response. Takes input
@@ -19,7 +19,7 @@ export async function runQuery(parameters: Parameter[],
                                res: Response,
                                contracts: Contract[] = []): Promise<void> {
     // If any parameter is invalid, reject
-    for (let p of parameters) {
+    for (const p of parameters) {
         if (p.valid === false) {
             const errData: ErrorData = {
                 message: p.error.message,
@@ -29,7 +29,7 @@ export async function runQuery(parameters: Parameter[],
         }
     }
 
-    for (let contract of contracts) {
+    for (const contract of contracts) {
         contract.check(parameters);
         if (contract.valid === false) {
             const errData: ErrorData = {
@@ -42,13 +42,13 @@ export async function runQuery(parameters: Parameter[],
 
     try {
         // Call queryFn with the parameter values
-        return handleSuccess(res, await queryFn.apply(null, _.map(parameters, p => p.value)))
+        return handleSuccess(res, await queryFn.apply(null, _.map(parameters, (p) => p.value)));
     } catch (ex) {
-        let errorData: ErrorData = {
+        const errorData: ErrorData = {
             message: 'Could not process request',
             input: _.zipObject(
-                _.map(parameters, p => p.name),
-                _.map(parameters, p => p.value)
+                _.map(parameters, (p) => p.name),
+                _.map(parameters, (p) => p.value)
             )
         };
 
@@ -77,8 +77,8 @@ export interface ErrorData {
 
 function handleSuccess(res: Response, data: any, status = 200) {
     const body: SuccessResponse = {
-        status: status,
-        data: data
+        status,
+        data
     };
 
     send(res, body, status);
@@ -86,8 +86,8 @@ function handleSuccess(res: Response, data: any, status = 200) {
 
 function handleError(res: Response, error: ErrorData, status = 400) {
     const body: ErrorResponse = {
-        status: status,
-        error: error
+        status,
+        error
     };
 
     send(res, body, status);

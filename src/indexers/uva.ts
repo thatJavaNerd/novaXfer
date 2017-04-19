@@ -1,20 +1,27 @@
-import { HtmlIndexer, normalizeWhitespace, determineEquivType } from './index';
 import {
     Course, CourseEquivalency, EquivType
 } from '../models';
+import { determineEquivType, HtmlIndexer, normalizeWhitespace } from './index';
 
 const headerRows = 2;
 const nvccIndex = 1; // CSS queries are 1-indexed
 const uvaIndex = 2;
 
 // Used when the college doens't accept equivalencies for a NVCC course
-const COURSE_NO_EQUIV = {
+const COURSE_NO_EQUIV = Object.freeze({
     subject: 'NONE',
     number: '000',
     credits: 0
-};
+});
 
 export default class UvaIndexer extends HtmlIndexer {
+    public institution = {
+        acronym: 'UVA',
+        fullName: 'University of Virginia',
+        location: 'Virginia',
+        parseSuccessThreshold: 1.00
+    };
+
     protected prepareRequest(): any {
         return 'http://ascs8.eservices.virginia.edu/AsEquivs/Home/EquivsShow?schoolId=1001975';
     }
@@ -28,7 +35,7 @@ export default class UvaIndexer extends HtmlIndexer {
             switch (getRowType($(this))) {
                 case 'unknown':
                     throw new Error('Found row with type \'unknown\'');
-                case 'empty':// This is a row to separate courses, skip
+                case 'empty': // This is a row to separate courses, skip
                 case 'input':
                 case 'output':
                     // We handle supplement and freebie rows when their base courses
@@ -63,13 +70,6 @@ export default class UvaIndexer extends HtmlIndexer {
 
         return [equivalencies, 0];
     }
-
-    institution = {
-        acronym: 'UVA',
-        fullName: 'University of Virginia',
-        location: 'Virginia',
-        parseSuccessThreshold: 1.00
-    };
 }
 
 function parseCourse($tr, index): Course {
@@ -86,12 +86,12 @@ function parseCourse($tr, index): Course {
 
     let credits = -1;
     if (parts.length >= 3)
-        credits = parseInt(parts[2]);
+        credits = parseInt(parts[2], 10);
 
     return {
         subject: parts[0],
         number: parts[1],
-        credits: credits
+        credits
     };
 }
 
@@ -133,4 +133,3 @@ function findEquivType(uvaCourses) {
 
     return determineEquivType(uvaCourses, 'T');
 }
-

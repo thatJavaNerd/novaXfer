@@ -30,7 +30,7 @@ export interface CourseEquivalencyDocument {
 
 export class CourseEquivalency {
     /** Course to perform lookups on */
-    keyCourse: KeyCourse;
+    public keyCourse: KeyCourse;
 
     constructor(public input: Course[], public output: Course[], public type: EquivType) {
         if (input === null || input === undefined || input.length === 0) {

@@ -1,10 +1,10 @@
-import * as requestLib from 'request';
 import * as fs from 'fs-extra-promise';
-import { Institution } from '../models';
-import { Database, Mode } from '../Database';
 import * as path from 'path';
+import * as requestLib from 'request';
+import { Database, Mode } from '../Database';
+import { Institution } from '../models';
 
-export default async function(requestData: any, institution: Institution, useCache = true): Promise<Buffer> {
+export default async (requestData: any, institution: Institution, useCache = true) => {
     if (institution === undefined)
         throw new Error('expecting an institution');
 
@@ -22,23 +22,23 @@ export default async function(requestData: any, institution: Institution, useCac
 
         return response;
     }
-}
+};
 
 /** Uses the request module to send an HTTP request */
 function networkRequest(requestData: any): Promise<Buffer> {
-    return new Promise(function(fulfill, reject) {
+    return new Promise((fulfill, reject) => {
         const chunks: Buffer[] = [];
         let error: Error | null = null;
 
         requestLib(requestData)
-            .on('response', function(response) {
+            .on('response', (response) => {
                 if (response.statusCode !== 200)
                     error = new Error(`Bad status code: ${response.statusCode}`);
-            }).on('error', function(err) {
+            }).on('error', (err) => {
             if (err) error = err;
-        }).on('data', function(chunk: Buffer) {
+        }).on('data', (chunk: Buffer) => {
             chunks.push(chunk);
-        }).on('end', function() {
+        }).on('end', () => {
             if (error) return reject(error);
             else return fulfill(Buffer.concat(chunks));
         });

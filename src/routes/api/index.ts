@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
-import v1 from './v1'
 import { Database } from '../../Database';
 import RouteModule from '../RouteModule';
+import v1 from './v1';
 
 export default function(): Router {
     const router = Router();
@@ -9,11 +9,11 @@ export default function(): Router {
     // Only load API modules if connected to the database. This is useful for
     // testing so we can test non-API routes without connecting to the database
     if (Database.get().isConnected()) {
-        const modules: (() => RouteModule)[] = [
+        const modules: Array<() => RouteModule> = [
             v1
         ];
 
-        for (let m of modules) {
+        for (const m of modules) {
             const mod = m();
             // data[0] is the mount point, data[1] is the Router
             router.use(mod.mountPoint, mod.router);
@@ -21,7 +21,7 @@ export default function(): Router {
     }
 
     router.get('/', (req: Request, res: Response) => {
-        res.redirect('https://github.com/thatJavaNerd/novaXfer/blob/master/docs/api.md')
+        res.redirect('https://github.com/thatJavaNerd/novaXfer/blob/master/docs/api.md');
     });
 
     return router;

@@ -1,5 +1,5 @@
 
-import { expect } from 'chai'
+import { expect } from 'chai';
 import { Course, CreditRange, Institution } from '../src/models';
 import {
     acronymRegex,
@@ -19,14 +19,13 @@ export function validateInstitution(inst: Institution) {
     expect(inst.parseSuccessThreshold).to.be.within(0, 1);
 }
 
-const isCreditRange = function(x: any): x is CreditRange {
-    return x.min !== undefined && x.max !== undefined;
-};
+const isCreditRange = (x: any): x is CreditRange =>
+    x.min !== undefined && x.max !== undefined;
 
 export function validateCourseArray(array: Course[]) {
     expect(array).to.have.length.above(0);
 
-    for (let course of array) {
+    for (const course of array) {
         // Validate subject and number
         expect(course.number).to.match(courseNumberRegex, JSON.stringify(course));
         expect(course.subject).to.match(courseSubjectRegex, JSON.stringify(course));
@@ -35,7 +34,7 @@ export function validateCourseArray(array: Course[]) {
         const cr = course.credits;
         expect(cr).to.be.exist;
         if (isCreditRange(cr)) {
-            expect(cr.min).to.be.below(cr.max)
+            expect(cr.min).to.be.below(cr.max);
         }
     }
 }

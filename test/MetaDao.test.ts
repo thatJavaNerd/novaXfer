@@ -53,7 +53,8 @@ describe('MetaDao', () => {
         });
 
         it('should return true when the existing dataset version is different', async () => {
-            const initialVer = 0, finalVer = 1;
+            const initialVer = 0;
+            const finalVer = 1;
             let dao = new MetaDao(initialVer);
 
             await dao.updateDatasetVersion();

@@ -1,7 +1,6 @@
-
-import { BulkWriteOpResultObject, Collection, Db } from 'mongodb';
-import { Database } from '../Database';
 import { ObjectID } from 'bson';
+import { Collection, Db } from 'mongodb';
+import { Database } from '../Database';
 
 abstract class Dao<G, P> {
     /** Reference to a mongodb.Db */
@@ -11,19 +10,19 @@ abstract class Dao<G, P> {
         this.db = Database.get().mongo();
     }
 
-    get(id: ObjectID | string): Promise<G> {
+    public get(id: ObjectID | string): Promise<G> {
         return this._get(Dao.resolveId(id));
     }
 
-    async put(data: P[] | P): Promise<ObjectID[]> {
+    public async put(data: P[] | P): Promise<ObjectID[]> {
         // Ensure data is an array
         const x = Array.isArray(data) ? data : [data];
         const ids = await this._put(x);
 
         // ids is a "fake" array (no length property), convert it to a real array
         const realArray: ObjectID[] = [];
-        for (let i in ids) {
-            realArray[i] = ids[i];
+        for (const i in ids) {
+            if (ids.hasOwnProperty(i)) realArray[i] = ids[i];
         }
 
         return realArray;
