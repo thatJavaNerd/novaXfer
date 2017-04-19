@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "gulp clean:testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts",
-    "start": "node main --use-strict"
+    "start": "node --use-strict dist/server/index.js"
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
   "license": "MIT",

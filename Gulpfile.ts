@@ -4,10 +4,12 @@ import * as gulp from 'gulp';
 import * as tsc from 'gulp-typescript';
 import tslint from 'gulp-tslint';
 
-gulp.task('scripts', () => {
-    const tsProject = tsc.createProject('tsconfig.json');
-    const tsResult = tsProject.src().pipe(tsProject());
-    return tsResult.js.pipe(gulp.dest('dist'));
+gulp.task('build:server', () => {
+    const proj = tsc.createProject('server/tsconfig.json');
+    const result = gulp.src('server/src/**/*.ts')
+        .pipe(proj());
+
+    return result.js.pipe(gulp.dest('dist/server'));
 });
 
 gulp.task('watch', ['scripts'], () => {
