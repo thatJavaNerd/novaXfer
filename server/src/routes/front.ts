@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 import Parameter = require('pinput');
@@ -13,7 +13,7 @@ export default function(): Router {
         res.sendFile(abs('index.html'));
     });
 
-    r.get('/partial/:name', async (req: Request, res: Response, next: NextFunction) => {
+    r.get('/partial/:name', async (req: Request, res: Response) => {
         const p = new Parameter({
             name: 'name',
             rawInput: req.params.name,
