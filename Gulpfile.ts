@@ -30,6 +30,7 @@ gulp.task('views', () => {
 
 gulp.task('watch', () => {
     gulp.watch('server/src/**/*.ts', ['build:server']);
+    gulp.watch('views/**/*.pug', ['views']);
 });
 
 gulp.task('build', ['build:server', 'views']);
