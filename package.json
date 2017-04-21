@@ -47,7 +47,6 @@
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-coveralls": "^0.1.4",
-    "gulp-css": "^0.1.0",
     "gulp-nodemon": "^2.2.1",
     "gulp-pug": "^3.3.0",
     "gulp-tslint": "^8.0.0",

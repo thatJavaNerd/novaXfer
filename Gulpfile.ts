@@ -2,7 +2,6 @@ import * as del from 'del';
 import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as coveralls from 'gulp-coveralls';
-import * as cssMin from 'gulp-css';
 import * as nodemon from 'gulp-nodemon';
 import * as pug from 'gulp-pug';
 import tslint from 'gulp-tslint';
@@ -10,7 +9,7 @@ import * as tsc from 'gulp-typescript';
 import * as runSequence from 'run-sequence';
 
 gulp.task('default', ['build'], (cb) => {
-    runSequence('start', cb);
+    runSequence('watch', 'start', cb);
 });
 
 ////// BUILDING //////
@@ -22,21 +21,6 @@ gulp.task('build:server', () => {
     return result.js.pipe(gulp.dest('dist/server'));
 });
 
-gulp.task('build:client', ['css', 'jspm', 'jspm:config'], () => {
-    return gulp.src('client/app/**/*.ts')
-        .pipe(gulp.dest('dist/server/public/app'));
-});
-
-gulp.task('jspm', () => {
-    return gulp.src(['client/jspm_packages/**/*'])
-        .pipe(gulp.dest('dist/server/public/jspm_packages'));
-});
-
-gulp.task('jspm:config', () => {
-    return gulp.src('client/jspm.config.js')
-        .pipe(gulp.dest('dist/server/public'));
-});
-
 gulp.task('views', () => {
     return gulp.src('views/**/*.pug')
         .pipe(pug({
@@ -45,12 +29,6 @@ gulp.task('views', () => {
             }
         }))
         .pipe(gulp.dest('dist/server/views'));
-});
-
-gulp.task('css', () => {
-    return gulp.src('client/style/**/*.css')
-        .pipe(cssMin())
-        .pipe(gulp.dest('dist/server/public/style'));
 });
 
 gulp.task('watch', () => {
@@ -66,7 +44,7 @@ gulp.task('watch', () => {
 });
 
 gulp.task('build', (cb) => {
-    runSequence('clean', 'build:server', 'build:client', 'views', 'views:testPrep', 'watch', cb);
+    runSequence('clean', 'build:server', 'views', cb);
 });
 
 gulp.task('start', () => {
@@ -95,11 +73,11 @@ gulp.task('testPrep', (cb) => {
 });
 
 gulp.task('coveralls', () => {
-    gulp.src('coverage/lcov.info').pipe(coveralls());
+    return gulp.src('coverage/lcov.info').pipe(coveralls());
 });
 
 gulp.task('lint', () => {
-    gulp.src('src/**/*.ts')
+    return gulp.src('src/**/*.ts')
         .pipe(tslint({
             configuration: 'tslint.json',
             formatter: 'prose'

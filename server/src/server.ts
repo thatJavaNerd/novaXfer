@@ -18,7 +18,7 @@ export function createServer(): express.Application {
     app.use(bodyParser.json());
     app.use('/api', api());
     app.use('/', html());
-    app.use(express.static(path.join(__dirname, 'public')));
+    app.use(express.static(path.join(__dirname, '../../client')));
     app.use(helmet());
 
     return app;

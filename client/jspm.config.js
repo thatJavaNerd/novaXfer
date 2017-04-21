@@ -6,11 +6,6 @@ SystemJS.config({
   browserConfig: {
     "baseURL": "/"
   },
-  nodeConfig: {
-    "paths": {
-      "novaXfer/": "client/"
-    }
-  },
   devConfig: {
     "map": {
       "plugin-typescript": "github:frankwallis/plugin-typescript@7.0.6"
