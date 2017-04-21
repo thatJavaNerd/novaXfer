@@ -34,9 +34,7 @@ gulp.task('views', () => {
 gulp.task('watch', () => {
     const conf = {
         'server/src/**/*.ts': ['build:server'],
-        'views/**/*.pug': ['views'],
-        'client/app/jspm.config.js': ['jspm:config'],
-        'client/app/**/*.ts': ['build:client']
+        'views/**/*.pug': ['views']
     };
     for (const src of Object.keys(conf)) {
         gulp.watch(src, conf[src]);
