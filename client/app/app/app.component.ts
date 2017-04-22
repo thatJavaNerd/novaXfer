@@ -1,19 +1,20 @@
 import { Component, Inject } from '@angular/core';
-import { Http } from '@angular/http';
 
 import 'rxjs/add/operator/toPromise';
+import { EquivalencyService } from '../core/equivalency.service';
 
 @Component({
     selector: 'novaxfer',
     template: `
     <input #course (keyup)="courseChange(course.value)" placeholder="Course" />
     <pre>{{ equivalencies | json }}</pre>
-    `
+    `,
+    providers: [ EquivalencyService ]
 })
 export class AppComponent {
     public equivalencies: any;
 
-    public constructor(@Inject(Http) private http: Http) {}
+    public constructor(@Inject(EquivalencyService) private equiv: EquivalencyService) {}
 
     public courseChange(course: string): void {
         const parts = course.trim().split(' ');
@@ -22,22 +23,8 @@ export class AppComponent {
             return;
         }
 
-        this.http.get(`/api/v1/course/${parts[0]}/${parts[1]}`)
-            .toPromise()
-            .then((res) => {
-                this.equivalencies = res.json().data.equivalencies;
-            })
-            .catch((res) => {
-                switch (res.status) {
-                    case 404:
-                        console.log(res.json());
-                        break;
-                    case 500:
-                        console.log('Server error');
-                        break;
-                    default:
-                        console.log(res);
-                }
-            });
+        this.equiv.course(parts[0], parts[1]).then((val: any) => {
+            this.equivalencies = val;
+        });
     }
 }
