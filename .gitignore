@@ -9,3 +9,4 @@ dist/
 .idea
 /server/src/views
 jspm_packages/
+yarn-error.log
