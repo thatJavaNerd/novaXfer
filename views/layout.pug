@@ -17,6 +17,10 @@ html
             script(src='/jspm_packages/system.js')
             script(src='/jspm.config.js')
             script.
+                // Import Angular dependencies
+                System.import('zone.js');
+                System.import('reflect-metadata');
+                // Import/bootstrap our Angular app
                 System.import('app');
 
     body

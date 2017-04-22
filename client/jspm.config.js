@@ -19,7 +19,8 @@ SystemJS.config({
         "*.ts": {
           "loader": "plugin-typescript"
         }
-      }
+      },
+      "defaultExtension": "ts"
     }
   }
 });
@@ -31,6 +32,13 @@ SystemJS.config({
     "npm:*.json"
   ],
   map: {
+    "@angular/common": "npm:@angular/common@4.0.3",
+    "@angular/compiler": "npm:@angular/compiler@4.0.3",
+    "@angular/core": "npm:@angular/core@4.0.3",
+    "@angular/forms": "npm:@angular/forms@4.0.3",
+    "@angular/http": "npm:@angular/http@4.0.3",
+    "@angular/platform-browser": "npm:@angular/platform-browser@4.0.3",
+    "@angular/platform-browser-dynamic": "npm:@angular/platform-browser-dynamic@4.0.3",
     "assert": "npm:jspm-nodelibs-assert@0.2.1",
     "buffer": "npm:jspm-nodelibs-buffer@0.2.3",
     "child_process": "npm:jspm-nodelibs-child_process@0.2.1",
@@ -43,12 +51,16 @@ SystemJS.config({
     "os": "npm:jspm-nodelibs-os@0.2.1",
     "path": "npm:jspm-nodelibs-path@0.2.3",
     "process": "npm:jspm-nodelibs-process@0.2.1",
+    "reflect-metadata": "npm:reflect-metadata@0.1.10",
+    "rxjs": "npm:rxjs@5.3.0",
     "stream": "npm:jspm-nodelibs-stream@0.2.1",
     "string_decoder": "npm:jspm-nodelibs-string_decoder@0.2.1",
+    "timers": "npm:jspm-nodelibs-timers@0.2.1",
     "ts": "github:frankwallis/plugin-typescript@7.0.6",
     "typescript": "npm:typescript@2.3.0",
     "util": "npm:jspm-nodelibs-util@0.2.2",
-    "vm": "npm:jspm-nodelibs-vm@0.2.1"
+    "vm": "npm:jspm-nodelibs-vm@0.2.1",
+    "zone.js": "npm:zone.js@0.8.8"
   },
   packages: {
     "npm:typescript@2.3.0": {
@@ -273,6 +285,21 @@ SystemJS.config({
     "npm:string_decoder@1.0.0": {
       "map": {
         "buffer-shims": "npm:buffer-shims@1.0.0"
+      }
+    },
+    "npm:rxjs@5.3.0": {
+      "map": {
+        "symbol-observable": "npm:symbol-observable@1.0.4"
+      }
+    },
+    "npm:jspm-nodelibs-timers@0.2.1": {
+      "map": {
+        "timers-browserify": "npm:timers-browserify@1.4.2"
+      }
+    },
+    "npm:timers-browserify@1.4.2": {
+      "map": {
+        "process": "npm:process@0.11.9"
       }
     }
   }
