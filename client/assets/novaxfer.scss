@@ -3,3 +3,8 @@ input {
   width: 125px;
   text-transform: uppercase;
 }
+
+div.summary-container {
+  display: flex;
+  flex-direction: column;
+}
