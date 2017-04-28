@@ -14,7 +14,7 @@ import { Observable } from 'rxjs/Observable';
     selector: 'novaxfer',
     template: `
         <input [formControl]="input" type="text" formnovalidate>
-        <small [hidden]="input.valid">We need something like CSC 202 here</small>
+        <small [hidden]="input.valid || input.pristine">We need something like CSC 202 here</small>
         <pre [hidden]="!input.valid">{{ summary | async | json }}</pre>
     `,
     providers: [ EquivalencyService ]
