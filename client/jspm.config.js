@@ -8,7 +8,38 @@ SystemJS.config({
   },
   devConfig: {
     "map": {
-      "plugin-typescript": "github:frankwallis/plugin-typescript@7.0.6"
+      "plugin-typescript": "github:frankwallis/plugin-typescript@7.0.6",
+      "graceful-fs": "npm:graceful-fs@4.1.11",
+      "https": "npm:jspm-nodelibs-https@0.2.2",
+      "url": "npm:jspm-nodelibs-url@0.2.1",
+      "http": "npm:jspm-nodelibs-http@0.2.0"
+    },
+    "packages": {
+      "npm:jspm-nodelibs-url@0.2.1": {
+        "map": {
+          "url": "npm:url@0.11.0"
+        }
+      },
+      "npm:jspm-nodelibs-http@0.2.0": {
+        "map": {
+          "http-browserify": "npm:stream-http@2.7.0"
+        }
+      },
+      "npm:stream-http@2.7.0": {
+        "map": {
+          "inherits": "npm:inherits@2.0.3",
+          "readable-stream": "npm:readable-stream@2.2.9",
+          "to-arraybuffer": "npm:to-arraybuffer@1.0.1",
+          "builtin-status-codes": "npm:builtin-status-codes@3.0.0",
+          "xtend": "npm:xtend@4.0.1"
+        }
+      },
+      "npm:url@0.11.0": {
+        "map": {
+          "punycode": "npm:punycode@1.3.2",
+          "querystring": "npm:querystring@0.2.0"
+        }
+      }
     }
   },
   transpiler: "plugin-typescript",
@@ -18,10 +49,137 @@ SystemJS.config({
       "meta": {
         "*.ts": {
           "loader": "plugin-typescript"
+        },
+        "*.css": {
+          "loader": "css"
         }
       },
       "defaultExtension": "ts"
+    },
+    "github:dougludlow/plugin-sass@0.6.0": {
+      "map": {
+        "css-asset-copier": "npm:css-asset-copier@1.0.2",
+        "postcss": "npm:postcss@5.2.17",
+        "css-url-rewriter-ex": "npm:css-url-rewriter-ex@1.0.6",
+        "sass.js": "npm:sass.js@0.9.13",
+        "autoprefixer": "npm:autoprefixer@6.7.7",
+        "reqwest": "github:ded/reqwest@2.0.5"
+      }
+    },
+    "npm:postcss@5.2.17": {
+      "map": {
+        "source-map": "npm:source-map@0.5.6",
+        "js-base64": "npm:js-base64@2.1.9",
+        "chalk": "npm:chalk@1.1.3",
+        "supports-color": "npm:supports-color@3.2.3"
+      }
+    },
+    "npm:autoprefixer@6.7.7": {
+      "map": {
+        "postcss": "npm:postcss@5.2.17",
+        "browserslist": "npm:browserslist@1.7.7",
+        "normalize-range": "npm:normalize-range@0.1.2",
+        "num2fraction": "npm:num2fraction@1.2.2",
+        "caniuse-db": "npm:caniuse-db@1.0.30000664",
+        "postcss-value-parser": "npm:postcss-value-parser@3.3.0"
+      }
+    },
+    "npm:css-asset-copier@1.0.2": {
+      "map": {
+        "fs-extra": "npm:fs-extra@0.30.0",
+        "babel-runtime": "npm:babel-runtime@6.23.0"
+      }
+    },
+    "npm:css-url-rewriter-ex@1.0.6": {
+      "map": {
+        "babel-runtime": "npm:babel-runtime@6.23.0"
+      }
+    },
+    "npm:chalk@1.1.3": {
+      "map": {
+        "supports-color": "npm:supports-color@2.0.0",
+        "escape-string-regexp": "npm:escape-string-regexp@1.0.5",
+        "ansi-styles": "npm:ansi-styles@2.2.1",
+        "has-ansi": "npm:has-ansi@2.0.0",
+        "strip-ansi": "npm:strip-ansi@3.0.1"
+      }
+    },
+    "npm:fs-extra@0.30.0": {
+      "map": {
+        "graceful-fs": "npm:graceful-fs@4.1.11",
+        "jsonfile": "npm:jsonfile@2.4.0",
+        "klaw": "npm:klaw@1.3.1",
+        "path-is-absolute": "npm:path-is-absolute@1.0.1",
+        "rimraf": "npm:rimraf@2.6.1"
+      }
+    },
+    "npm:browserslist@1.7.7": {
+      "map": {
+        "caniuse-db": "npm:caniuse-db@1.0.30000664",
+        "electron-to-chromium": "npm:electron-to-chromium@1.3.8"
+      }
+    },
+    "npm:babel-runtime@6.23.0": {
+      "map": {
+        "regenerator-runtime": "npm:regenerator-runtime@0.10.4",
+        "core-js": "npm:core-js@2.4.1"
+      }
+    },
+    "npm:supports-color@3.2.3": {
+      "map": {
+        "has-flag": "npm:has-flag@1.0.0"
+      }
+    },
+    "npm:rimraf@2.6.1": {
+      "map": {
+        "glob": "npm:glob@7.1.1"
+      }
+    },
+    "npm:has-ansi@2.0.0": {
+      "map": {
+        "ansi-regex": "npm:ansi-regex@2.1.1"
+      }
+    },
+    "npm:strip-ansi@3.0.1": {
+      "map": {
+        "ansi-regex": "npm:ansi-regex@2.1.1"
+      }
+    },
+    "npm:glob@7.1.1": {
+      "map": {
+        "inherits": "npm:inherits@2.0.3",
+        "path-is-absolute": "npm:path-is-absolute@1.0.1",
+        "fs.realpath": "npm:fs.realpath@1.0.0",
+        "inflight": "npm:inflight@1.0.6",
+        "minimatch": "npm:minimatch@3.0.3",
+        "once": "npm:once@1.4.0"
+      }
+    },
+    "npm:inflight@1.0.6": {
+      "map": {
+        "once": "npm:once@1.4.0",
+        "wrappy": "npm:wrappy@1.0.2"
+      }
+    },
+    "npm:once@1.4.0": {
+      "map": {
+        "wrappy": "npm:wrappy@1.0.2"
+      }
+    },
+    "npm:minimatch@3.0.3": {
+      "map": {
+        "brace-expansion": "npm:brace-expansion@1.1.7"
+      }
+    },
+    "npm:brace-expansion@1.1.7": {
+      "map": {
+        "balanced-match": "npm:balanced-match@0.4.2",
+        "concat-map": "npm:concat-map@0.0.1"
+      }
     }
+  },
+  map: {
+    "sass": "github:dougludlow/plugin-sass@0.6.0"
   }
 });
 
@@ -40,10 +198,12 @@ SystemJS.config({
     "@angular/platform-browser": "npm:@angular/platform-browser@4.0.3",
     "@angular/platform-browser-dynamic": "npm:@angular/platform-browser-dynamic@4.0.3",
     "assert": "npm:jspm-nodelibs-assert@0.2.1",
+    "bootstrap": "github:twbs/bootstrap@3.3.7",
     "buffer": "npm:jspm-nodelibs-buffer@0.2.3",
     "child_process": "npm:jspm-nodelibs-child_process@0.2.1",
     "constants": "npm:jspm-nodelibs-constants@0.2.1",
     "crypto": "npm:jspm-nodelibs-crypto@0.2.1",
+    "css": "github:systemjs/plugin-css@0.1.33",
     "events": "npm:jspm-nodelibs-events@0.2.2",
     "fs": "npm:jspm-nodelibs-fs@0.2.1",
     "lodash": "npm:lodash@4.17.4",
@@ -301,6 +461,11 @@ SystemJS.config({
     "npm:timers-browserify@1.4.2": {
       "map": {
         "process": "npm:process@0.11.9"
+      }
+    },
+    "github:twbs/bootstrap@3.3.7": {
+      "map": {
+        "jquery": "npm:jquery@3.2.1"
       }
     }
   }

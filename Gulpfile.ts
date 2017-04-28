@@ -4,6 +4,7 @@ import * as gulp from 'gulp';
 import * as coveralls from 'gulp-coveralls';
 import * as nodemon from 'gulp-nodemon';
 import * as pug from 'gulp-pug';
+import * as sass from 'gulp-sass';
 import tslint from 'gulp-tslint';
 import * as tsc from 'gulp-typescript';
 import * as runSequence from 'run-sequence';
@@ -34,11 +35,18 @@ gulp.task('views', () => {
 gulp.task('watch', () => {
     const conf = {
         'server/src/**/*.ts': ['build:server'],
-        'views/**/*.pug': ['views']
+        'views/**/*.pug': ['views'],
+        'client/assets/*.scss': ['sass']
     };
     for (const src of Object.keys(conf)) {
         gulp.watch(src, conf[src]);
     }
+});
+
+gulp.task('sass', () => {
+    return gulp.src('client/assets/*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest('client/build'));
 });
 
 gulp.task('build', (cb) => {
