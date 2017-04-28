@@ -83,6 +83,7 @@
       "@angular/forms": "npm:@angular/forms@^4.0.3",
       "@angular/http": "npm:@angular/http@^4.0.3",
       "@angular/platform-browser-dynamic": "npm:@angular/platform-browser-dynamic@^4.0.3",
+      "lodash": "npm:lodash@^4.17.4",
       "reflect-metadata": "npm:reflect-metadata@^0.1.10",
       "ts": "github:frankwallis/plugin-typescript@^7.0.6"
     },
@@ -120,6 +121,12 @@
         "ignore": [
           "test.js"
         ]
+      },
+      "npm:lodash@4.17.4": {
+        "map": {
+          "buffer": "@empty",
+          "process": "@empty"
+        }
       },
       "npm:reflect-metadata@0.1.10": {
         "jspmNodeConversion": false,
