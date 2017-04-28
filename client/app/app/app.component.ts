@@ -13,6 +13,7 @@ import { Observable } from 'rxjs/Observable';
 @Component({
     selector: 'novaxfer',
     templateUrl: '/partial/app',
+    styleUrls: ['build/novaxfer.css'],
     providers: [ EquivalencyService ]
 })
 export class AppComponent {
