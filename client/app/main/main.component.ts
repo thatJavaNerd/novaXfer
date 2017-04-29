@@ -17,14 +17,14 @@ import * as _ from 'lodash/lodash';
     styleUrls: ['build/novaxfer.css'],
     providers: [ EquivalencyService ]
 })
-export class AppComponent {
+export class MainComponent {
     private static readonly COURSE_PATTERN = /^ *[A-Z]{3} +[0-9]{3} *$/i;
     private static readonly NBSP = String.fromCharCode(160);
 
     public input = new FormControl('',
         [
             Validators.required,
-            Validators.pattern(AppComponent.COURSE_PATTERN)
+            Validators.pattern(MainComponent.COURSE_PATTERN)
         ]);
 
     public summary: SuccinctCourseSummary;
@@ -36,10 +36,10 @@ export class AppComponent {
             .distinctUntilChanged()
             .switchMap((raw: string) => {
                 this.summary = null;
-                const parts = AppComponent.normalizeWhitespace(raw).split(' ');
+                const parts = MainComponent.normalizeWhitespace(raw).split(' ');
                 return this.equivService.courseSummary(parts[0].trim(), parts[1].trim());
             })
-            .map(AppComponent.makeSuccinct)
+            .map(MainComponent.makeSuccinct)
             .subscribe((cs: SuccinctCourseSummary) => {
                 this.summary = cs;
             });
@@ -47,7 +47,7 @@ export class AppComponent {
 
     private static makeSuccinct(cs: CourseSummary): SuccinctCourseSummary {
         return cs === null ? null : {
-            institutions: AppComponent.formatInstitutions(cs.institutions),
+            institutions: MainComponent.formatInstitutions(cs.institutions),
             course: cs.subject + ' ' + cs.number,
             exists: cs.exists,
             icon: cs.exists ? 'check_circle' : 'block',
@@ -63,7 +63,7 @@ export class AppComponent {
     }
 
     private static normalizeWhitespace(text) {
-        return text.replace(new RegExp(`(?:\r\n|\r|\n|${AppComponent.NBSP}| )+`, 'g'), ' ').trim();
+        return text.replace(new RegExp(`(?:\r\n|\r|\n|${MainComponent.NBSP}| )+`, 'g'), ' ').trim();
     }
 }
 

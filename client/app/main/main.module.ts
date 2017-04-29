@@ -4,7 +4,7 @@ import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { CoreModule } from '../core/core.module';
-import { AppComponent } from './app.component';
+import { MainComponent } from './main.component';
 
 @NgModule({
     imports: [
@@ -14,8 +14,8 @@ import { AppComponent } from './app.component';
         ReactiveFormsModule
     ],
     declarations: [
-        AppComponent
+        MainComponent
     ],
-    bootstrap: [ AppComponent ]
+    bootstrap: [ MainComponent ]
 })
-export class AppModule {}
+export default class MainModule {}
