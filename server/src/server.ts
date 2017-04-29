@@ -21,6 +21,9 @@ export function createServer(): express.Application {
     app.use(express.static(path.join(__dirname, '../../client')));
     app.use(helmet());
 
+    app.set('view engine', 'pug');
+    app.set('views', './views');
+
     return app;
 }
 

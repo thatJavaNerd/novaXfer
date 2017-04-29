@@ -2,38 +2,18 @@ import { Request, Response, Router } from 'express';
 import Parameter = require('pinput');
 
 import EquivalencyDao from '../../../queries/EquivalencyDao';
+import { numberParam, subjectParam } from '../../params';
 import RouteModule from '../../RouteModule';
 import { SuccessResponse } from './responses';
 import { runQuery } from './util';
 import {
-    validateCourseNumber, validateInstitutionAcronym,
-    validateSubject
+    validateInstitutionAcronym,
 } from './validation';
 
 export default function(): RouteModule {
     const dao = new EquivalencyDao();
 
     const r = Router();
-
-    const subjectParam = (req: Request) =>
-        new Parameter({
-            name: 'subject',
-            rawInput: req.params.subject,
-            validate: validateSubject,
-            preprocess: (val) => val.trim(),
-            // Make sure we give the query the uppercase value
-            postprocess: (val) => val.toUpperCase()
-        });
-
-    const numberParam = (req: Request) =>
-        new Parameter({
-            name: 'number',
-            rawInput: req.params.number,
-            validate: validateCourseNumber,
-            preprocess: (val) => val.trim(),
-            // Make sure we give the query the uppercase value
-            postprocess: (val) => val.toUpperCase()
-        });
 
     const validateInstitutions = (institutions: string[]) => {
         for (const i of institutions) {

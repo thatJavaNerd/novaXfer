@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as coveralls from 'gulp-coveralls';
 import * as nodemon from 'gulp-nodemon';
-import * as pug from 'gulp-pug';
 import * as sass from 'gulp-sass';
 import tslint from 'gulp-tslint';
 import * as tsc from 'gulp-typescript';
@@ -23,12 +22,7 @@ gulp.task('build:server', () => {
 });
 
 gulp.task('views', () => {
-    return gulp.src('views/**/*.pug')
-        .pipe(pug({
-            data: {
-                year: new Date().getFullYear()
-            }
-        }))
+    gulp.src('views/**/*.pug')
         .pipe(gulp.dest('dist/server/views'));
 });
 
@@ -70,7 +64,7 @@ gulp.task('clean:testPrep', () => {
 });
 
 gulp.task('views:testPrep', ['views'], () => {
-    return gulp.src('dist/server/views/**/*.html')
+    return gulp.src('views/**/*.pug')
         .pipe(gulp.dest('server/src/views'));
 });
 
