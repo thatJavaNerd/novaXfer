@@ -18,11 +18,8 @@ export function createServer(): express.Application {
     app.use(bodyParser.json());
     app.use('/api', api());
     app.use('/', html());
-    app.use(express.static(path.join(__dirname, '../../client')));
+    app.use(express.static(path.join(__dirname, 'public')));
     app.use(helmet());
-
-    app.set('view engine', 'pug');
-    app.set('views', './views');
 
     return app;
 }

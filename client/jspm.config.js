@@ -42,19 +42,15 @@ SystemJS.config({
       }
     }
   },
-  transpiler: "plugin-typescript",
   packages: {
     "app": {
-      "main": "novaXfer.ts",
+      "main": "novaXfer.js",
       "meta": {
-        "*.ts": {
-          "loader": "plugin-typescript"
-        },
         "*.css": {
           "loader": "css"
         }
       },
-      "defaultExtension": "ts"
+      "defaultExtension": "js"
     },
     "github:dougludlow/plugin-sass@0.6.0": {
       "map": {
@@ -217,7 +213,6 @@ SystemJS.config({
     "stream": "npm:jspm-nodelibs-stream@0.2.1",
     "string_decoder": "npm:jspm-nodelibs-string_decoder@0.2.1",
     "timers": "npm:jspm-nodelibs-timers@0.2.1",
-    "ts": "github:frankwallis/plugin-typescript@7.0.6",
     "typescript": "npm:typescript@2.3.0",
     "util": "npm:jspm-nodelibs-util@0.2.2",
     "vm": "npm:jspm-nodelibs-vm@0.2.1",

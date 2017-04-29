@@ -1,12 +1,22 @@
 import * as del from 'del';
 import * as fs from 'fs';
+
 import * as gulp from 'gulp';
 import * as coveralls from 'gulp-coveralls';
 import * as nodemon from 'gulp-nodemon';
+import * as pug from 'gulp-pug';
 import * as sass from 'gulp-sass';
 import tslint from 'gulp-tslint';
 import * as tsc from 'gulp-typescript';
 import * as runSequence from 'run-sequence';
+
+const publicDir = (rel: string = '') => 'dist/server/public/' + rel;
+const cp = (src: string | string[], dest: string) =>
+    gulp.src(src).pipe(gulp.dest(dest));
+const renderPug = (src: string, dest: string) =>
+    gulp.src(src)
+        .pipe(pug())
+        .pipe(gulp.dest(dest));
 
 gulp.task('default', ['build'], (cb) => {
     runSequence('watch', 'start', cb);
@@ -21,30 +31,61 @@ gulp.task('build:server', () => {
     return result.js.pipe(gulp.dest('dist/server'));
 });
 
-gulp.task('views', () => {
-    gulp.src('views/**/*.pug')
-        .pipe(gulp.dest('dist/server/views'));
-});
+gulp.task('views', ['views:templates', 'views:host']);
+gulp.task('views:host', () =>
+    renderPug('views/**/*.pug', 'dist/server/views')
+);
+gulp.task('views:templates', () =>
+    renderPug('client/app/**/*.pug', publicDir('app'))
+);
 
 gulp.task('watch', () => {
     const conf = {
+        'client/app/**/*.scss': ['sass:component'],
+        'client/app/**/*.pug': ['views:templates'],
+        'client/app/**/*.ts': ['clientts'],
+        'client/assets/**/*.scss': ['sass:core'],
         'server/src/**/*.ts': ['build:server'],
-        'views/**/*.pug': ['views'],
-        'client/assets/*.scss': ['sass']
+        'views/**/*.pug': ['views:host']
     };
     for (const src of Object.keys(conf)) {
         gulp.watch(src, conf[src]);
     }
 });
 
-gulp.task('sass', () => {
-    return gulp.src('client/assets/*.scss')
+gulp.task('build:client', ['clientts', 'sass', 'views', 'jspm']);
+
+gulp.task('clientts', () => {
+    const proj = tsc.createProject('client/tsconfig.json');
+    const result = gulp.src('client/app/**/*.ts')
+        .pipe(proj());
+
+    return result.js.pipe(gulp.dest(publicDir('app')));
+});
+
+gulp.task('jspm', ['jspm:config', 'jspm:packages']);
+gulp.task('jspm:config', () =>
+    cp('client/jspm.config.js', publicDir())
+);
+gulp.task('jspm:packages', () =>
+    cp('client/jspm_packages/**/*', publicDir('jspm_packages'))
+);
+
+gulp.task('sass', ['sass:component', 'sass:core']);
+gulp.task('sass:component', () => {
+    return gulp.src('client/app/**/*.scss')
         .pipe(sass().on('error', sass.logError))
-        .pipe(gulp.dest('client/build'));
+        .pipe(gulp.dest(publicDir('app')));
+});
+
+gulp.task('sass:core', () => {
+    return gulp.src('client/assets/**/*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest(publicDir('assets')));
 });
 
 gulp.task('build', (cb) => {
-    runSequence('clean', 'build:server', 'views', 'sass', cb);
+    runSequence('clean', 'build:server', 'build:client', cb);
 });
 
 gulp.task('start', () => {
@@ -54,22 +95,20 @@ gulp.task('start', () => {
     nodemon(config);
 });
 
+gulp.task('testPrep', () => {
+    return runSequence('clean', 'views:testPrep');
+});
+gulp.task('views:testPrep', () =>
+    renderPug('views/**/*.pug', 'server/src/views')
+);
+
 ////// TESTING AND LINTING //////
-gulp.task('clean', ['clean:testPrep'], () => {
-    return del(['dist']);
-});
-
-gulp.task('clean:testPrep', () => {
-    return del(['server/src/indexers/.cache', 'server/src/views']);
-});
-
-gulp.task('views:testPrep', ['views'], () => {
-    return gulp.src('views/**/*.pug')
-        .pipe(gulp.dest('server/src/views'));
-});
-
-gulp.task('testPrep', (cb) => {
-    return runSequence('clean:testPrep', 'views:testPrep', cb);
+gulp.task('clean', () => {
+    return del([
+        'dist',
+        'server/src/indexers/.cache',
+        'server/src/views'
+    ]);
 });
 
 gulp.task('coveralls', () => {
@@ -77,7 +116,7 @@ gulp.task('coveralls', () => {
 });
 
 gulp.task('lint', () => {
-    return gulp.src('src/**/*.ts')
+    return gulp.src('./**/*.ts')
         .pipe(tslint({
             configuration: 'tslint.json',
             formatter: 'prose'

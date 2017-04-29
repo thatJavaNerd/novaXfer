@@ -9,10 +9,13 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';
 
+declare const module: any;
+
 @Component({
     selector: 'simple-preview',
-    templateUrl: '/partial/simple-preview',
-    styleUrls: [ 'build/simple-preview.css' ],
+    moduleId: module.id,
+    templateUrl: './simple-preview.html',
+    styleUrls: [ './simple-preview.css' ],
     providers: [ EquivalencyService ]
 })
 export default class SimplePreviewComponent {
