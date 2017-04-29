@@ -6,5 +6,5 @@ import { EquivalencyService } from './equivalency.service';
     imports: [ HttpModule ],
     providers: [ EquivalencyService ]
 })
-export class CoreModule {}
+export default class CoreModule {}
 

@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { CoreModule } from './core/core.module';
-import { MainComponent } from './main.component';
+import AppComponent from './app.component';
+import CoreModule from './core/core.module';
 import SimplePreviewComponent from './simple-preview.component';
 
 @NgModule({
@@ -13,9 +13,9 @@ import SimplePreviewComponent from './simple-preview.component';
         ReactiveFormsModule
     ],
     declarations: [
-        MainComponent,
+        AppComponent,
         SimplePreviewComponent
     ],
-    bootstrap: [ MainComponent ]
+    bootstrap: [ AppComponent ]
 })
-export default class MainModule {}
+export default class AppModule {}

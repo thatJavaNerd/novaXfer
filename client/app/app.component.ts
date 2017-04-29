@@ -4,4 +4,4 @@ import { Component } from '@angular/core';
     selector: 'novaxfer',
     template: '<simple-preview></simple-preview>'
 })
-export class MainComponent {}
+export default class AppComponent {}
