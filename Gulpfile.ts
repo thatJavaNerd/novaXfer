@@ -44,7 +44,7 @@ gulp.task('sass', () => {
 });
 
 gulp.task('build', (cb) => {
-    runSequence('clean', 'build:server', 'views', cb);
+    runSequence('clean', 'build:server', 'views', 'sass', cb);
 });
 
 gulp.task('start', () => {
