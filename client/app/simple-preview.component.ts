@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 
-import { CourseSummary, EquivalencyService } from '../core/equivalency.service';
+import { CourseSummary, EquivalencyService } from './core/equivalency.service';
 
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -9,22 +9,20 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';
 
-import * as _ from 'lodash/lodash';
-
 @Component({
-    selector: 'novaxfer',
-    templateUrl: '/partial/app',
-    styleUrls: ['build/novaxfer.css'],
+    selector: 'simple-preview',
+    templateUrl: '/partial/simple-preview',
+    styleUrls: [ 'build/simple-preview.css' ],
     providers: [ EquivalencyService ]
 })
-export class MainComponent {
+export default class SimplePreviewComponent {
     private static readonly COURSE_PATTERN = /^ *[A-Z]{3} +[0-9]{3} *$/i;
     private static readonly NBSP = String.fromCharCode(160);
 
     public input = new FormControl('',
         [
             Validators.required,
-            Validators.pattern(MainComponent.COURSE_PATTERN)
+            Validators.pattern(SimplePreviewComponent.COURSE_PATTERN)
         ]);
 
     public summary: SuccinctCourseSummary;
@@ -36,10 +34,10 @@ export class MainComponent {
             .distinctUntilChanged()
             .switchMap((raw: string) => {
                 this.summary = null;
-                const parts = MainComponent.normalizeWhitespace(raw).split(' ');
+                const parts = SimplePreviewComponent.normalizeWhitespace(raw).split(' ');
                 return this.equivService.courseSummary(parts[0].trim(), parts[1].trim());
             })
-            .map(MainComponent.makeSuccinct)
+            .map(SimplePreviewComponent.makeSuccinct)
             .subscribe((cs: SuccinctCourseSummary) => {
                 this.summary = cs;
             });
@@ -47,7 +45,7 @@ export class MainComponent {
 
     private static makeSuccinct(cs: CourseSummary): SuccinctCourseSummary {
         return cs === null ? null : {
-            institutions: MainComponent.formatInstitutions(cs.institutions),
+            institutions: SimplePreviewComponent.formatInstitutions(cs.institutions),
             course: cs.subject + ' ' + cs.number,
             exists: cs.exists,
             icon: cs.exists ? 'check_circle' : 'block',
@@ -63,7 +61,7 @@ export class MainComponent {
     }
 
     private static normalizeWhitespace(text) {
-        return text.replace(new RegExp(`(?:\r\n|\r|\n|${MainComponent.NBSP}| )+`, 'g'), ' ').trim();
+        return text.replace(new RegExp(`(?:\r\n|\r|\n|${SimplePreviewComponent.NBSP}| )+`, 'g'), ' ').trim();
     }
 }
 

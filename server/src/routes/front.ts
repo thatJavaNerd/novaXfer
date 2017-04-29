@@ -47,7 +47,7 @@ export default function(): Router {
         const p = new Parameter({
             name: 'name',
             rawInput: req.params.name,
-            validate: (name: string) => /^[A-Za-z.]{1,30}$/.test(name),
+            validate: (name: string) => /^[A-Za-z.-]{1,30}$/.test(name),
         });
 
         if (!p.valid) {
