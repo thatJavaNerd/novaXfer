@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import {
     Course, CourseEquivalencyDocument,
     EquivType
-} from './common/api-models';
+} from '../common/api-models';
 
 import * as _ from 'lodash';
 

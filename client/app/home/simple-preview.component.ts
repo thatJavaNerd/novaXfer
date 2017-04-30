@@ -2,16 +2,16 @@ import { Component, Inject, OnInit } from '@angular/core';
 import {
     FormBuilder, FormGroup, Validators
 } from '@angular/forms';
+import { Response } from '@angular/http';
 
-import { CourseEntry, Institution } from './common/api-models';
-import { EquivalencyService } from './core/equivalency.service';
+import { CourseEntry, Institution } from '../common/api-models';
+import { EquivalencyService } from '../core/equivalency.service';
 
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';
-import { Response } from '@angular/http';
 
 declare const module: any;
 
