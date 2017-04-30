@@ -116,7 +116,7 @@ gulp.task('coveralls', () => {
 });
 
 gulp.task('lint', () => {
-    return gulp.src('./**/*.ts')
+    return gulp.src(['server/**/*.ts', 'client/app/**/*.ts'])
         .pipe(tslint({
             configuration: 'tslint.json',
             formatter: 'prose'
