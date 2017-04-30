@@ -1,0 +1,27 @@
+@import '../assets/palette';
+
+header {
+  height: 50vh;
+  max-height: 400px;
+  min-height: 200px;
+  background-color: $primary-color-dark;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  a {
+    color: $primary-color-text;
+    font-size: 5em;
+
+    &:hover {
+      color: $primary-color-text;
+      text-decoration: none;
+    }
+  }
+
+  em {
+    color: $primary-color-light;
+    font-size: 1.5em;
+  }
+}

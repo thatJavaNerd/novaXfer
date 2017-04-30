@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import AppComponent from './app.component';
 import CapitalizePipe from './capitalize.pipe';
 import CoreModule from './core/core.module';
+import LargeHeaderComponent from './large-header.component';
 import SimplePreviewComponent from './simple-preview.component';
 import SummarizePipe from './summarize.pipe';
 
@@ -19,6 +20,7 @@ import SummarizePipe from './summarize.pipe';
     declarations: [
         AppComponent,
         CapitalizePipe,
+        LargeHeaderComponent,
         SimplePreviewComponent,
         SummarizePipe
     ],
