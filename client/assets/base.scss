@@ -28,3 +28,13 @@ main {
 hr {
   border-color: $divider-color;
 }
+
+footer {
+  hr {
+    margin-bottom: 0;
+  }
+
+  p {
+    margin: 15px;
+  }
+}
