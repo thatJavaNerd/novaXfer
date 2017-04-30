@@ -23,12 +23,6 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
         super(EquivalencyDao.COLLECTION);
     }
 
-    public async exists(subj: string, numb: string): Promise<boolean> {
-        return (await this.coll().find({ subject: subj, number: numb })
-            .limit(1)
-            .count(true)) > 0;
-    }
-
     /**
      * Gets an object mapping course subjects to the amount of courses in that
      * subject. Sorted alphabetically by subject.
