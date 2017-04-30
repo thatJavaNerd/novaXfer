@@ -11,6 +11,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
 after_success: gulp coveralls
 addons:
+  firefox: 'latest'
   apt:
     sources:
       - mongodb-upstart
