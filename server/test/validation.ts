@@ -1,6 +1,6 @@
 
 import { expect } from 'chai';
-import { Course, CreditRange, Institution } from '../src/models';
+import { Course, CreditRange, Institution } from '../src/common/api-models';
 import {
     acronymRegex,
     courseNumberRegex,

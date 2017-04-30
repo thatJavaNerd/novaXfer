@@ -1,5 +1,6 @@
 import * as del from 'del';
 import * as fs from 'fs';
+import * as merge from 'merge2';
 
 import * as gulp from 'gulp';
 import * as coveralls from 'gulp-coveralls';
@@ -31,6 +32,14 @@ gulp.task('build:server', () => {
     return result.js.pipe(gulp.dest('dist/server'));
 });
 
+gulp.task('build:common', () => {
+    const SOURCE = 'common/**/*.ts';
+    return merge(
+        cp(SOURCE, 'server/src/common'),
+        cp(SOURCE, 'client/app/common')
+    );
+});
+
 gulp.task('views', ['views:templates', 'views:host']);
 gulp.task('views:host', () =>
     renderPug('views/**/*.pug', 'dist/server/views')
@@ -45,6 +54,7 @@ gulp.task('watch', () => {
         'client/app/**/*.pug': ['views:templates'],
         'client/app/**/*.ts': ['clientts'],
         'client/assets/**/*.scss': ['sass:core'],
+        'common/**/*.ts': ['build:common'],
         'server/src/**/*.ts': ['build:server'],
         'views/**/*.pug': ['views:host']
     };
@@ -85,7 +95,7 @@ gulp.task('sass:core', () => {
 });
 
 gulp.task('build', (cb) => {
-    runSequence('clean', 'build:server', 'build:client', cb);
+    runSequence('clean', 'build:server', 'build:client', 'build:common', cb);
 });
 
 gulp.task('start', () => {
@@ -95,8 +105,8 @@ gulp.task('start', () => {
     nodemon(config);
 });
 
-gulp.task('testPrep', () => {
-    return runSequence('clean', 'views:testPrep');
+gulp.task('testPrep', (cb) => {
+    runSequence('clean', 'views:testPrep', 'build:common', cb);
 });
 gulp.task('views:testPrep', () =>
     renderPug('views/**/*.pug', 'server/src/views')
@@ -105,7 +115,9 @@ gulp.task('views:testPrep', () =>
 ////// TESTING AND LINTING //////
 gulp.task('clean', () => {
     return del([
+        'client/app/common',
         'dist',
+        'server/src/common',
         'server/src/indexers/.cache',
         'server/src/views'
     ]);

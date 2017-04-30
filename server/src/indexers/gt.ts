@@ -1,9 +1,10 @@
-import {
-    Course, CourseEquivalency, CREDITS_UNKNOWN, EquivType,
-} from '../models';
+import { Course, EquivType } from '../common/api-models';
 import {
     determineEquivType, HtmlIndexer, normalizeWhitespace
 } from './index';
+import {
+    CourseEquivalency, CREDITS_UNKNOWN,
+} from './models';
 
 const headerRows = 2;
 const nvccNumberIndex = 2;

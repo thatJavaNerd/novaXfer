@@ -9,9 +9,9 @@ import 'rxjs/add/operator/toPromise';
 export class EquivalencyService {
     public constructor(@Inject(Http) private http: Http) {}
 
-    public async courseSummary(subj: string, num: string): Promise<CourseSummary> {
+    public async for(subj: string, num: string, institution: string): Promise<CourseSummary> {
         try {
-            const data = (await this.http.get(`/api/v1/course/${subj}/${num}`)
+            const data = (await this.http.get(`/api/v1/course/${subj}/${num}/${institution}`)
                 .toPromise()).json().data;
 
             return {
@@ -32,11 +32,4 @@ export class EquivalencyService {
             throw err;
         }
     }
-}
-
-export interface CourseSummary {
-    subject: string;
-    number: string;
-    institutions: string[];
-    exists: boolean;
 }

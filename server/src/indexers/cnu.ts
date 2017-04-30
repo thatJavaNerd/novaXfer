@@ -1,9 +1,9 @@
+import { Course } from '../common/api-models';
+import { determineEquivType, PdfIndexer } from './index';
 import {
-    Course,
     CourseEquivalency,
     CREDITS_UNKNOWN,
-} from '../models';
-import { determineEquivType, PdfIndexer } from './index';
+} from './models';
 
 const subjectRegex = /^[A-Z]{3}$/;
 // Tests if the entirety of a string represents a valid course identifier.

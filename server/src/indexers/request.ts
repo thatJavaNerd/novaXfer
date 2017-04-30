@@ -1,8 +1,9 @@
 import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 import * as requestLib from 'request';
+
+import { Institution } from '../common/api-models';
 import { Database, Mode } from '../Database';
-import { Institution } from '../models';
 
 export default async (requestData: any, institution: Institution, useCache = true) => {
     if (institution === undefined)

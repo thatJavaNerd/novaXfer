@@ -1,7 +1,6 @@
-import {
-    Course, CourseEquivalency, EquivType
-} from '../models';
+import { Course, EquivType } from '../common/api-models';
 import { determineEquivType, HtmlIndexer, normalizeWhitespace } from './index';
+import { CourseEquivalency } from './models';
 
 const headerRows = 2;
 const nvccIndex = 1; // CSS queries are 1-indexed

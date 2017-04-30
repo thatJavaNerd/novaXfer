@@ -1,5 +1,6 @@
-import { Course, CourseEquivalency } from '../models';
+import { Course } from '../common/api-models';
 import { determineEquivType, Indexer, interpretCreditInput } from './index';
+import { CourseEquivalency } from './models';
 
 export default class VcuIndexer extends Indexer<any> {
     public institution = {

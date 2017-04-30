@@ -1,6 +1,7 @@
 import { ObjectID } from 'bson';
+
+import { Institution } from '../common/api-models';
 import { Database } from '../Database';
-import { Institution } from '../models';
 import Dao from './Dao';
 import { QueryError, QueryErrorType } from './errors';
 

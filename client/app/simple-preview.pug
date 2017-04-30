@@ -1,11 +1,8 @@
-input.form-control([formControl]="input" type="text")
-small([hidden]="input.valid || input.pristine") We need something like CSC 202 here
-
-div(*ngIf="summary !== null && summary !== undefined && input.valid")
-    div.summary-container(*ngIf="summary.exists")
-        i.material-icons.md-48.md-dark arrow_downward
-        span
-            a([href]="summary.link") {{ summary.institutions }}
-            i.material-icons.md-48.md-dark {{ summary.icon }}
-    div(*ngIf="!summary.exists")
-        p Nah fam
+div
+    | Will
+    input.form-control(
+        [formControl]="input"
+        type='text'
+        placeholder='ENG 111'
+        size='3'
+    )

@@ -3,12 +3,11 @@ import { AssertionError, expect } from 'chai';
 import { Application } from 'express';
 import * as _ from 'lodash';
 import * as request from 'supertest';
+import {
+    CourseEntry, CourseEquivalencyDocument, KeyCourse
+} from '../src/common/api-models';
 import { Database, Mode } from '../src/Database';
 import { findIndexers } from '../src/indexers/index';
-import {
-    CourseEntry, CourseEquivalencyDocument, Institution,
-    KeyCourse
-} from '../src/models';
 import EquivalencyDao, { InstitutionFocusedEquivalency } from '../src/queries/EquivalencyDao';
 import { ErrorData } from '../src/routes/api/v1/util';
 import { createServer, doFullIndex } from '../src/server';

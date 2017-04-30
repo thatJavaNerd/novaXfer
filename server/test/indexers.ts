@@ -1,10 +1,10 @@
 import { expect } from 'chai';
+import { EquivType } from '../src/common/api-models';
 import {
     determineEquivType,
     findIndexers, Indexer,
     normalizeWhitespace
 } from '../src/indexers/index';
-import { EquivType } from '../src/models';
 import { validateCourseArray, validateInstitution } from './validation';
 
 describe('indexers', function() {

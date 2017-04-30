@@ -1,8 +1,9 @@
+import { Course } from '../common/api-models';
 import { determineEquivType, PdfIndexer } from './index';
 
 import {
-    Course, CourseEquivalency, CREDITS_UNKNOWN
-} from '../models';
+    CourseEquivalency, CREDITS_UNKNOWN
+} from './models';
 
 // See http://regexr.com/3eukm for examples
 const nvccPartsRegex = /^([A-Z]{3}) ([0-9]{3}) (?:(?:\+|or) ([0-9]{3}))?/;

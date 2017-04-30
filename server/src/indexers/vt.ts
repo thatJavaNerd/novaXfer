@@ -1,8 +1,9 @@
-import { Course, CourseEquivalency } from '../models';
+import { Course } from '../common/api-models';
 import {
     determineEquivType, Indexer, interpretCreditInput,
     normalizeWhitespace
 } from './index';
+import { CourseEquivalency } from './models';
 
 // Detect if a course is "evaluated on an individual basis." One of the entries
 // is misspelled, hence the optional second 'i'.

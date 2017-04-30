@@ -1,11 +1,12 @@
 import * as cheerio from 'cheerio';
 import * as _ from 'lodash';
 import * as pdf2table from 'pdf2table';
+
 import {
-    Course,
-    CourseEquivalency, CreditRange, EquivalencyContext, EquivType,
+    Course, CreditRange, EquivType,
     Institution
-} from '../models';
+} from '../common/api-models';
+import { CourseEquivalency, EquivalencyContext } from './models';
 import request from './request';
 
 export abstract class Indexer<T> {

@@ -1,9 +1,12 @@
 import { ObjectID } from 'bson';
+
 import {
-    CourseEntry, CourseEquivalencyDocument,
+    CourseEntry, CourseEquivalencyDocument, EquivType,
+    KeyCourse
+} from '../common/api-models';
+import {
     EquivalencyContext,
-    EquivType, KeyCourse
-} from '../models';
+} from '../indexers/models';
 import Dao from './Dao';
 import { QueryError, QueryErrorType } from './errors';
 import InstitutionDao from './InstitutionDao';

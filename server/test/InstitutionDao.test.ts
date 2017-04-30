@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 
 import * as _ from 'lodash';
+import { Institution } from '../src/common/api-models';
 import { Database, Mode } from '../src/Database';
 import { findIndexers } from '../src/indexers/index';
-import { Institution } from '../src/models';
 import { QueryError, QueryErrorType } from '../src/queries/errors';
 import InstitutionDao from '../src/queries/InstitutionDao';
 import { validateInstitution } from './validation';

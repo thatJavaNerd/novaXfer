@@ -1,7 +1,8 @@
-import {
-    Course, CourseEquivalency, CREDITS_UNKNOWN, Institution
-} from '../models';
+import { Course } from '../common/api-models';
 import { determineEquivType, HtmlIndexer } from './index';
+import {
+    CourseEquivalency, CREDITS_UNKNOWN
+} from './models';
 
 const headerRows = 8;
 

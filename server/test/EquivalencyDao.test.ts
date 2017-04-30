@@ -2,9 +2,8 @@
 import { AssertionError, expect } from 'chai';
 import { Database, Mode } from '../src/Database';
 import {
-    CourseEquivalency, CourseEquivalencyDocument,
-    EquivalencyContext, EquivType, KeyCourse
-} from '../src/models';
+    CourseEquivalency, EquivalencyContext
+} from '../src/indexers/models';
 import EquivalencyDao from '../src/queries/EquivalencyDao';
 import { QueryError, QueryErrorType } from '../src/queries/errors';
 import {
@@ -12,6 +11,10 @@ import {
 } from '../src/routes/api/v1/validation';
 import { doFullIndex } from '../src/server';
 import { validateCourseArray } from './validation';
+import {
+    CourseEquivalencyDocument, EquivType,
+    KeyCourse
+} from '../src/common/api-models';
 
 describe('EquivalencyDao', () => {
     let dao: EquivalencyDao;
