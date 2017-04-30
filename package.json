@@ -11,13 +11,13 @@
   "license": "MIT",
   "repository": "thatJavaNerd/novaXfer",
   "dependencies": {
-    "@angular/common": "^4.0.3",
-    "@angular/compiler": "^4.0.3",
-    "@angular/core": "^4.0.3",
-    "@angular/forms": "^4.0.3",
-    "@angular/http": "^4.0.3",
-    "@angular/platform-browser": "^4.0.3",
-    "@angular/platform-browser-dynamic": "^4.0.3",
+    "@angular/common": "^4.1.0",
+    "@angular/compiler": "^4.1.0",
+    "@angular/core": "^4.1.0",
+    "@angular/forms": "^4.1.0",
+    "@angular/http": "^4.1.0",
+    "@angular/platform-browser": "^4.1.0",
+    "@angular/platform-browser-dynamic": "^4.1.0",
     "@types/lodash": "^4.14.62",
     "body-parser": "^1.17.1",
     "cheerio": "^0.22.0",
@@ -82,9 +82,9 @@
       "baseURL": "client"
     },
     "dependencies": {
-      "@angular/forms": "npm:@angular/forms@^4.0.3",
-      "@angular/http": "npm:@angular/http@^4.0.3",
-      "@angular/platform-browser-dynamic": "npm:@angular/platform-browser-dynamic@^4.0.3",
+      "@angular/forms": "npm:@angular/forms@^4.1.0",
+      "@angular/material": "npm:@angular/material@^2.0.0-beta.3",
+      "@angular/platform-browser-dynamic": "npm:@angular/platform-browser-dynamic@^4.1.0",
       "bootstrap": "github:twbs/bootstrap@^3.3.7",
       "css": "github:systemjs/plugin-css@^0.1.33",
       "lodash": "npm:lodash@^4.17.4",
@@ -94,14 +94,14 @@
       "graceful-fs": "npm:graceful-fs@^4.1.9",
       "http": "npm:jspm-nodelibs-http@^0.2.0",
       "https": "npm:jspm-nodelibs-https@^0.2.0",
-      "plugin-typescript": "github:frankwallis/plugin-typescript@^7.0.6",
       "url": "npm:jspm-nodelibs-url@^0.2.0"
     },
     "peerDependencies": {
-      "@angular/common": "npm:@angular/common@^4.0.3",
-      "@angular/compiler": "npm:@angular/compiler@^4.0.3",
-      "@angular/core": "npm:@angular/core@^4.0.3",
-      "@angular/platform-browser": "npm:@angular/platform-browser@^4.0.3",
+      "@angular/common": "npm:@angular/common@4.1.0",
+      "@angular/compiler": "npm:@angular/compiler@4.1.0",
+      "@angular/core": "npm:@angular/core@4.1.0",
+      "@angular/http": "npm:@angular/http@^4.1.0",
+      "@angular/platform-browser": "npm:@angular/platform-browser@4.1.0",
       "assert": "npm:jspm-nodelibs-assert@^0.2.0",
       "buffer": "npm:jspm-nodelibs-buffer@^0.2.0",
       "child_process": "npm:jspm-nodelibs-child_process@^0.2.0",
@@ -114,14 +114,14 @@
       "os": "npm:jspm-nodelibs-os@^0.2.0",
       "path": "npm:jspm-nodelibs-path@^0.2.0",
       "process": "npm:jspm-nodelibs-process@^0.2.0",
-      "rxjs": "npm:rxjs@^5.3.0",
+      "rxjs": "npm:rxjs@^5.0.1",
       "stream": "npm:jspm-nodelibs-stream@^0.2.0",
       "string_decoder": "npm:jspm-nodelibs-string_decoder@^0.2.0",
       "timers": "npm:jspm-nodelibs-timers@^0.2.0",
       "typescript": "npm:typescript@^2.0.0",
       "util": "npm:jspm-nodelibs-util@^0.2.0",
       "vm": "npm:jspm-nodelibs-vm@^0.2.0",
-      "zone.js": "npm:zone.js@^0.8.8"
+      "zone.js": "npm:zone.js@^0.8.4"
     },
     "overrides": {
       "github:twbs/bootstrap@3.3.7": {
@@ -168,7 +168,7 @@
           }
         }
       },
-      "npm:typescript@2.3.0": {
+      "npm:typescript@2.3.2": {
         "browser": {},
         "map": {
           "buffer": "@empty",
