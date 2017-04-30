@@ -95,7 +95,7 @@ gulp.task('sass:core', () => {
 });
 
 gulp.task('build', (cb) => {
-    runSequence('clean', 'build:server', 'build:client', 'build:common', cb);
+    runSequence('clean', 'build:common', 'build:server', 'build:client', cb);
 });
 
 gulp.task('start', () => {

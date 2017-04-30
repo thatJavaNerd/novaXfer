@@ -1,14 +1,13 @@
-
 import { NextFunction, Request, Response, Router } from 'express';
 import Parameter = require('pinput');
 
 import { KeyCourse } from '../../../common/api-models';
+import { SuccessResponse } from '../../../common/responses';
 import EquivalencyDao from '../../../queries/EquivalencyDao';
 import InstitutionDao from '../../../queries/InstitutionDao';
 
 import RouteModule from '../../RouteModule';
 
-import { SuccessResponse } from './responses';
 import { runQuery } from './util';
 import {
     validateCourseNumber, validateInstitutionAcronym,

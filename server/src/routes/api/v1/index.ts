@@ -1,8 +1,9 @@
 import { Request, Response, Router } from 'express';
+
+import { ErrorResponse } from '../../../common/responses';
 import RouteModule from '../../RouteModule';
 import course from './course';
 import institution from './institution';
-import { ErrorResponse } from './responses';
 
 export default function(): RouteModule {
     const router = Router();

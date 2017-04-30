@@ -1,10 +1,10 @@
 import { Request, Response, Router } from 'express';
 import Parameter = require('pinput');
 
+import { SuccessResponse } from '../../../common/responses';
 import EquivalencyDao from '../../../queries/EquivalencyDao';
 import { numberParam, subjectParam } from '../../params';
 import RouteModule from '../../RouteModule';
-import { SuccessResponse } from './responses';
 import { runQuery } from './util';
 import {
     validateInstitutionAcronym,
