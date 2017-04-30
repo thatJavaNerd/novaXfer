@@ -63,5 +63,5 @@ export function watch(conf: WatchConfig) {
 
 /** Gets a path relative to the distribution directory */
 export function distDir(rel: string = '') {
-    return 'dist/server/' + rel;
+    return 'dist/' + rel;
 }

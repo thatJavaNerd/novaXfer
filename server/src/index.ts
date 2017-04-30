@@ -12,7 +12,7 @@ import { Database, Mode } from './Database';
 import MetaDao from './queries/MetaDao';
 import { createServer, doFullIndex } from './server';
 
-const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../../package.json'), 'utf8'));
+const metadata = JSON.parse(fs.readFileSync(path.join(__dirname, 'about.json'), 'utf8'));
 
 // Catch unhandled Promises
 process.on('unhandledRejection', (reason, p) => {
@@ -38,7 +38,7 @@ bootstrap({
 });
 
 async function bootstrap(options: BootstrapOptions) {
-    log(colors.bold('Starting novaXfer v' + packageJson.version));
+    log(colors.bold('Starting novaXfer v' + metadata.version));
 
     try {
         await Database.get().connect(Mode.PROD);
@@ -76,12 +76,12 @@ async function bootstrap(options: BootstrapOptions) {
 
 function printHelp() {
     const script = path.basename(__filename);
-    log(colors.bold(`${packageJson.name} v${packageJson.version}`));
+    log(colors.bold(`${metadata.name} v${metadata.version}`));
     log('\nUsage:');
     log(`$ ${script} [--force-index] [--help]`);
     log('  --force-index: Forces fresh data to be imported from the Indexers');
     log('  --help: Prints this help message');
-    log(`\nFor more see ${colors.bold(packageJson.repository)}`);
+    log(`\nFor more see ${colors.bold(metadata.repository)}`);
 }
 
 /**
