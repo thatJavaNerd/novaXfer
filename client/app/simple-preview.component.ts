@@ -1,6 +1,9 @@
-import { Component, Inject } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { Component, Inject, OnInit } from '@angular/core';
+import {
+    FormBuilder, FormGroup, Validators
+} from '@angular/forms';
 
+import { CourseEntry, Institution } from './common/api-models';
 import { EquivalencyService } from './core/equivalency.service';
 
 import 'rxjs/add/operator/debounceTime';
@@ -18,31 +21,42 @@ declare const module: any;
     styleUrls: [ './simple-preview.css' ],
     providers: [ EquivalencyService ]
 })
-export default class SimplePreviewComponent {
+export default class SimplePreviewComponent implements OnInit {
     private static readonly COURSE_PATTERN = /^ *[A-Z]{3} +[0-9]{3} *$/i;
     private static readonly NBSP = String.fromCharCode(160);
 
-    public input = new FormControl('',
-        [
-            Validators.required,
-            Validators.pattern(SimplePreviewComponent.COURSE_PATTERN)
-        ]);
+    public form: FormGroup;
+    public entry: CourseEntry;
 
-    public summary: SuccinctCourseSummary;
+    public institutions: Institution[];
 
-    public constructor(@Inject(EquivalencyService) private equivService: EquivalencyService) {
-        this.input.valueChanges
-            .filter(() => this.input.valid)
+    public constructor(
+        @Inject(EquivalencyService) private equivService: EquivalencyService,
+        @Inject(FormBuilder) private fb: FormBuilder
+    ) {
+
+        this.form = this.fb.group({
+            course: ['', [Validators.required, Validators.pattern(SimplePreviewComponent.COURSE_PATTERN)]],
+            institution: ['', [Validators.required]]
+        });
+
+        this.form.valueChanges
+            .filter(() => this.form.valid)
             .debounceTime(300)
             .distinctUntilChanged()
-            .switchMap((raw: string) => {
-                this.summary = null;
-                const parts = SimplePreviewComponent.normalizeWhitespace(raw).split(' ');
-                return this.equivService.courseSummary(parts[0].trim(), parts[1].trim());
+            .switchMap((raw: InputForm) => {
+                const courseParts = SimplePreviewComponent.normalizeWhitespace(raw.course).split(' ');
+                return this.equivService.entry(courseParts[0].trim(), courseParts[1].trim(), raw.institution.trim());
             })
-            .subscribe((cs: SuccinctCourseSummary) => {
-                this.summary = cs;
+            .subscribe((val: CourseEntry) => {
+                this.entry = val;
             });
+    }
+
+    public ngOnInit(): void {
+        this.equivService.institutions().then((institutions: Institution[]) => {
+            this.institutions = institutions;
+        });
     }
 
     private static normalizeWhitespace(text) {
@@ -50,10 +64,8 @@ export default class SimplePreviewComponent {
     }
 }
 
-export interface SuccinctCourseSummary {
-    institutions: string;
+interface InputForm {
     course: string;
-    exists: boolean;
-    icon: string;
-    link: string;
+    institution: string;
 }
+

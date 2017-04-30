@@ -1,8 +1,19 @@
-div
-    | Will
+form([formGroup]='form' novalidate)
+    p Will
     input.form-control(
-        [formControl]="input"
+        formControlName='course'
         type='text'
         placeholder='ENG 111'
-        size='3'
     )
+    p transfer to
+    select.form-control(formControlName='institution')
+        option(*ngFor='let inst of institutions') {{ inst.acronym }}
+    p ?
+
+div.results.container(*ngIf='entry')
+    p.text-muted(*ngIf='entry.equivalencies.length === 0') There's nothing here ¯\_(ツ)_/¯
+    div(*ngIf='entry.equivalencies.length > 0')
+        ul
+            li(*ngFor='let equiv of entry.equivalencies') {{ equiv | summarize | capitalize }}
+
+
