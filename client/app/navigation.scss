@@ -13,6 +13,14 @@ ul {
   margin: 0;
 }
 
+ul > li {
+  display: inline-block;
+  zoom: 1;
+
+  /* Fix for IE7 and below */
+  *display: inline;
+}
+
 .md-overlay {
   @include border-radius(2px);
 
