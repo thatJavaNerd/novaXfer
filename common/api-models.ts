@@ -43,10 +43,10 @@ export interface CourseEquivalencyDocument {
 export enum EquivType {
     /** Transfers directly to a specific class */
     DIRECT,
-        /** At least one course transfers as a generic course */
+    /** At least one course transfers as a generic course */
     GENERIC,
-        /** The student should clarify with the institution about specifics */
+    /** The student should clarify with the institution about specifics */
     SPECIAL,
-        /** Does not trasnfer at all */
+    /** Does not trasnfer at all */
     NONE
 }
