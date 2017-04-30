@@ -7,6 +7,7 @@ import AppComponent from './app.component';
 import CapitalizePipe from './capitalize.pipe';
 import CoreModule from './core/core.module';
 import LargeHeaderComponent from './large-header.component';
+import NavigationDrawerComponent from './navigation.component';
 import SimplePreviewComponent from './simple-preview.component';
 import SummarizePipe from './summarize.pipe';
 
@@ -21,6 +22,7 @@ import SummarizePipe from './summarize.pipe';
         AppComponent,
         CapitalizePipe,
         LargeHeaderComponent,
+        NavigationDrawerComponent,
         SimplePreviewComponent,
         SummarizePipe
     ],

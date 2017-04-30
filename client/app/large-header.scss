@@ -3,12 +3,20 @@
 header {
   height: 50vh;
   max-height: 400px;
-  min-height: 200px;
+  min-height: 250px;
   background-color: $primary-color-dark;
   display: flex !important;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  .title {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    flex-grow: 1;
+  }
 
   a {
     color: $primary-color-text;
@@ -24,4 +32,8 @@ header {
     color: $primary-color-light;
     font-size: 1.5em;
   }
+}
+
+navigation {
+  padding-bottom: 10px;
 }

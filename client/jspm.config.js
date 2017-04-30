@@ -1,16 +1,10 @@
 SystemJS.config({
-  browserConfig: {
-    "paths": {
-      "npm:": "/jspm_packages/npm/",
-      "github:": "/jspm_packages/github/"
-    },
-    "baseURL": "/"
+  paths: {
+    "npm:": "jspm_packages/npm/",
+    "github:": "jspm_packages/github/"
   },
-  nodeConfig: {
-    "paths": {
-      "npm:": "jspm_packages/npm/",
-      "github:": "jspm_packages/github/"
-    }
+  browserConfig: {
+    "baseURL": "/"
   },
   devConfig: {
     "map": {
@@ -47,7 +41,7 @@ SystemJS.config({
       }
     }
   },
-  "packages": {
+  packages: {
     "app": {
       "main": "novaXfer.js",
       "meta": {
@@ -57,6 +51,9 @@ SystemJS.config({
       },
       "defaultExtension": "js"
     }
+  },
+  map: {
+    "@angular/animations": "npm:@angular/animations@4.1.0"
   }
 });
 
@@ -67,7 +64,6 @@ SystemJS.config({
     "github:*/*.json"
   ],
   map: {
-    "@angular/animations": "npm:@angular/animations@4.1.0",
     "@angular/common": "npm:@angular/common@4.1.0",
     "@angular/compiler": "npm:@angular/compiler@4.1.0",
     "@angular/core": "npm:@angular/core@4.1.0",

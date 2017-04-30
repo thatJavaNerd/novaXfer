@@ -1,0 +1,44 @@
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  border-radius: $radius;
+}
+
+$button-padding: 6px 10px;
+
+ul {
+  list-style-type: none;
+  text-transform: uppercase;
+  padding: 0;
+  margin: 0;
+}
+
+.md-overlay {
+  @include border-radius(2px);
+
+  background-color: transparent;
+  padding: $button-padding;
+  z-index: 10;
+
+  &:hover {
+    /* 25% #000000 */
+    background-color: rgba(0, 0, 0, .12);
+  }
+
+  &:active {
+    /* 25% #CCCCCC */
+    background-color: rgba(204, 204, 204, 0.25);
+  }
+}
+
+a {
+  color: white;
+  font-weight: 500;
+  padding: $button-padding;
+
+  width: 100%;
+
+  &:hover, &:focus {
+    text-decoration: none;
+  }
+}
