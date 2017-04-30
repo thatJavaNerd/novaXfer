@@ -51,9 +51,6 @@ SystemJS.config({
       },
       "defaultExtension": "js"
     }
-  },
-  map: {
-    "@angular/animations": "npm:@angular/animations@4.1.0"
   }
 });
 
@@ -72,6 +69,7 @@ SystemJS.config({
     "@angular/material": "npm:@angular/material@2.0.0-beta.3",
     "@angular/platform-browser": "npm:@angular/platform-browser@4.1.0",
     "@angular/platform-browser-dynamic": "npm:@angular/platform-browser-dynamic@4.1.0",
+    "@angular/router": "npm:@angular/router@4.1.0",
     "assert": "npm:jspm-nodelibs-assert@0.2.1",
     "bootstrap": "github:twbs/bootstrap@3.3.7",
     "buffer": "npm:jspm-nodelibs-buffer@0.2.3",
