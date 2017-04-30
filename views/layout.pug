@@ -13,13 +13,13 @@ html
         block stylesheets
             link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic')
             link(rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons')
+            link(rel='stylesheet' href='/assets/base.css')
 
         block scripts
             script(src='/jspm_packages/system.js')
             script(src='/jspm.config.js')
             script.
                 System.import('bootstrap/dist/css/bootstrap.css!');
-                System.import('assets/base.css!');
                 // Import Angular dependencies
                 System.import('zone.js');
                 System.import('reflect-metadata');
