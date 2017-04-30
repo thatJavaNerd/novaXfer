@@ -11,7 +11,9 @@ SystemJS.config({
       "graceful-fs": "npm:graceful-fs@4.1.11",
       "http": "npm:jspm-nodelibs-http@0.2.0",
       "https": "npm:jspm-nodelibs-https@0.2.2",
-      "url": "npm:jspm-nodelibs-url@0.2.1"
+      "url": "npm:jspm-nodelibs-url@0.2.1",
+      "chai": "npm:chai@3.5.0",
+      "@types/chai": "npm:@types/chai@3.5.2"
     },
     "packages": {
       "npm:jspm-nodelibs-http@0.2.0": {
@@ -38,6 +40,18 @@ SystemJS.config({
           "querystring": "npm:querystring@0.2.0",
           "punycode": "npm:punycode@1.3.2"
         }
+      },
+      "npm:chai@3.5.0": {
+        "map": {
+          "type-detect": "npm:type-detect@1.0.0",
+          "deep-eql": "npm:deep-eql@0.1.3",
+          "assertion-error": "npm:assertion-error@1.0.2"
+        }
+      },
+      "npm:deep-eql@0.1.3": {
+        "map": {
+          "type-detect": "npm:type-detect@0.1.1"
+        }
       }
     }
   },
@@ -49,6 +63,9 @@ SystemJS.config({
           "loader": "css"
         }
       },
+      "defaultExtension": "js"
+    },
+    "test": {
       "defaultExtension": "js"
     }
   }

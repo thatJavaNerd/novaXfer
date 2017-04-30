@@ -4,7 +4,7 @@
   "description": "Quick and easy NVCC course equivalencies",
   "main": "server.js",
   "scripts": {
-    "test": "gulp testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts",
+    "test": "gulp testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts && karma start",
     "start": "node --use-strict dist/server/index.js"
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
@@ -64,6 +64,10 @@
     "gulp-tslint": "^8.0.0",
     "gulp-typescript": "^3.1.6",
     "istanbul": "1.1.0-alpha.1",
+    "karma": "^1.6.0",
+    "karma-firefox-launcher": "^1.0.1",
+    "karma-jspm": "^2.2.3",
+    "karma-mocha": "^1.3.0",
     "merge2": "^1.0.3",
     "mocha": "^3.2.0",
     "nyc": "^10.2.0",
@@ -93,6 +97,8 @@
       "reflect-metadata": "npm:reflect-metadata@^0.1.10"
     },
     "devDependencies": {
+      "@types/chai": "npm:@types/chai@^3.5.2",
+      "chai": "npm:chai@^3.5.0",
       "graceful-fs": "npm:graceful-fs@^4.1.9",
       "http": "npm:jspm-nodelibs-http@^0.2.0",
       "https": "npm:jspm-nodelibs-https@^0.2.0",

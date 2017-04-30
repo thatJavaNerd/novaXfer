@@ -54,6 +54,7 @@ gulp.task('watch', () => {
         'client/app/**/*.pug': ['views:templates'],
         'client/app/**/*.ts': ['clientts'],
         'client/assets/**/*.scss': ['sass:core'],
+        'client/test/**/*.spec.ts': ['clientts:test'],
         'common/**/*.ts': ['build:common'],
         'server/src/**/*.ts': ['build:server'],
         'views/**/*.pug': ['views:host']
@@ -71,6 +72,14 @@ gulp.task('clientts', () => {
         .pipe(proj());
 
     return result.js.pipe(gulp.dest(publicDir('app')));
+});
+
+gulp.task('clientts:test', () => {
+    const proj = tsc.createProject('client/tsconfig.json');
+    const result = gulp.src('client/test/**/*.ts')
+        .pipe(proj());
+
+    return result.js.pipe(gulp.dest(publicDir('test')));
 });
 
 gulp.task('jspm', ['jspm:config', 'jspm:packages']);
@@ -106,7 +115,7 @@ gulp.task('start', () => {
 });
 
 gulp.task('testPrep', (cb) => {
-    runSequence('clean', 'views:testPrep', 'build:common', cb);
+    runSequence('build', 'views:testPrep', 'clientts:test', cb);
 });
 gulp.task('views:testPrep', () =>
     renderPug('views/**/*.pug', 'server/src/views')
