@@ -10,10 +10,11 @@ form([formGroup]='form' novalidate)
         option(*ngFor='let inst of institutions') {{ inst.acronym }}
     p ?
 
-div.results.container(*ngIf='entry')
-    p.text-muted(*ngIf='entry.equivalencies.length === 0') There's nothing here ¯\_(ツ)_/¯
+div.results.container(*ngIf='entry !== undefined && entry !== null')
+    p.text-muted.text-center(*ngIf='entry.equivalencies.length === 0') There's nothing here ¯\_(ツ)_/¯
     div(*ngIf='entry.equivalencies.length > 0')
         ul
             li(*ngFor='let equiv of entry.equivalencies') {{ equiv | summarize | capitalize }}
 
-
+div.results.container(*ngIf='entry === null')
+    p.text-muted.text-center We don't know anything about that course ¯\(°_o)/¯

@@ -11,6 +11,7 @@ import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';
+import { Response } from '@angular/http';
 
 declare const module: any;
 
@@ -44,9 +45,21 @@ export default class SimplePreviewComponent implements OnInit {
             .filter(() => this.form.valid)
             .debounceTime(300)
             .distinctUntilChanged()
-            .switchMap((raw: InputForm) => {
+            .switchMap(async (raw: InputForm) => {
                 const courseParts = SimplePreviewComponent.normalizeWhitespace(raw.course).split(' ');
-                return this.equivService.entry(courseParts[0].trim(), courseParts[1].trim(), raw.institution.trim());
+                try {
+                    const subj = courseParts[0].trim(),
+                        numb = courseParts[1].trim(),
+                        inst = raw.institution.trim();
+
+                    return await this.equivService.entry(subj, numb, inst);
+                } catch (ex) {
+                    if (ex instanceof Response) {
+                        return null;
+                    }
+
+                    throw ex;
+                }
             })
             .subscribe((val: CourseEntry) => {
                 this.entry = val;
