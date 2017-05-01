@@ -70,7 +70,7 @@ export default function(gulp) {
             'client/app/**/*.scss':     'sass:component',
             'client/app/**/*.pug':      'views:templates',
             'client/app/**/*.ts':       'compile:client',
-            'client/assets/**/*.scss':  'sass:core',
+            'client/assets/**/*.scss':  'sass:global',
             'client/test/**/*.spec.ts': 'compile:client:test'
         });
     });
