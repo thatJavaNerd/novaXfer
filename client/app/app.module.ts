@@ -5,12 +5,15 @@ import { Router } from '@angular/router';
 
 import AppRoutingModule from './app-routing.module';
 import AppComponent from './app.component';
-import HomeModule from './home/home.module';
 import BulkModule from './bulk/bulk.module';
+import CoreModule from './core/core.module';
+import HomeModule from './home/home.module';
+import NotFoundComponent from './not-found.component';
 
 @NgModule({
     imports: [
         BrowserModule,
+        CoreModule,
         CommonModule,
 
         HomeModule,
@@ -18,7 +21,8 @@ import BulkModule from './bulk/bulk.module';
         AppRoutingModule
     ],
     declarations: [
-        AppComponent
+        AppComponent,
+        NotFoundComponent
     ],
     bootstrap: [ AppComponent ]
 })
