@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import HomeComponent from './home.component';
+
+import BulkComponent from './bulk.component';
 
 const routes: Routes = [
-    { path: 'home', component: HomeComponent }
+    { path: 'bulk', component: BulkComponent }
 ];
 
 @NgModule({

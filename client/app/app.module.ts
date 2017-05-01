@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import AppRoutingModule from './app-routing.module';
 import AppComponent from './app.component';
 import HomeModule from './home/home.module';
+import BulkModule from './bulk/bulk.module';
 
 @NgModule({
     imports: [
@@ -13,6 +14,7 @@ import HomeModule from './home/home.module';
         CommonModule,
 
         HomeModule,
+        BulkModule,
         AppRoutingModule
     ],
     declarations: [
