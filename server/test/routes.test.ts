@@ -1,7 +1,6 @@
 import { Application } from 'express';
 import * as request from 'supertest';
 
-import { NG_ROUTES } from '../src/routes/front';
 import { createServer } from '../src/server';
 
 describe('routes', () => {
@@ -11,16 +10,18 @@ describe('routes', () => {
         app = createServer();
     });
 
-    for (const ngRoute of NG_ROUTES) {
-        describe('GET ' + ngRoute, () => {
-            it('should respond with HTML', () =>
-                request(app)
+    describe('GET /*', () => {
+        // Let the Angular app show 404's
+        it('should respond with HTML', async () => {
+            const randomRoutes = ['/', '/home', '/foo'];
+            for (const ngRoute of randomRoutes) {
+                await request(app)
                     .get(ngRoute)
                     .expect(200)
-                    .expect('Content-Type', /html/)
-            );
+                    .expect('Content-Type', /html/);
+            }
         });
-    }
+    });
 
     describe('GET /api', () => {
         it('should redirect to the docs on GitHub', () =>

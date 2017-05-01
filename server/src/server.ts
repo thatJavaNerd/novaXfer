@@ -16,10 +16,13 @@ export function createServer(): express.Application {
     const app = express();
     app.use(logger('dev'));
     app.use(bodyParser.json());
-    app.use('/api', api());
-    app.use('/', html());
-    app.use(express.static(path.join(__dirname, 'public')));
     app.use(helmet());
+
+    app.use('/api', api());
+    // Mount static assets before the html module so we can still use our assets
+    // without the module's wildcard route catching it first
+    app.use(express.static(path.join(__dirname, 'public')));
+    app.use('/', html());
 
     return app;
 }
