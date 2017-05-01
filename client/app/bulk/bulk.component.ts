@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
     template: `
-        <large-header></large-header>
+        <small-header></small-header>
         <main>
             <bulk-lookup></bulk-lookup>
         </main>

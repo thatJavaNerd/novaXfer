@@ -6,6 +6,7 @@ import CapitalizePipe from './capitalize.pipe';
 import { EquivalencyService } from './equivalency.service';
 import LargeHeaderComponent from './large-header.component';
 import NavigationComponent from './navigation.component';
+import SmallHeaderComponent from './small-header.component';
 
 @NgModule({
     imports: [
@@ -17,10 +18,12 @@ import NavigationComponent from './navigation.component';
         CapitalizePipe,
         LargeHeaderComponent,
         NavigationComponent,
+        SmallHeaderComponent
     ],
     exports: [
         CapitalizePipe,
-        LargeHeaderComponent
+        LargeHeaderComponent,
+        SmallHeaderComponent,
     ],
     providers: [ EquivalencyService ]
 })

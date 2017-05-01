@@ -4,8 +4,8 @@ declare const module: any;
 
 @Component({
     selector: 'large-header',
-    templateUrl: './large-header.html',
-    styleUrls: [ './large-header.css' ],
+    templateUrl: './header.html',
+    styleUrls: [ './header.css', './large-header.css' ],
     moduleId: module.id
 })
 export default class LargeHeaderComponent {}
