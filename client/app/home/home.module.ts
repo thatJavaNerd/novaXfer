@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import CoreModule from '../core/core.module';
+
+import HomeRoutingModule from './home-routing.module';
 import HomeComponent from './home.component';
 import SimplePreviewComponent from './simple-preview.component';
 import SummarizePipe from './summarize.pipe';
@@ -12,14 +14,12 @@ import SummarizePipe from './summarize.pipe';
         CommonModule,
         CoreModule,
         ReactiveFormsModule,
+        HomeRoutingModule
     ],
     declarations: [
         HomeComponent,
         SimplePreviewComponent,
         SummarizePipe
-    ],
-    exports: [
-        HomeComponent
     ]
 })
 export default class HomeModule {}
