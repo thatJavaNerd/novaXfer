@@ -5,14 +5,14 @@ div.container
             th.inst-selector-cell(*ngFor='let isnt of institutions; let i = index; trackBy: trackByIndex')
                 div.header-wrapper
                     div(*ngIf='institutions.length > 1')
-                        button.btn.btn-default((click)='removeInstitution(i)') -
+                        button.btn.btn-default.material-icons((click)='removeInstitution(i)') remove
                     div.select-wrapper
                         select.form-control(
                             (change)='onChangeInstitution(i, $event.target.value)',
                             [(ngModel)]='institutions[i]'
                         )
                             option(*ngFor='let inst2 of availableInstitutions', '[value]'='inst2.acronym') {{ inst2.fullName }}
-            th: button.btn.btn-default((click)='addInstitution()') +
+            th: button.btn.btn-default.material-icons((click)='addInstitution()') add
         tr(
             *ngFor='let course of courses; let i = index; trackBy: trackByIndex',
             '[ngClass]'='{ danger: courseValidities[i] === false, "has-error": courseValidities[i] === false }'
