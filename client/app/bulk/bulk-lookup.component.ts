@@ -29,6 +29,12 @@ export default class BulkLookupComponent implements OnInit {
     private parsedCourses: KeyCourse[] = [];
 
     /**
+     * Keeps track of which courses are valid. The validity of a course at
+     * this.institutions[i] can be found at this.courseValidities[i].
+     */
+    private courseValidities: boolean[];
+
+    /**
      * A 2-dimensional array of equivalency data where the each subarray
      * represents equivalencies for a given institution. The equivalency data
      * for the third institution (from the left) and the first course (from the
@@ -46,6 +52,8 @@ export default class BulkLookupComponent implements OnInit {
     public ngOnInit(): void {
         this.courseHelper = this.pattern.get('course');
         this.parsedCourses = _.map(this.courses, (c) => this.courseHelper.parse(c));
+        // Assume all courses are valid by default
+        this.courseValidities = _.fill(Array(this.courses.length), true);
 
         this.equiv.institutions().then((data: Institution[]) => {
             this.availableInstitutions = data;
@@ -67,48 +75,74 @@ export default class BulkLookupComponent implements OnInit {
     }
 
     public onChangeCourse(courseIndex: number, course: string) {
-        if (this.courseHelper.matches(course)) {
-            const parsed = this.courseHelper.parse(course);
+        // Handle courses that don't match the course regex first
+        if (!this.courseHelper.matches(course)) {
+            // Set every index to undefined so that nothing gets rendered in
+            // the template
+            for (let i = 0; i < this.institutions.length; i++) {
+                if (this.matrix[courseIndex] === undefined)
+                    this.matrix[courseIndex] = [];
 
-            const prevCourse = this.parsedCourses[courseIndex];
+                this.matrix[courseIndex][i] = undefined;
+            }
 
-            // No need to do extra work
-            if (prevCourse !== undefined &&
-                parsed.subject === prevCourse.subject &&
-                parsed.number === prevCourse.number)
-                return;
+            // Let the template know this course is invalid
+            this.courseValidities[courseIndex] = false;
 
-            // Request data for this institution, filtering data so that it only
-            // includes the institutions we currently have
-            this.equiv.forCourse(parsed, this.institutions).then((data: CourseEntry) => {
-                // Group the result by each equivalency's acronym so that all
-                // equivalencies for UVA can be accessed at equivMapping['UVA']
-                const equivMapping = _.groupBy(data.equivalencies, (e) => e.institution);
-
-                for (const acronym of this.institutions) {
-                    // Find the index of each institution in the array
-                    const institutionIndex = _.findIndex(this.institutions, (i) => i === acronym);
-
-                    // If institutionIndex < 0, then there's a bug in either the
-                    // server/client side. Fail hard so the user isn't presented
-                    // bad info
-                    if (institutionIndex < 0)
-                        throw new Error('Unidentified institution: ' + acronym);
-
-                    // Make sure we don't run into any 'cant assign property x
-                    // of undefined' errors
-                    if (this.matrix[courseIndex] === undefined)
-                        this.matrix[courseIndex] = [];
-
-                    // Adjust the matrix for the new information
-                    this.matrix[courseIndex][institutionIndex] = equivMapping[acronym];
-                }
-
-                // Update the parsed courses so that we can prevent multiple
-                // requests for the same course
-                this.parsedCourses[courseIndex] = parsed;
-            });
+            // Unset the current parsed course so that if the user happens to
+            // delete one character of the course string and then enter it back
+            // this function will still request it
+            this.parsedCourses[courseIndex] = undefined;
+            return;
         }
+
+        const parsed = this.courseHelper.parse(course);
+
+        const prevCourse = this.parsedCourses[courseIndex];
+
+        // No need to do extra work
+        if (prevCourse !== undefined &&
+            parsed.subject === prevCourse.subject &&
+            parsed.number === prevCourse.number)
+            return;
+
+        // Request data for this institution, filtering data so that it only
+        // includes the institutions we currently have
+        this.equiv.forCourse(parsed, this.institutions).then((data: CourseEntry) => {
+            // Group the result by each equivalency's acronym so that all
+            // equivalencies for UVA can be accessed at equivMapping['UVA']
+            const equivMapping = _.groupBy(data.equivalencies, (e) => e.institution);
+
+            for (const acronym of this.institutions) {
+                // Find the index of each institution in the array
+                const institutionIndex = _.findIndex(this.institutions, (i) => i === acronym);
+
+                // If institutionIndex < 0, then there's a bug in either the
+                // server/client side. Fail hard so the user isn't presented
+                // bad info
+                if (institutionIndex < 0)
+                    throw new Error('Unidentified institution: ' + acronym);
+
+                // Make sure we don't run into any 'cant assign property x
+                // of undefined' errors
+                if (this.matrix[courseIndex] === undefined)
+                    this.matrix[courseIndex] = [];
+
+                const newData = equivMapping[acronym];
+
+                // Adjust the matrix for the new information. The template
+                // expects a value of 'null' to mean that there are no institutions,
+                // while a value of 'undefined' means that the course hasn't been
+                // looked up yet
+                this.matrix[courseIndex][institutionIndex] =
+                    newData === undefined ? null : newData;
+            }
+
+            // Update the parsed courses so that we can prevent multiple
+            // requests for the same course
+            this.parsedCourses[courseIndex] = parsed;
+            this.courseValidities[courseIndex] = true;
+        });
     }
 
     public coursesTrackBy(index: number, item: any) {

@@ -7,7 +7,10 @@ div.container
                     (change)='onChangeInstitution(i, $event.target.value)'
                 )
                     option(*ngFor='let inst2 of availableInstitutions', '[value]'='inst2.acronym') {{ inst2.fullName }}
-        tr(*ngFor='let course of courses; let i = index; trackBy: coursesTrackBy')
+        tr(
+            *ngFor='let course of courses; let i = index; trackBy: coursesTrackBy',
+            '[ngClass]'='{ danger: courseValidities[i] === false, "has-error": courseValidities[i] === false }'
+        )
             td
                 input.form-control(
                     [(ngModel)]='courses[i]',
@@ -15,7 +18,7 @@ div.container
                 )
 
             td.equiv-cell(*ngFor='let courseEquivs of matrix[i]')
-                div(*ngIf='courseEquivs === undefined')
+                div(*ngIf='courseEquivs === null')
                     p.text-muted There's nothing here ¯\_(ツ)_/¯
-                div.equiv-listing(*ngIf='courseEquivs !== undefined')
+                div.equiv-listing(*ngIf='courseEquivs !== null && courseEquivs !== undefined')
                     p(*ngFor='let equiv of courseEquivs') {{ equiv | summarize | capitalize }}
