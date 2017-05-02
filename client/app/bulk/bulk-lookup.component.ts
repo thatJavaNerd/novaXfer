@@ -22,7 +22,7 @@ export default class BulkLookupComponent implements OnInit {
     public availableInstitutions: ReadonlyArray<Institution>;
 
     public readonly institutions: string[] = [''];
-    public readonly courses: string[] = ['MTH 163', 'CSC 202'];
+    public readonly courses: string[] = [''];
 
     private courseHelper: PatternHelper<KeyCourse>;
 
@@ -51,7 +51,8 @@ export default class BulkLookupComponent implements OnInit {
 
     public ngOnInit(): void {
         this.courseHelper = this.pattern.get('course');
-        this.parsedCourses = _.map(this.courses, (c) => this.courseHelper.parse(c));
+        // Initialize to an empty array
+        this.parsedCourses = [];
         // Assume all courses are valid by default
         this.courseValidities = _.fill(Array(this.courses.length), true);
 
@@ -77,6 +78,11 @@ export default class BulkLookupComponent implements OnInit {
     }
 
     public onChangeCourse(courseIndex: number, course: string) {
+        if (courseIndex === this.courses.length - 1) {
+            if (this.courses[courseIndex] !== '')
+                this.courses.push('');
+        }
+
         // Handle courses that don't match the course regex first
         if (!this.courseHelper.matches(course)) {
             // Set every index to undefined so that nothing gets rendered in
