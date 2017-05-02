@@ -79,9 +79,11 @@ export default class BulkLookupComponent implements OnInit {
 
     public onChangeCourse(courseIndex: number, course: string) {
         if (courseIndex === this.courses.length - 1 && this.courses[courseIndex] !== '') {
+            // Ensure that the last row is always an empty textbox
             this.courses.push('');
             return;
         } else if (courseIndex !== this.courses.length - 1 && this.courses[courseIndex] === '') {
+            // The user has deleted the contents of the textbox, remove this row
             this.courses.splice(courseIndex, 1);
             this.matrix.splice(courseIndex, 1);
             return;
