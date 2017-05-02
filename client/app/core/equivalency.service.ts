@@ -27,7 +27,7 @@ export class EquivalencyService {
     }
 
     public async forInstitution(institution: string, courses: KeyCourse[]) {
-        const courseString = _.join(_.map(courses, (c) => `${c.subject}:${c.number}`), ',');
+        const courseString = _.join(_.map(_.without(courses, undefined), (c) => `${c.subject}:${c.number}`), ',');
         const url = `/api/v1/institution/${institution}/${courseString}`;
 
         return this.get<InstitutionFocusedEquivalency>(url);

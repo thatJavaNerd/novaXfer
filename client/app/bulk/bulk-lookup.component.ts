@@ -73,8 +73,12 @@ export default class BulkLookupComponent implements OnInit {
                 if (this.matrix[i] === undefined)
                     this.matrix[i] = [];
 
-                const entry = _.find(data.courses, findFn);
-                this.matrix[i][instIndex] = entry === undefined ? null : entry.equivalencies;
+                if (this.courseValidities[i]) {
+                    const entry = _.find(data.courses, findFn);
+                    this.matrix[i][instIndex] = entry === undefined ? null : entry.equivalencies;
+                } else {
+                    this.matrix[i][instIndex] = undefined;
+                }
             }
         });
     }
