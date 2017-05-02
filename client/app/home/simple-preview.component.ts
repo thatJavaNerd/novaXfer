@@ -5,6 +5,7 @@ import {
 import { Response } from '@angular/http';
 
 import { CourseEntry, Institution } from '../common/api-models';
+import { PLACEHOLDER_COURSE } from '../core/constants';
 import { EquivalencyService } from '../core/equivalency.service';
 import { PatternService } from '../core/pattern.service';
 
@@ -29,12 +30,14 @@ export default class SimplePreviewComponent implements OnInit {
     public entry: CourseEntry;
 
     public institutions: Institution[];
+    public placeholderCourse: string;
 
     public constructor(
         private equivService: EquivalencyService,
         private pattern: PatternService,
         private fb: FormBuilder,
     ) {
+        this.placeholderCourse = PLACEHOLDER_COURSE;
 
         this.form = this.fb.group({
             course: ['', [Validators.required, pattern.get('course').validator()]],

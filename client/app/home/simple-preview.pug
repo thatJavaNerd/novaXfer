@@ -1,9 +1,9 @@
 form([formGroup]='form' novalidate)
     p Will
     input.form-control(
-        formControlName='course'
-        type='text'
-        placeholder='ENG 111'
+        formControlName='course',
+        type='text',
+        [placeholder]='placeholderCourse'
     )
     p transfer to
     select.form-control(formControlName='institution')

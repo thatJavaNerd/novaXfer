@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+
+import { PLACEHOLDER_COURSE } from '../core/constants';
 import { EquivalencyService } from '../core/equivalency.service';
+import { PatternHelper, PatternService } from '../core/pattern.service';
 
 import {
     CourseEntry, CourseEquivalencyDocument, Institution,
@@ -8,7 +11,6 @@ import {
 } from '../common/api-models';
 
 import * as _ from 'lodash';
-import { PatternHelper, PatternService } from '../core/pattern.service';
 
 declare const module: any;
 
@@ -24,6 +26,7 @@ export default class BulkLookupComponent implements OnInit {
     public readonly institutions: string[] = [];
     public readonly courses: string[] = [''];
 
+    public placeholderCourse: string;
     private courseHelper: PatternHelper<KeyCourse>;
 
     private parsedCourses: KeyCourse[] = [];
@@ -55,6 +58,7 @@ export default class BulkLookupComponent implements OnInit {
         this.parsedCourses = [];
         // Assume all courses are valid by default
         this.courseValidities = _.fill(Array(this.courses.length), true);
+        this.placeholderCourse = PLACEHOLDER_COURSE;
 
         this.equiv.institutions().then((data: Institution[]) => {
             this.availableInstitutions = Object.freeze(data);
