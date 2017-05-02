@@ -1,14 +1,14 @@
-
 import { AssertionError, expect } from 'chai';
 import { Application } from 'express';
 import * as _ from 'lodash';
 import * as request from 'supertest';
 import {
-    CourseEntry, CourseEquivalencyDocument, KeyCourse
+    CourseEntry, CourseEquivalencyDocument, InstitutionFocusedEquivalency,
+    KeyCourse
 } from '../src/common/api-models';
 import { Database, Mode } from '../src/Database';
 import { findIndexers } from '../src/indexers/index';
-import EquivalencyDao, { InstitutionFocusedEquivalency } from '../src/queries/EquivalencyDao';
+import EquivalencyDao from '../src/queries/EquivalencyDao';
 import { ErrorData } from '../src/routes/api/v1/util';
 import { createServer, doFullIndex } from '../src/server';
 
