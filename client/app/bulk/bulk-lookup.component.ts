@@ -21,7 +21,7 @@ declare const module: any;
 export default class BulkLookupComponent implements OnInit {
     public availableInstitutions: ReadonlyArray<Institution>;
 
-    public readonly institutions: string[] = [''];
+    public readonly institutions: string[] = [];
     public readonly courses: string[] = [''];
 
     private courseHelper: PatternHelper<KeyCourse>;
@@ -58,6 +58,8 @@ export default class BulkLookupComponent implements OnInit {
 
         this.equiv.institutions().then((data: Institution[]) => {
             this.availableInstitutions = Object.freeze(data);
+            // Add the first institution
+            this.addInstitution();
         });
     }
 
@@ -160,7 +162,14 @@ export default class BulkLookupComponent implements OnInit {
     }
 
     public addInstitution() {
-        this.institutions.push('');
+        const findFn = (i: Institution) => !this.institutions.includes(i.acronym);
+
+        // Push the first unused institution or if all of them are being shown,
+        // the first institution
+        const institution = _.find(this.availableInstitutions, findFn);
+        this.institutions.push(
+            institution !== undefined ?
+                institution.acronym : this.availableInstitutions[0].acronym);
     }
 
     public trackByIndex(index: number, item: any) {
