@@ -2,8 +2,13 @@ import { Inject, Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
 import 'rxjs/add/operator/toPromise';
-import { CourseEntry, Institution } from '../common/api-models';
+import {
+    CourseEntry, Institution, InstitutionFocusedEquivalency,
+    KeyCourse
+} from '../common/api-models';
 import { SuccessResponse } from '../common/responses';
+
+import * as _ from 'lodash';
 
 @Injectable()
 export class EquivalencyService {
@@ -19,6 +24,13 @@ export class EquivalencyService {
 
     public async institutions(): Promise<Institution[]> {
         return this.get<Institution[]>('/api/v1/institution');
+    }
+
+    public async forInstitution(institution: string, courses: KeyCourse[]) {
+        const courseString = _.join(_.map(courses, (c) => `${c.subject}:${c.number}`), ',');
+        const url = `/api/v1/institution/${institution}/${courseString}`;
+
+        return this.get<InstitutionFocusedEquivalency>(url);
     }
 
     private async get<T>(url: string): Promise<T> {

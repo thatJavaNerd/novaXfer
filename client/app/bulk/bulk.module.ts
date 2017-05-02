@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 import CoreModule from '../core/core.module';
 
@@ -12,7 +12,7 @@ import BulkComponent from './bulk.component';
     imports: [
         CommonModule,
         CoreModule,
-        ReactiveFormsModule,
+        FormsModule,
         BulkRoutingModule
     ],
     declarations: [

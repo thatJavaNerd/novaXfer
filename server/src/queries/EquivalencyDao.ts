@@ -2,6 +2,7 @@ import { ObjectID } from 'bson';
 
 import {
     CourseEntry, CourseEquivalencyDocument, EquivType,
+    InstitutionFocusedEquivalency,
     KeyCourse
 } from '../common/api-models';
 import {
@@ -10,11 +11,6 @@ import {
 import Dao from './Dao';
 import { QueryError, QueryErrorType } from './errors';
 import InstitutionDao from './InstitutionDao';
-
-export interface InstitutionFocusedEquivalency {
-    institution: string;
-    courses: CourseEntry[];
-}
 
 export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext> {
     public static readonly COLLECTION = 'courses';

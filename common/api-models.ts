@@ -29,6 +29,11 @@ export interface CourseEntry {
     equivalencies: CourseEquivalencyDocument[];
 }
 
+export interface InstitutionFocusedEquivalency {
+    institution: string;
+    courses: CourseEntry[];
+}
+
 /**
  * Document representation of a CourseEquivalency when inserted into/pulled from
  * the database.

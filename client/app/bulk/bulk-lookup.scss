@@ -1,0 +1,25 @@
+@import '../../assets/palette';
+
+input {
+  text-transform: uppercase;
+}
+
+td.equiv-cell {
+  vertical-align: middle;
+
+  p {
+    margin: 0;
+
+    $padding: 8px 0;
+
+    &:not(:first-child) {
+      padding: $padding;
+      border-top: dashed 1px $divider-color;
+    }
+
+    &:not(:last-child) {
+      padding: $padding;
+    }
+  }
+
+}

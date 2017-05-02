@@ -1,0 +1,21 @@
+div.container
+    table.table.table-striped
+        tr
+            th NVCC
+            th(*ngFor='let isnt of institutions; let i = index')
+                select.form-control(
+                    (change)='onChangeInstitution(i, $event.target.value)'
+                )
+                    option(*ngFor='let inst2 of availableInstitutions', '[value]'='inst2.acronym') {{ inst2.fullName }}
+        tr(*ngFor='let course of courses; let i = index; trackBy: coursesTrackBy')
+            td
+                input.form-control(
+                    [(ngModel)]='courses[i]',
+                    (keyup)='onChangeCourse(i, $event.target.value)'
+                )
+
+            td.equiv-cell(*ngFor='let courseEntry of matrix[i]')
+                div(*ngIf='courseEntry === undefined')
+                    p.text-muted There's nothing here ¯\_(ツ)_/¯
+                div.equiv-listing(*ngIf='courseEntry !== undefined')
+                    p(*ngFor='let equiv of courseEntry.equivalencies') {{ equiv | summarize | capitalize }}
