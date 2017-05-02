@@ -4,6 +4,10 @@ input {
   text-transform: uppercase;
 }
 
+th {
+  vertical-align: middle !important;
+}
+
 td.equiv-cell {
   vertical-align: middle;
 
