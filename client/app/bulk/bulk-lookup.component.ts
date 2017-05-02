@@ -19,7 +19,7 @@ declare const module: any;
     moduleId: module.id
 })
 export default class BulkLookupComponent implements OnInit {
-    public availableInstitutions: Institution[];
+    public availableInstitutions: ReadonlyArray<Institution>;
 
     public readonly institutions: string[] = [''];
     public readonly courses: string[] = ['MTH 163', 'CSC 202'];
@@ -56,7 +56,7 @@ export default class BulkLookupComponent implements OnInit {
         this.courseValidities = _.fill(Array(this.courses.length), true);
 
         this.equiv.institutions().then((data: Institution[]) => {
-            this.availableInstitutions = data;
+            this.availableInstitutions = Object.freeze(data);
         });
     }
 
