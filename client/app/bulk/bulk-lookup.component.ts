@@ -78,9 +78,13 @@ export default class BulkLookupComponent implements OnInit {
     }
 
     public onChangeCourse(courseIndex: number, course: string) {
-        if (courseIndex === this.courses.length - 1) {
-            if (this.courses[courseIndex] !== '')
-                this.courses.push('');
+        if (courseIndex === this.courses.length - 1 && this.courses[courseIndex] !== '') {
+            this.courses.push('');
+            return;
+        } else if (courseIndex !== this.courses.length - 1 && this.courses[courseIndex] === '') {
+            this.courses.splice(courseIndex, 1);
+            this.matrix.splice(courseIndex, 1);
+            return;
         }
 
         // Handle courses that don't match the course regex first
