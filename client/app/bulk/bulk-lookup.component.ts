@@ -87,6 +87,16 @@ export default class BulkLookupComponent implements OnInit {
         if (courseIndex === this.courses.length - 1 && this.courses[courseIndex] !== '') {
             // Ensure that the last row is always an empty textbox
             this.courses.push('');
+            const index = courseIndex + 1;
+
+            if (this.matrix[index] === undefined)
+                this.matrix[index] = [];
+
+            // Fill the matrix row with 'undefined' so that the table gets
+            // rendered properly
+            for (let instIndex = 0; instIndex < this.institutions.length; instIndex++) {
+                this.matrix[index][instIndex] = undefined;
+            }
         } else if (courseIndex !== this.courses.length - 1 && this.courses[courseIndex] === '') {
             // The user has deleted the contents of the textbox, remove this row
             this.courses.splice(courseIndex, 1);
@@ -176,6 +186,14 @@ export default class BulkLookupComponent implements OnInit {
 
         const index = this.institutions.length - 1;
         this.onChangeInstitution(index, this.institutions[index]);
+
+        const courseIndex = this.courses.length - 1;
+        if (this.matrix[courseIndex] === undefined)
+            this.matrix[courseIndex] = [];
+
+        // Set the cell at the bottom right of the matrix to undefined so the
+        // table renders correctly
+        this.matrix[courseIndex][index] = undefined;
     }
 
     public removeInstitution(instIndex: number) {
