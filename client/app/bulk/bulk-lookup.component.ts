@@ -210,9 +210,7 @@ export default class BulkLookupComponent implements OnInit {
             if (this.matrix[j] === undefined)
                 this.matrix[j] = [];
 
-            if (instIndex < this.institutions.length) {
-                this.matrix[j].splice(instIndex, 1);
-            }
+            this.matrix[j].splice(instIndex, 1);
         }
     }
 
