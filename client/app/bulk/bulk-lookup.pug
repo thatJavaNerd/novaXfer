@@ -14,8 +14,8 @@ div.container
                     (keyup)='onChangeCourse(i, $event.target.value)'
                 )
 
-            td.equiv-cell(*ngFor='let courseEntry of matrix[i]')
-                div(*ngIf='courseEntry === undefined')
+            td.equiv-cell(*ngFor='let courseEquivs of matrix[i]')
+                div(*ngIf='courseEquivs === undefined')
                     p.text-muted There's nothing here ¯\_(ツ)_/¯
-                div.equiv-listing(*ngIf='courseEntry !== undefined')
-                    p(*ngFor='let equiv of courseEntry.equivalencies') {{ equiv | summarize | capitalize }}
+                div.equiv-listing(*ngIf='courseEquivs !== undefined')
+                    p(*ngFor='let equiv of courseEquivs') {{ equiv | summarize | capitalize }}

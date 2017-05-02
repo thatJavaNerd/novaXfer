@@ -33,6 +33,13 @@ export class EquivalencyService {
         return this.get<InstitutionFocusedEquivalency>(url);
     }
 
+    public async forCourse(course: KeyCourse, institutions: string[]): Promise<CourseEntry> {
+        const instString = _.join(institutions, ',');
+        const url = `/api/v1/course/${course.subject}/${course.number}/${instString}`;
+
+        return this.get<CourseEntry>(url);
+    }
+
     private async get<T>(url: string): Promise<T> {
         return ((await this.http.get(url).toPromise()).json() as SuccessResponse).data;
     }
