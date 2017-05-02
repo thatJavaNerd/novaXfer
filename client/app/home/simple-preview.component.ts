@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
     FormBuilder, FormGroup, Validators
 } from '@angular/forms';
@@ -6,6 +6,7 @@ import { Response } from '@angular/http';
 
 import { CourseEntry, Institution } from '../common/api-models';
 import { EquivalencyService } from '../core/equivalency.service';
+import { PatternService } from '../core/pattern.service';
 
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -23,8 +24,6 @@ declare const module: any;
     providers: [ EquivalencyService ]
 })
 export default class SimplePreviewComponent implements OnInit {
-    private static readonly COURSE_PATTERN = /^ *[A-Z]{3} +[0-9]{3} *$/i;
-    private static readonly NBSP = String.fromCharCode(160);
 
     public form: FormGroup;
     public entry: CourseEntry;
@@ -32,12 +31,13 @@ export default class SimplePreviewComponent implements OnInit {
     public institutions: Institution[];
 
     public constructor(
-        @Inject(EquivalencyService) private equivService: EquivalencyService,
-        @Inject(FormBuilder) private fb: FormBuilder
+        private equivService: EquivalencyService,
+        private pattern: PatternService,
+        private fb: FormBuilder,
     ) {
 
         this.form = this.fb.group({
-            course: ['', [Validators.required, Validators.pattern(SimplePreviewComponent.COURSE_PATTERN)]],
+            course: ['', [Validators.required, pattern.get('course').validator()]],
             institution: ['', [Validators.required]]
         });
 
@@ -46,13 +46,11 @@ export default class SimplePreviewComponent implements OnInit {
             .debounceTime(300)
             .distinctUntilChanged()
             .switchMap(async (raw: InputForm) => {
-                const courseParts = SimplePreviewComponent.normalizeWhitespace(raw.course).split(' ');
+                const course = pattern.get('course').parse(raw.course);
                 try {
-                    const subj = courseParts[0].trim(),
-                        numb = courseParts[1].trim(),
-                        inst = raw.institution.trim();
+                    const inst = raw.institution.trim();
 
-                    return await this.equivService.entry(subj, numb, inst);
+                    return await this.equivService.entry(course, inst);
                 } catch (ex) {
                     if (ex instanceof Response) {
                         return null;
@@ -70,10 +68,6 @@ export default class SimplePreviewComponent implements OnInit {
         this.equivService.institutions().then((institutions: Institution[]) => {
             this.institutions = institutions;
         });
-    }
-
-    private static normalizeWhitespace(text) {
-        return text.replace(new RegExp(`(?:\r\n|\r|\n|${SimplePreviewComponent.NBSP}| )+`, 'g'), ' ').trim();
     }
 }
 

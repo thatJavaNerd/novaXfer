@@ -14,8 +14,8 @@ import * as _ from 'lodash';
 export class EquivalencyService {
     public constructor(@Inject(Http) private http: Http) {}
 
-    public entry(subj: string, num: string, institution?: string): Promise<CourseEntry> {
-        let url = `/api/v1/course/${subj}/${num}`;
+    public entry(course: KeyCourse, institution?: string): Promise<CourseEntry> {
+        let url = `/api/v1/course/${course.subject}/${course.number}`;
         if (institution !== undefined)
             url += '/' + institution;
 

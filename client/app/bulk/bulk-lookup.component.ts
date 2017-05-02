@@ -7,6 +7,7 @@ import {
 } from '../common/api-models';
 
 import * as _ from 'lodash';
+import { PatternService } from '../core/pattern.service';
 
 declare const module: any;
 
@@ -22,16 +23,7 @@ export default class BulkLookupComponent implements OnInit {
     public readonly institutions: string[] = ['', ''];
     public readonly courses: string[] = ['FOR 202', 'MTH 163'];
 
-    private parsedCourses: KeyCourse[] = [
-        {
-            subject: 'FOR',
-            number: '202'
-        },
-        {
-            subject: 'MTH',
-            number: '163'
-        }
-    ];
+    private parsedCourses: KeyCourse[];
 
     /**
      * A 2-dimensional array of equivalency data where the each subarray
@@ -43,9 +35,14 @@ export default class BulkLookupComponent implements OnInit {
      */
     public readonly matrix: CourseEntry[][] = [];
 
-    public constructor(private equiv: EquivalencyService) {}
+    public constructor(
+        private equiv: EquivalencyService,
+        private pattern: PatternService
+    ) {}
 
     public ngOnInit(): void {
+        this.parsedCourses = _.map(this.courses, (c) => this.pattern.get('course').parse(c));
+
         this.equiv.institutions().then((data: Institution[]) => {
             this.availableInstitutions = data;
         });
