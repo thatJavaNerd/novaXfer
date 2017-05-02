@@ -29,4 +29,7 @@ div.container
                 div(*ngIf='courseEquivs === null')
                     p.text-muted There's nothing here ¯\_(ツ)_/¯
                 div.equiv-listing(*ngIf='courseEquivs !== null && courseEquivs !== undefined')
-                    p(*ngFor='let equiv of courseEquivs') {{ equiv | summarize | capitalize }}
+                    p(
+                        *ngFor='let equiv of courseEquivs',
+                        title='{{ equiv | summarize:"short" }}'
+                    ) {{ equiv | summarize | capitalize }}
