@@ -13,7 +13,7 @@ div.container
             *ngFor='let course of courses; let i = index; trackBy: trackByIndex',
             '[ngClass]'='{ danger: courseValidities[i] === false, "has-error": courseValidities[i] === false }'
         )
-            td
+            td.course-input
                 input.form-control(
                     [(ngModel)]='courses[i]',
                     (keyup)='onChangeCourse(i, $event.target.value)',

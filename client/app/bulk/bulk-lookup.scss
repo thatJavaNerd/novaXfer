@@ -6,6 +6,15 @@ input {
 
 th {
   vertical-align: middle !important;
+  text-align: center;
+}
+
+.course-input {
+  width: 8em;
+  
+  input {
+    text-align: center;
+  }
 }
 
 td.equiv-cell {
