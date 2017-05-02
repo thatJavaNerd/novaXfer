@@ -178,6 +178,21 @@ export default class BulkLookupComponent implements OnInit {
         this.onChangeInstitution(index, this.institutions[index]);
     }
 
+    public removeInstitution(instIndex: number) {
+        // Remove from the institutions array
+        this.institutions.splice(instIndex, 1);
+
+        // Remove all data for this course from each top-level array in the matrix
+        for (let j = 0; j < this.courses.length; j++) {
+            if (this.matrix[j] === undefined)
+                this.matrix[j] = [];
+
+            if (instIndex < this.institutions.length) {
+                this.matrix[j].splice(instIndex, 1);
+            }
+        }
+    }
+
     public trackByIndex(index: number, item: any) {
         return index;
     }

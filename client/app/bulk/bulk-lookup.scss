@@ -9,6 +9,15 @@ th {
   text-align: center;
 }
 
+div.header-wrapper {
+  display: flex;
+  flex-direction: row;
+
+  div.select-wrapper {
+    flex-grow: 1;
+  }
+}
+
 .course-input {
   width: 8em;
   
