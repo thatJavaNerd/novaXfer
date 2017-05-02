@@ -173,6 +173,9 @@ export default class BulkLookupComponent implements OnInit {
         this.institutions.push(
             institution !== undefined ?
                 institution.acronym : this.availableInstitutions[0].acronym);
+
+        const index = this.institutions.length - 1;
+        this.onChangeInstitution(index, this.institutions[index]);
     }
 
     public trackByIndex(index: number, item: any) {
