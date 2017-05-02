@@ -147,7 +147,11 @@ export default class BulkLookupComponent implements OnInit {
         });
     }
 
-    public coursesTrackBy(index: number, item: any) {
+    public addInstitution() {
+        this.institutions.push('');
+    }
+
+    public trackByIndex(index: number, item: any) {
         return index;
     }
 }
