@@ -11,6 +11,7 @@ import {
 } from '../common/api-models';
 
 import * as _ from 'lodash';
+import { Response } from '@angular/http';
 
 declare const module: any;
 
@@ -176,6 +177,17 @@ export default class BulkLookupComponent implements OnInit {
             // but we don't want them thinking that the course is invalid when
             // that isn't the case, so update it manually here
             this.courseValidities[courseIndex] = true;
+        }).catch((error: any) => {
+            if (error instanceof Response) {
+                // Silently swallow the error if it's a 404
+                if (error.status !== 404) {
+                    throw error;
+                }
+
+                return;
+            }
+
+            throw error;
         });
     }
 
