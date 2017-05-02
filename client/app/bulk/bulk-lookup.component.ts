@@ -21,7 +21,7 @@ declare const module: any;
 export default class BulkLookupComponent implements OnInit {
     public availableInstitutions: Institution[];
 
-    public readonly institutions: string[] = ['UVA', 'VT'];
+    public readonly institutions: string[] = [''];
     public readonly courses: string[] = ['MTH 163', 'CSC 202'];
 
     private courseHelper: PatternHelper<KeyCourse>;
@@ -69,7 +69,9 @@ export default class BulkLookupComponent implements OnInit {
 
                 if (this.matrix[i] === undefined)
                     this.matrix[i] = [];
-                this.matrix[i][instIndex] = _.find(data.courses, findFn).equivalencies;
+
+                const entry = _.find(data.courses, findFn);
+                this.matrix[i][instIndex] = entry === undefined ? null : entry.equivalencies;
             }
         });
     }
