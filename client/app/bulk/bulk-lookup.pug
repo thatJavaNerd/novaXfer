@@ -31,5 +31,5 @@ div.container
                 div.equiv-listing(*ngIf='courseEquivs !== null && courseEquivs !== undefined')
                     p(
                         *ngFor='let equiv of courseEquivs',
-                        title='{{ equiv | summarize:"short" }}'
+                        title='{{ equiv | summarize:"succinct" }}'
                     ) {{ equiv | summarize | capitalize }}

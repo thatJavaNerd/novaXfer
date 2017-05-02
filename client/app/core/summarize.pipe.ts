@@ -32,8 +32,8 @@ abstract class EquivalencyFormatter {
     protected abstract formatTypeGeneric(equiv: CourseEquivalencyDocument): string;
 }
 
-class LongFormatter extends EquivalencyFormatter {
-    public readonly type = 'long';
+class InformalFormatter extends EquivalencyFormatter {
+    public readonly type = 'informal';
 
     protected formatTypeSpecial(equiv: CourseEquivalencyDocument): string {
         return `We're not sure, check with ${equiv.institution} about this one.`;
@@ -48,15 +48,15 @@ class LongFormatter extends EquivalencyFormatter {
         const prefix = type === EquivType.DIRECT ? 'directly as' : 'as';
 
         // Format all output courses
-        const output = _.map(equiv.output, (c) => LongFormatter.formatCourse(c, type, false));
+        const output = _.map(equiv.output, (c) => InformalFormatter.formatCourse(c, type, false));
 
         // For now just add the prefix and the output
-        let result = prefix + ' ' + LongFormatter.humanConcat(output);
+        let result = prefix + ' ' + InformalFormatter.humanConcat(output);
 
         // If there's more than 1 output course, add it to the result
-        const leftoverInput = _.map(equiv.input.slice(1), (c) => LongFormatter.formatCourse(c, type, true));
+        const leftoverInput = _.map(equiv.input.slice(1), (c) => InformalFormatter.formatCourse(c, type, true));
         if (leftoverInput.length > 0) {
-            result += ' when you also take ' + LongFormatter.humanConcat(leftoverInput);
+            result += ' when you also take ' + InformalFormatter.humanConcat(leftoverInput);
         }
 
         return result;
@@ -98,8 +98,8 @@ class LongFormatter extends EquivalencyFormatter {
     }
 }
 
-class ShortFormatter extends EquivalencyFormatter {
-    public readonly type = 'short';
+class SuccinctFormatter extends EquivalencyFormatter {
+    public readonly type = 'succinct';
 
     protected formatTypeSpecial(equiv: CourseEquivalencyDocument): string {
         return `Check with ${equiv.institution}`;
@@ -110,16 +110,16 @@ class ShortFormatter extends EquivalencyFormatter {
     }
 
     protected formatTypeGeneric(equiv: CourseEquivalencyDocument): string {
-        return ShortFormatter.formatCourseArray(equiv.input) + ' → ' +
-                ShortFormatter.formatCourseArray(equiv.output);
+        return SuccinctFormatter.formatCourseArray(equiv.input) + ' → ' +
+                SuccinctFormatter.formatCourseArray(equiv.output);
     }
 
     private static formatCourseArray(ca: Course[]) {
-        return _.join(_.map(ca, ShortFormatter.formatCourse), ', ');
+        return _.join(_.map(ca, SuccinctFormatter.formatCourse), ', ');
     }
 
     private static formatCourse(c: Course) {
-        return `${c.subject} ${c.number} ${ShortFormatter.formatCredits(c.credits)}`;
+        return `${c.subject} ${c.number} ${SuccinctFormatter.formatCredits(c.credits)}`;
     }
 
     private static formatCredits(creds: number | CreditRange) {
@@ -140,11 +140,11 @@ class ShortFormatter extends EquivalencyFormatter {
 })
 export default class SummarizePipe implements PipeTransform {
     private static formatters: EquivalencyFormatter[] = [
-        new LongFormatter(),
-        new ShortFormatter()
+        new InformalFormatter(),
+        new SuccinctFormatter()
     ];
 
-    public transform(equiv: CourseEquivalencyDocument, type = 'long'): string {
+    public transform(equiv: CourseEquivalencyDocument, type = 'informal'): string {
         for (const formatter of SummarizePipe.formatters) {
             if (formatter.type === type)
                 return formatter.format(equiv);
