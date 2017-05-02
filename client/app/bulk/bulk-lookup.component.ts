@@ -77,7 +77,7 @@ export default class BulkLookupComponent implements OnInit {
                 if (this.matrix[i] === undefined)
                     this.matrix[i] = [];
 
-                if (this.courseValidities[i]) {
+                if (this.parsedCourses[i] !== undefined) {
                     const entry = _.find(data.courses, findFn);
                     this.matrix[i][instIndex] = entry === undefined ? null : entry.equivalencies;
                 } else {
@@ -118,9 +118,6 @@ export default class BulkLookupComponent implements OnInit {
 
                 this.matrix[courseIndex][i] = undefined;
             }
-
-            // Let the template know this course is invalid
-            this.courseValidities[courseIndex] = false;
 
             // Unset the current parsed course so that if the user happens to
             // delete one character of the course string and then enter it back
@@ -174,6 +171,10 @@ export default class BulkLookupComponent implements OnInit {
             // Update the parsed courses so that we can prevent multiple
             // requests for the same course
             this.parsedCourses[courseIndex] = parsed;
+
+            // We normally validate the course after the user leaves the textbox,
+            // but we don't want them thinking that the course is invalid when
+            // that isn't the case, so update it manually here
             this.courseValidities[courseIndex] = true;
         });
     }
@@ -213,6 +214,10 @@ export default class BulkLookupComponent implements OnInit {
                 this.matrix[j].splice(instIndex, 1);
             }
         }
+    }
+
+    public updateValidity(i: number) {
+        this.courseValidities[i] = this.courseHelper.matches(this.courses[i]);
     }
 
     public trackByIndex(index: number, item: any) {

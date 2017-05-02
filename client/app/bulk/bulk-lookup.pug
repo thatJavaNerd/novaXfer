@@ -21,7 +21,8 @@ div.container
                 input.form-control(
                     [(ngModel)]='courses[i]',
                     (keyup)='onChangeCourse(i, $event.target.value)',
-                    [placeholder]='placeholderCourse'
+                    [placeholder]='placeholderCourse',
+                    (change)='updateValidity(i)'
                 )
 
             td.equiv-cell(*ngFor='let courseEquivs of matrix[i]')
