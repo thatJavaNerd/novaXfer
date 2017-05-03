@@ -1,0 +1,44 @@
+@import 'material-icons';
+@import 'palette';
+
+$font-stack: Roboto, sans-serif;
+
+header {
+  margin-bottom: 25px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-stack;
+}
+
+code {
+  font-family: 'Roboto Mono', monospace;
+}
+
+body, p, input {
+  font-family: $font-stack;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.site-content {
+  flex-grow: 1;
+}
+
+hr {
+  border-color: $divider-color;
+}
+
+footer {
+  hr {
+    margin-bottom: 0;
+  }
+
+  p {
+    margin: 15px;
+  }
+}

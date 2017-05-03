@@ -1,0 +1,33 @@
+doctype html
+html
+    head
+        //- These three <meta> elements must come first for bootstrap
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible' content='IE-edge')
+        meta(name='viewport' content='width=device-width, initial-scale=1')
+
+        block meta
+
+        title novaXfer
+
+        block stylesheets
+            link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono:300,400,500,700,400italic')
+            link(rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons')
+
+        block scripts
+            script(src='/jspm_packages/system.js')
+            script(src='/jspm.config.js')
+            script.
+                System.import('bootstrap/dist/css/bootstrap.css!');
+                System.import('assets/base.css!');
+                // Import/bootstrap our Angular app
+                System.import('app');
+
+    body
+        div.site-content
+            block content
+
+        footer
+            hr
+            div.container
+                p Copyright &copy; Matthew Dean 2017

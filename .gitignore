@@ -1,7 +1,15 @@
+.nyc_output/
+coverage/
 node_modules/
 npm-debug.log
 todo.txt
 .cache/
 build/
+dist/
 .idea
-app/server/public/
+/server/src/views
+jspm_packages/
+yarn-error.log
+/client/app/common
+/server/src/common
+/server/src/about.json

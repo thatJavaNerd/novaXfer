@@ -1,0 +1,20 @@
+form([formGroup]='form' novalidate)
+    p Will
+    input.form-control(
+        formControlName='course',
+        type='text',
+        [placeholder]='placeholderCourse'
+    )
+    p transfer to
+    select.form-control(formControlName='institution')
+        option(*ngFor='let inst of institutions') {{ inst.acronym }}
+    p ?
+
+div.results.container(*ngIf='entry !== undefined && entry !== null')
+    p.text-muted.text-center(*ngIf='entry.equivalencies.length === 0') There's nothing here ¯\_(ツ)_/¯
+    div(*ngIf='entry.equivalencies.length > 0')
+        ul
+            li(*ngFor='let equiv of entry.equivalencies') {{ equiv | summarize | capitalize }}
+
+div.results.container(*ngIf='entry === null')
+    p.text-muted.text-center We don't know anything about that course ¯\(°_o)/¯

@@ -1,0 +1,47 @@
+@import '../../assets/palette';
+
+input {
+  text-transform: uppercase;
+}
+
+th {
+  vertical-align: middle !important;
+  text-align: center;
+}
+
+div.header-wrapper {
+  display: flex;
+  flex-direction: row;
+
+  div.select-wrapper {
+    flex-grow: 1;
+  }
+}
+
+.course-input {
+  width: 8em;
+  
+  input {
+    text-align: center;
+  }
+}
+
+td.equiv-cell {
+  vertical-align: middle;
+
+  p {
+    margin: 0;
+
+    $padding: 8px 0;
+
+    &:not(:first-child) {
+      padding: $padding;
+      border-top: dashed 1px $divider-color;
+    }
+
+    &:not(:last-child) {
+      padding: $padding;
+    }
+  }
+
+}

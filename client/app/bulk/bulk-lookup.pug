@@ -1,0 +1,35 @@
+div.container
+    table.table.table-striped
+        tr
+            th NVCC
+            th.inst-selector-cell(*ngFor='let isnt of institutions; let i = index; trackBy: trackByIndex')
+                div.header-wrapper
+                    div(*ngIf='institutions.length > 1')
+                        button.btn.btn-default.material-icons((click)='removeInstitution(i)') remove
+                    div.select-wrapper
+                        select.form-control(
+                            (change)='onChangeInstitution(i, $event.target.value)',
+                            [(ngModel)]='institutions[i]'
+                        )
+                            option(*ngFor='let inst2 of availableInstitutions', '[value]'='inst2.acronym') {{ inst2.fullName }}
+            th: button.btn.btn-default.material-icons((click)='addInstitution()') add
+        tr(
+            *ngFor='let course of courses; let i = index; trackBy: trackByIndex',
+            '[ngClass]'='{ danger: courseValidities[i] === false, "has-error": courseValidities[i] === false }'
+        )
+            td.course-input
+                input.form-control(
+                    [(ngModel)]='courses[i]',
+                    (keyup)='onChangeCourse(i, $event.target.value)',
+                    [placeholder]='placeholderCourse',
+                    (change)='updateValidity(i)'
+                )
+
+            td.equiv-cell(*ngFor='let courseEquivs of matrix[i]')
+                div(*ngIf='courseEquivs === null')
+                    p.text-muted There's nothing here ¯\_(ツ)_/¯
+                div.equiv-listing(*ngIf='courseEquivs !== null && courseEquivs !== undefined')
+                    p(
+                        *ngFor='let equiv of courseEquivs',
+                        title='{{ equiv | summarize:"succinct" }}'
+                    ) {{ equiv | summarize | capitalize }}
