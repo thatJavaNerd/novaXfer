@@ -1,4 +1,5 @@
 import * as gulp from 'gulp';
+import * as plumber from 'gulp-plumber';
 import * as pug from 'gulp-pug';
 import * as sassBuild from 'gulp-sass';
 import * as tsc from 'gulp-typescript';
@@ -48,6 +49,7 @@ export function cp(src: string | string[], dest: string) {
 /** Renders pug files */
 export function renderPug(opts: IOTaskOptions) {
     gulp.src(opts.src)
+        .pipe(plumber())
         .pipe(pug())
         .pipe(gulp.dest(opts.dest));
 }
