@@ -1,25 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { DocsService } from './docs.service';
 
 @Component({
     template: `
         <small-header></small-header>
         <main>
-            <p>{{ docName }}</p>
+            <div class="container" [innerHtml]="content"></div>
         </main>
     `
 })
 export class DocsDisplayComponent implements OnInit {
-    private docName: string;
+    private content: string;
 
     constructor(
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private docs: DocsService
     ) {}
 
     public ngOnInit() {
         this.route.params
-            .subscribe((params: Params) => {
-                this.docName = params.id.toLowerCase();
+            .switchMap((params: Params) => this.docs.fetch(params.id.toLowerCase()))
+            .subscribe((result: string) => {
+                this.content = result;
             });
     }
 }
