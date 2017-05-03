@@ -1,6 +1,9 @@
 import * as del from 'del';
 
-import { cp, distDir, renderPug, sass, typescript, watch } from './util';
+import {
+    cp, distDir, renderMarkdown, renderPug, sass, typescript,
+    watch
+} from './util';
 
 const publicDir = (rel: string = '') => distDir('public/' + rel);
 const PROJECT = 'client/tsconfig.json';
@@ -10,7 +13,8 @@ export default function(gulp) {
         'compile:client',
         'jspm',
         'sass',
-        'views:templates'
+        'views:templates',
+        'views:docs'
     ]);
 
     gulp.task('compile:client', () =>
@@ -56,6 +60,13 @@ export default function(gulp) {
         renderPug({
             src: 'client/app/**/*.pug',
             dest: publicDir('app')
+        })
+    );
+
+    gulp.task('views:docs', () =>
+        renderMarkdown({
+            src: 'docs/**/*.md',
+            dest: publicDir('assets/docs')
         })
     );
 

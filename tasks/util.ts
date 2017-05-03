@@ -1,4 +1,5 @@
 import * as gulp from 'gulp';
+import * as markdown from 'gulp-markdown';
 import * as pug from 'gulp-pug';
 import * as sassBuild from 'gulp-sass';
 import * as tsc from 'gulp-typescript';
@@ -49,6 +50,13 @@ export function cp(src: string | string[], dest: string) {
 export function renderPug(opts: IOTaskOptions) {
     gulp.src(opts.src)
         .pipe(pug())
+        .pipe(gulp.dest(opts.dest));
+}
+
+/** Renders markdown */
+export function renderMarkdown(opts: IOTaskOptions) {
+    gulp.src(opts.src)
+        .pipe(markdown())
         .pipe(gulp.dest(opts.dest));
 }
 
