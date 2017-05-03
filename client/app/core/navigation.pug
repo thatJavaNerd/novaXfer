@@ -1,8 +1,5 @@
-mixin link(href, name)
-    li: div.md-overlay: a(routerLink=href)= name
-
 ul
-    +link('/home', 'Home')
-    +link('/bulk', 'Bulk')
-    +link('/docs/api', 'API')
-    li: div.md-overlay: a(href='https://github.com/thatJavaNerd/novaXfer') Open Source
+    li(*ngFor='let routerLink of routerLinks')
+        div.md-overlay: a([routerLink]='routerLink.href') {{ routerLink.title }}
+    li(*ngFor='let hrefLink of hrefLinks')
+        div.md-overlay: a([href]='hrefLink.href') {{ hrefLink.title }}

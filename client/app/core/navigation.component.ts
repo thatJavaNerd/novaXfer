@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 declare const module: any;
 
@@ -8,4 +8,12 @@ declare const module: any;
     styleUrls: [ './navigation.css' ],
     moduleId: module.id
 })
-export default class NavigationComponent {}
+export class NavigationComponent {
+    @Input() public routerLinks: NavigationLink[] = [];
+    @Input() public hrefLinks: NavigationLink[] = [];
+}
+
+export interface NavigationLink {
+    href: string;
+    title: string;
+}

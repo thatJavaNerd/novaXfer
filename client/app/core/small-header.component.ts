@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NAVIGATION_MAIN } from './constants';
 
 declare const module: any;
 
@@ -13,4 +14,7 @@ declare const module: any;
     styleUrls: [ './header.css' ],
     moduleId: module.id
 })
-export default class SmallHeaderComponent {}
+export default class SmallHeaderComponent {
+    public hrefLinks = NAVIGATION_MAIN.hrefLinks;
+    public routerLinks = NAVIGATION_MAIN.routerLinks;
+}
