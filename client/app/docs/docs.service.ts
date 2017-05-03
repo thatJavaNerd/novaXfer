@@ -8,7 +8,7 @@ export class DocsService {
     public constructor(private http: Http) {}
 
     public fetch(id: string): Promise<string> {
-        return this.http.get('/assets/docs/' + id + '.html')
+        return this.http.get('/html/docs/' + id)
             .toPromise()
             .then((res: Response) => res.text());
     }
