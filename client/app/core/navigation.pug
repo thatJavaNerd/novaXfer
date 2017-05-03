@@ -1,4 +1,8 @@
+mixin link(href, name)
+    li: div.md-overlay: a(routerLink=href)= name
+
 ul
-    li: div.md-overlay: a(routerLink='/home') Home
-    li: div.md-overlay: a(routerLink='/bulk') Bulk
+    +link('/home', 'Home')
+    +link('/bulk', 'Bulk')
+    +link('/docs/api', 'API')
     li: div.md-overlay: a(href='https://github.com/thatJavaNerd/novaXfer') Open Source
