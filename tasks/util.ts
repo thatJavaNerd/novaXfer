@@ -1,5 +1,6 @@
 import * as gulp from 'gulp';
 import * as plumber from 'gulp-plumber';
+import * as markdown from 'gulp-markdown';
 import * as pug from 'gulp-pug';
 import * as sassBuild from 'gulp-sass';
 import * as tsc from 'gulp-typescript';
@@ -51,6 +52,13 @@ export function renderPug(opts: IOTaskOptions) {
     gulp.src(opts.src)
         .pipe(plumber())
         .pipe(pug())
+        .pipe(gulp.dest(opts.dest));
+}
+
+/** Renders markdown */
+export function renderMarkdown(opts: IOTaskOptions) {
+    gulp.src(opts.src)
+        .pipe(markdown())
         .pipe(gulp.dest(opts.dest));
 }
 

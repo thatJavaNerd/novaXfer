@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import BulkComponent from './bulk.component';
+import { DocsDisplayComponent } from './docs-display.component';
 
 const routes: Routes = [
-    { path: 'bulk', component: BulkComponent }
+    { path: 'docs/:id', component: DocsDisplayComponent },
+    { path: 'docs', redirectTo: '/docs/api', pathMatch: 'full' }
 ];
 
 @NgModule({
@@ -15,4 +15,4 @@ const routes: Routes = [
         RouterModule
     ]
 })
-export default class BulkRoutingModule {}
+export default class DocsRoutingModule {}
