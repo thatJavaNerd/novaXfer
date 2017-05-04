@@ -1,6 +1,6 @@
 import { Db, MongoClient } from 'mongodb';
 
-const BASE_URL = 'mongodb://localhost:27017/novaxfer';
+const MONGO_URI = (process.env.MONGO_URI || 'mongodb://localhost:27017') + '/novaxfer';
 
 /**
  * Singleton that manages a connection to a MongoDB database
@@ -30,7 +30,7 @@ export class Database {
         }
 
         this.modeInt = mode;
-        this.urlInt = BASE_URL + '_' + Mode[mode].toLowerCase();
+        this.urlInt = MONGO_URI + '_' + Mode[mode].toLowerCase();
         this.dbInt = await MongoClient.connect(this.urlInt);
     }
 
