@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "gulp testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts && karma start",
-    "start": "node --use-strict dist/server/index.js"
+    "start": "node --use-strict dist",
+    "heroku-postbuild": "jspm install && gulp build"
   },
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
   "license": "MIT",
