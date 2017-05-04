@@ -2,7 +2,7 @@
   "name": "novaXfer",
   "version": "0.3.0",
   "description": "Quick and easy NVCC course equivalencies",
-  "main": "server.js",
+  "main": "dist",
   "scripts": {
     "test": "gulp testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts && karma start",
     "start": "node --use-strict dist",
@@ -11,6 +11,9 @@
   "author": "Matthew Dean <deanmatthew16@gmail.com>",
   "license": "MIT",
   "repository": "thatJavaNerd/novaXfer",
+  "engines": {
+    "node": "7.10.0"
+  },
   "dependencies": {
     "@angular/common": "^4.1.0",
     "@angular/compiler": "^4.1.0",
