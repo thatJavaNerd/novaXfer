@@ -7,7 +7,7 @@ import {
 
 const publicDir = (rel: string = '') => distDir('public/' + rel);
 const PROJECT = 'client/config/tsconfig.json';
-const webpackConfig = require('../client/config/webpack.config.js');
+const webpackConfig = require('../client/webpack.config');
 
 export default function(gulp) {
     gulp.task('build:client', [
