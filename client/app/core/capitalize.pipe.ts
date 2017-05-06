@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
     name: 'capitalize'
 })
-export default class CapitalizePipe implements PipeTransform {
+export class CapitalizePipe implements PipeTransform {
     public transform(data: any) {
         if (data === null || data === undefined || data === '') return '';
         if (typeof data !== 'string') throw new Error('Need a string, got ' + data);

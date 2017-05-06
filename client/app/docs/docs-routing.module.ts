@@ -15,4 +15,4 @@ const routes: Routes = [
         RouterModule
     ]
 })
-export default class DocsRoutingModule {}
+export class DocsRoutingModule {}

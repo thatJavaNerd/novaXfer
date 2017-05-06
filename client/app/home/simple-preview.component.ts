@@ -24,7 +24,7 @@ declare const module: any;
     styleUrls: [ './simple-preview.css' ],
     providers: [ EquivalencyService ]
 })
-export default class SimplePreviewComponent implements OnInit {
+export class SimplePreviewComponent implements OnInit {
 
     public form: FormGroup;
     public entry: CourseEntry;

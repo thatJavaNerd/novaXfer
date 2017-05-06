@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import CapitalizePipe from '../app/core/capitalize.pipe';
+import { CapitalizePipe } from '../app/core/capitalize.pipe';
 
 describe('CapitalizePipe', () => {
     let pipe: CapitalizePipe;

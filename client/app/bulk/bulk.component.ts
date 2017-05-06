@@ -8,4 +8,4 @@ import { Component } from '@angular/core';
         </main>
     `
 })
-export default class HomeComponent {}
+export class BulkComponent {}

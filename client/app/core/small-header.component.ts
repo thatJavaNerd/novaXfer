@@ -14,7 +14,7 @@ declare const module: any;
     styleUrls: [ './header.css' ],
     moduleId: module.id
 })
-export default class SmallHeaderComponent {
+export class SmallHeaderComponent {
     public hrefLinks = NAVIGATION_MAIN.hrefLinks;
     public routerLinks = NAVIGATION_MAIN.routerLinks;
 }

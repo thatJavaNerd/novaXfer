@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import BulkComponent from './bulk.component';
+import { BulkComponent } from './bulk.component';
 
 const routes: Routes = [
     { path: 'bulk', component: BulkComponent }
@@ -15,4 +15,4 @@ const routes: Routes = [
         RouterModule
     ]
 })
-export default class BulkRoutingModule {}
+export class BulkRoutingModule {}

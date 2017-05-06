@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Response } from '@angular/http';
 
 import { PLACEHOLDER_COURSE } from '../core/constants';
 import { EquivalencyService } from '../core/equivalency.service';
@@ -11,7 +12,6 @@ import {
 } from '../common/api-models';
 
 import * as _ from 'lodash';
-import { Response } from '@angular/http';
 
 declare const module: any;
 
@@ -21,7 +21,7 @@ declare const module: any;
     styleUrls: [ './bulk-lookup.css' ],
     moduleId: module.id
 })
-export default class BulkLookupComponent implements OnInit {
+export class BulkLookupComponent implements OnInit {
     public availableInstitutions: ReadonlyArray<Institution>;
 
     public readonly institutions: string[] = [];

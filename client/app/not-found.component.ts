@@ -6,4 +6,4 @@ declare const module: any;
     templateUrl: './not-found.html',
     moduleId: module.id
 })
-export default class NotFoundComponent {}
+export class NotFoundComponent {}

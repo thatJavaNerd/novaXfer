@@ -9,7 +9,7 @@ declare const module: any;
     styleUrls: [ './header.css', './large-header.css' ],
     moduleId: module.id
 })
-export default class LargeHeaderComponent {
+export class LargeHeaderComponent {
     public hrefLinks = NAVIGATION_MAIN.hrefLinks;
     public routerLinks = NAVIGATION_MAIN.routerLinks;
 }
