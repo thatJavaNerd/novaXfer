@@ -6,16 +6,15 @@ import {
 } from './util';
 
 const publicDir = (rel: string = '') => distDir('public/' + rel);
-const PROJECT = 'client/config/tsconfig.json';
 const webpackConfig = require('../client/webpack.config');
 
 export default function(gulp) {
-    gulp.task('build:client', [
-        'compile:client',
-        'sass:global'
+    gulp.task('client:build', [
+        'client:bundle',
+        'client:styles'
     ]);
 
-    gulp.task('compile:client', (callback) => {
+    gulp.task('client:bundle', (callback) => {
         const conf = Object.create(webpackConfig);
         webpack(conf, (err) => {
             if (err) throw err;
@@ -23,28 +22,20 @@ export default function(gulp) {
         });
     });
 
-    gulp.task('compile:client:test', () =>
-        typescript({
-            project: PROJECT,
-            src: 'client/test/**/*.ts',
-            dest: publicDir('test')
-        })
-    );
-
-    gulp.task('sass:global', () =>
+    gulp.task('client:styles', () =>
         sass({
             src: 'client/assets/**/*.scss',
             dest: publicDir('assets')
         })
     );
 
-    gulp.task('clean:client', () =>
+    gulp.task('client:clean', () =>
         del([
             'client/app/common'
         ])
     );
 
-    gulp.task('watch:client', () => {
+    gulp.task('client:watch', () => {
         watch({
             'client/app/**/*.scss':     'sass:component',
             'client/app/**/*.pug':      'views:templates',
