@@ -1,6 +1,5 @@
 import * as del from 'del';
 import * as webpack from 'webpack';
-import { conf as webpackConfig } from '../client/config/webpack.config';
 
 import {
     distDir, sass, typescript, watch
@@ -8,6 +7,7 @@ import {
 
 const publicDir = (rel: string = '') => distDir('public/' + rel);
 const PROJECT = 'client/config/tsconfig.json';
+const webpackConfig = require('../client/config/webpack.config.js');
 
 export default function(gulp) {
     gulp.task('build:client', [

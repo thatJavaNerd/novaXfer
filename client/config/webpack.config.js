@@ -1,6 +1,6 @@
-import * as path from 'path';
+const path = require('path');
 
-export const conf = {
+module.exports = {
     context: path.join(__dirname, '..'),
     entry: {
         app: './app/novaXfer.ts',
