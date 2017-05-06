@@ -1,28 +1,27 @@
 import * as del from 'del';
+import * as webpack from 'webpack';
+import { conf as webpackConfig } from '../client/config/webpack.config';
 
 import {
-    cp, distDir, renderMarkdown, renderPug, sass, typescript,
-    watch
+    distDir, sass, typescript, watch
 } from './util';
 
 const publicDir = (rel: string = '') => distDir('public/' + rel);
-const PROJECT = 'client/tsconfig.json';
+const PROJECT = 'client/config/tsconfig.json';
 
 export default function(gulp) {
     gulp.task('build:client', [
         'compile:client',
-        'jspm',
-        'sass',
-        'views:templates'
+        'sass:global'
     ]);
 
-    gulp.task('compile:client', () =>
-        typescript({
-            project: PROJECT,
-            src: 'client/app/**/*.ts',
-            dest: publicDir('app')
-        })
-    );
+    gulp.task('compile:client', (callback) => {
+        const conf = Object.create(webpackConfig);
+        webpack(conf, (err) => {
+            if (err) throw err;
+            callback();
+        });
+    });
 
     gulp.task('compile:client:test', () =>
         typescript({
@@ -32,33 +31,10 @@ export default function(gulp) {
         })
     );
 
-    gulp.task('jspm', ['jspm:config', 'jspm:packages']);
-    gulp.task('jspm:config', () =>
-        cp('client/jspm.config.js', publicDir())
-    );
-    gulp.task('jspm:packages', () =>
-        cp('client/jspm_packages/**/*', publicDir('jspm_packages'))
-    );
-
-    gulp.task('sass', ['sass:component', 'sass:global']);
-    gulp.task('sass:component', () =>
-        sass({
-            src: 'client/app/**/*.scss',
-            dest: publicDir('app')
-        })
-    );
-
     gulp.task('sass:global', () =>
         sass({
             src: 'client/assets/**/*.scss',
             dest: publicDir('assets')
-        })
-    );
-
-    gulp.task('views:templates', () =>
-        renderPug({
-            src: 'client/app/**/*.pug',
-            dest: publicDir('app')
         })
     );
 

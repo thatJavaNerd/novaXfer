@@ -1,13 +1,10 @@
 import { Component } from '@angular/core';
 import { NAVIGATION_MAIN } from './constants';
 
-declare const module: any;
-
 @Component({
     selector: 'large-header',
-    templateUrl: './header.html',
-    styleUrls: [ './header.css', './large-header.css' ],
-    moduleId: module.id
+    templateUrl: 'header.pug',
+    styleUrls: [ 'header.scss', 'large-header.scss' ],
 })
 export class LargeHeaderComponent {
     public hrefLinks = NAVIGATION_MAIN.hrefLinks;

@@ -15,18 +15,18 @@
     "node": "7.10.0"
   },
   "dependencies": {
-    "@angular/common": "^4.1.0",
-    "@angular/compiler": "^4.1.0",
-    "@angular/core": "^4.1.0",
-    "@angular/forms": "^4.1.0",
-    "@angular/http": "^4.1.0",
-    "@angular/platform-browser": "^4.1.0",
-    "@angular/platform-browser-dynamic": "^4.1.0",
-    "@angular/router": "^4.1.0",
-    "@types/lodash": "^4.14.62",
+    "@angular/common": "^4.1.1",
+    "@angular/compiler": "^4.1.1",
+    "@angular/core": "^4.1.1",
+    "@angular/forms": "^4.1.1",
+    "@angular/http": "^4.1.1",
+    "@angular/platform-browser": "^4.1.1",
+    "@angular/platform-browser-dynamic": "^4.1.1",
+    "@angular/router": "^4.1.1",
     "body-parser": "^1.17.1",
     "cheerio": "^0.22.0",
     "colors": "^1.1.2",
+    "core-js": "^2.4.1",
     "express": "^4.15.2",
     "express-list-endpoints": "^3.0.0",
     "fs-extra-promise": "^1.0.1",
@@ -52,14 +52,18 @@
     "@types/express": "^4.0.35",
     "@types/fs-extra-promise": "^0.0.31",
     "@types/helmet": "^0.0.34",
+    "@types/lodash": "^4.14.64",
     "@types/mocha": "^2.2.40",
     "@types/mongodb": "^2.1.43",
     "@types/morgan": "^1.7.32",
     "@types/node": "^7.0.12",
     "@types/request": "^0.0.42",
     "@types/supertest": "^2.0.0",
+    "angular2-template-loader": "^0.6.2",
+    "awesome-typescript-loader": "^3.1.3",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
+    "css-loader": "^0.28.1",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-about": "^1.1.0",
@@ -70,6 +74,8 @@
     "gulp-sass": "^3.1.0",
     "gulp-tslint": "^8.0.0",
     "gulp-typescript": "^3.1.6",
+    "html-webpack-plugin": "^2.28.0",
+    "html-webpack-pug-plugin": "^0.0.3",
     "istanbul": "1.1.0-alpha.1",
     "karma": "^1.6.0",
     "karma-firefox-launcher": "^1.0.1",
@@ -79,125 +85,16 @@
     "merge2": "^1.0.3",
     "mocha": "^3.2.0",
     "nyc": "^10.2.0",
+    "pug": "^2.0.0-rc.1",
+    "pug-html-loader": "^1.1.4",
+    "raw-loader": "^0.5.1",
     "run-sequence": "^1.2.2",
+    "sass-loader": "^6.0.3",
     "source-map-support": "^0.4.14",
     "supertest": "^3.0.0",
     "ts-node": "^3.0.2",
     "tslint": "^5.1.0",
-    "typescript": "^2.2.2"
-  },
-  "jspm": {
-    "name": "novaXfer",
-    "configFiles": {
-      "jspm": "client/jspm.config.js"
-    },
-    "directories": {
-      "baseURL": "client"
-    },
-    "dependencies": {
-      "@angular/forms": "npm:@angular/forms@^4.1.0",
-      "@angular/material": "npm:@angular/material@^2.0.0-beta.3",
-      "@angular/platform-browser-dynamic": "npm:@angular/platform-browser-dynamic@^4.1.0",
-      "@angular/router": "npm:@angular/router@^4.1.0",
-      "bootstrap": "github:twbs/bootstrap@^3.3.7",
-      "css": "github:systemjs/plugin-css@^0.1.33",
-      "lodash": "npm:lodash@^4.17.4",
-      "reflect-metadata": "npm:reflect-metadata@^0.1.10"
-    },
-    "devDependencies": {
-      "@types/chai": "npm:@types/chai@^3.5.2",
-      "chai": "npm:chai@^3.5.0",
-      "graceful-fs": "npm:graceful-fs@^4.1.9",
-      "http": "npm:jspm-nodelibs-http@^0.2.0",
-      "https": "npm:jspm-nodelibs-https@^0.2.0",
-      "url": "npm:jspm-nodelibs-url@^0.2.0"
-    },
-    "peerDependencies": {
-      "@angular/common": "npm:@angular/common@4.1.0",
-      "@angular/compiler": "npm:@angular/compiler@4.1.0",
-      "@angular/core": "npm:@angular/core@4.1.0",
-      "@angular/http": "npm:@angular/http@^4.1.0",
-      "@angular/platform-browser": "npm:@angular/platform-browser@4.1.0",
-      "assert": "npm:jspm-nodelibs-assert@^0.2.0",
-      "buffer": "npm:jspm-nodelibs-buffer@^0.2.0",
-      "child_process": "npm:jspm-nodelibs-child_process@^0.2.0",
-      "constants": "npm:jspm-nodelibs-constants@^0.2.0",
-      "crypto": "npm:jspm-nodelibs-crypto@^0.2.0",
-      "events": "npm:jspm-nodelibs-events@^0.2.0",
-      "fs": "npm:jspm-nodelibs-fs@^0.2.0",
-      "module": "npm:jspm-nodelibs-module@^0.2.0",
-      "net": "npm:jspm-nodelibs-net@^0.2.0",
-      "os": "npm:jspm-nodelibs-os@^0.2.0",
-      "path": "npm:jspm-nodelibs-path@^0.2.0",
-      "process": "npm:jspm-nodelibs-process@^0.2.0",
-      "rxjs": "npm:rxjs@^5.0.1",
-      "stream": "npm:jspm-nodelibs-stream@^0.2.0",
-      "string_decoder": "npm:jspm-nodelibs-string_decoder@^0.2.0",
-      "timers": "npm:jspm-nodelibs-timers@^0.2.0",
-      "typescript": "npm:typescript@^2.0.0",
-      "util": "npm:jspm-nodelibs-util@^0.2.0",
-      "vm": "npm:jspm-nodelibs-vm@^0.2.0",
-      "zone.js": "npm:zone.js@^0.8.4"
-    },
-    "overrides": {
-      "github:twbs/bootstrap@3.3.7": {
-        "main": "js/bootstrap.js",
-        "dependencies": {
-          "jquery": "jspm:jquery@*"
-        },
-        "files": [
-          "dist",
-          "fonts",
-          "js",
-          "css"
-        ],
-        "meta": {
-          "js/bootstrap.js": {
-            "deps": [
-              "jquery"
-            ],
-            "exports": "$",
-            "format": "global"
-          }
-        }
-      },
-      "npm:inherits@2.0.3": {
-        "ignore": [
-          "test.js"
-        ]
-      },
-      "npm:jquery@3.2.1": {
-        "format": "amd"
-      },
-      "npm:lodash@4.17.4": {
-        "map": {
-          "buffer": "@empty",
-          "process": "@empty"
-        }
-      },
-      "npm:reflect-metadata@0.1.10": {
-        "jspmNodeConversion": false,
-        "map": {
-          "crypto": {
-            "node": "@node/crypto",
-            "default": "@empty"
-          }
-        }
-      },
-      "npm:typescript@2.3.2": {
-        "browser": {},
-        "map": {
-          "buffer": "@empty",
-          "child_process": "@empty",
-          "fs": "@empty",
-          "path": "@empty",
-          "process": "@empty",
-          "readline": "@empty"
-        },
-        "dependencies": {
-          "source-map-support": "*"
-        }
-      }
-    }
+    "typescript": "^2.2.2",
+    "webpack": "^2.5.0"
   }
 }

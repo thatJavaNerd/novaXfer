@@ -1,12 +1,9 @@
 import { Component, Input } from '@angular/core';
 
-declare const module: any;
-
 @Component({
     selector: 'navigation',
-    templateUrl: './navigation.html',
-    styleUrls: [ './navigation.css' ],
-    moduleId: module.id
+    templateUrl: 'navigation.pug',
+    styleUrls: [ 'navigation.scss' ],
 })
 export class NavigationComponent {
     @Input() public routerLinks: NavigationLink[] = [];
