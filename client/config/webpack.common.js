@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     context: path.join(__dirname, '..'),
@@ -37,5 +38,10 @@ module.exports = {
                 loaders:  ['raw-loader', 'sass-loader']
             }
         ]
-    }
+    },
+    plugins: [
+        new webpack.optimize.CommonsChunkPlugin({
+            names: ['app', 'vendor', 'polyfills'],
+        })
+    ]
 };

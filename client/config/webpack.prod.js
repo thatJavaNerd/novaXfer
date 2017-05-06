@@ -1,2 +1,8 @@
-// Simply re-export the common configuration for now
-module.exports = require('./webpack.common');
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+
+module.exports = merge(require('./webpack.common'), {
+    plugins: [
+        new webpack.optimize.UglifyJsPlugin()
+    ]
+});
