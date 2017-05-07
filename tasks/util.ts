@@ -1,9 +1,11 @@
+import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as markdown from 'gulp-markdown';
 import * as plumber from 'gulp-plumber';
 import * as pug from 'gulp-pug';
 import * as sassBuild from 'gulp-sass';
 import * as tsc from 'gulp-typescript';
+import * as path from 'path';
 
 /** Generic options for a Gulp task that works with files. */
 export interface IOTaskOptions {
@@ -69,6 +71,10 @@ export function watch(conf: WatchConfig) {
         const tasks = Array.isArray(conf[src]) ? conf[src] : [conf[src]];
         gulp.watch(src, tasks);
     }
+}
+
+export function version(): string {
+    return JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8')).version;
 }
 
 /** Gets a path relative to the distribution directory */
