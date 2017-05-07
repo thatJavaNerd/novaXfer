@@ -1,24 +1,41 @@
 # Building
 
-novaXfer is built with the [Grunt](http://gruntjs.com/) task runner.
+novaXfer is built with Gulp 3. The default task will build the app, watch sources, and start the server.
 
-## Tasks
+```sh
+$ gulp
+```
 
-***(default)*** — Runs Mocha and Karma
+Common tasks:
 
-**test** — Same as default
+ - `build` builds the entire app
+ - `client:build` only builds the client
+ - `server:build` only builds the server
+ - `watch` executes the relevant tasks when a file changes
+ - `start` starts the server with nodemon
 
-**testCoverage** — Cleans the `build` and `.cache` directories and runs Mocha and Karma with code coverage. Coverage info can be found in `build/reports/coverage/`
+Do a production build by setting the `NODE_ENV` environmental variable
 
-**uploadCoverage** — Merges the coverage results from Mocha and Karma and sends it to Coveralls
+```sh
+$ NODE_ENV=production gulp
+```
 
-**build** — Builds the project
+Compiled files will be built to `dist/`. If you don't need to rebuild the app, just run
 
- 1. Cleans the build and final distribution folder
- 2. Runs browserify to bundle JavaScript app
- 3. Passes resulting file through Babel, then minifies
- 4. Minifies CSS
- 5. Renders Pug templates
- 6. Copies files from temporary build location to `app/server/public`
+```sh
+$ node dist
+```
 
-**watch** — Watches JS, CSS, and Pug files for changes and rebuilds the necessary components. Useful for developing
+Specify a port to serve on with the `PORT` environmental variable
+
+```sh
+$ PORT=8081 node dist
+```
+
+## Testing
+
+For simplicity, you can run both server-side and client-side tests with the test script defined in [package.json](https://github.com/thatJavaNerd/novaXfer/blob/master/package.json):
+
+```sh
+$ yarn test
+```
