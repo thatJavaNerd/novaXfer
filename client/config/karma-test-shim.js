@@ -9,13 +9,14 @@ require('zone.js/dist/proxy');
 require('zone.js/dist/sync-test');
 require('zone.js/dist/async-test');
 require('zone.js/dist/fake-async-test');
+require('zone.js/dist/mocha-patch');
 
 const appContext = require.context('../app', true, /\.spec\.ts/);
 
 appContext.keys().forEach(appContext);
 
-// const testing = require('@angular/core/testing');
-// const browser = require('@angular/platform-browser-dynamic/testing');
-//
-// testing.TestBed.initTestEnvironment(browser.BrowserDynamicTestingModule,
-//     browser.platformBrowserDynamicTesting());
+const testing = require('@angular/core/testing');
+const browser = require('@angular/platform-browser-dynamic/testing');
+
+testing.TestBed.initTestEnvironment(browser.BrowserDynamicTestingModule,
+    browser.platformBrowserDynamicTesting());
