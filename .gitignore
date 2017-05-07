@@ -7,7 +7,7 @@ todo.txt
 build/
 dist/
 .idea
-/server/src/views
+/server/src/views/**/*.html
 jspm_packages/
 yarn-error.log
 /client/app/common

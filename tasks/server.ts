@@ -29,7 +29,7 @@ export default function(gulp) {
 
     gulp.task('server:views:templates', () =>
         renderPug({
-            src: 'views/**/*.pug',
+            src: 'server/src/views/**/*.pug',
             dest: distDir('views')
         })
     );
@@ -45,7 +45,7 @@ export default function(gulp) {
 
     gulp.task('server:testPrep:views', () =>
         renderPug({
-            src: 'views/**/*.pug',
+            src: 'server/src/views/**/*.pug',
             dest: 'server/src/views'
         })
     );
@@ -61,7 +61,7 @@ export default function(gulp) {
         del([
             'server/src/common',
             'server/src/indexers/.cache',
-            'server/src/views'
+            'server/src/views/**/*.html'
         ])
     );
 
