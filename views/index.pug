@@ -1,7 +1,28 @@
-extends layout.pug
+doctype html
+html
+    head
+        //- These three <meta> elements must come first for bootstrap
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible' content='IE-edge')
+        meta(name='viewport' content='width=device-width, initial-scale=1')
+        base(href='/')
 
-block meta
-    base(href='/')
+        title novaXfer
 
-block content
-    novaxfer
+        link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono:300,400,500,700,400italic')
+        link(rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons')
+        link(rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+        link(rel='stylesheet' href='/assets/base.css')
+
+        - var modules = ['polyfills', 'vendor', 'app'];
+        each mod in modules
+            script(src='/' + mod + '.js')
+
+    body
+        div.site-content
+            novaxfer
+
+        footer
+            hr
+            div.container
+                p Copyright &copy; Matthew Dean 2017

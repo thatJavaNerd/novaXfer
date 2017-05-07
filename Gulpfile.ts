@@ -16,7 +16,7 @@ gulp.task('default', ['build'], (cb) => {
 });
 
 gulp.task('build', ['clean'], (cb) => {
-    runSequence('build:common', 'build:server', 'build:client', cb);
+    runSequence('common:copy', 'server:build', 'client:build', cb);
 });
 
 gulp.task('start', () => {
@@ -27,7 +27,7 @@ gulp.task('start', () => {
 });
 
 gulp.task('testPrep', ['build'], (cb) => {
-    runSequence('testPrep:server', 'compile:client:test', cb);
+    runSequence('server:testPrep', cb);
 });
 
 gulp.task('coveralls', () => {
@@ -44,12 +44,12 @@ gulp.task('lint', () => {
 });
 
 gulp.task('watch', [
-    'watch:client',
-    'watch:common',
-    'watch:server'
+    'client:watch',
+    'common:watch',
+    'server:watch'
 ]);
 
-gulp.task('clean', ['clean:client', 'clean:server'], () =>
+gulp.task('clean', ['client:clean', 'server:clean'], () =>
     del([
         distDir()
     ])

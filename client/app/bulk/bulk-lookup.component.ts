@@ -13,13 +13,10 @@ import {
 
 import * as _ from 'lodash';
 
-declare const module: any;
-
 @Component({
     selector: 'bulk-lookup',
-    templateUrl: './bulk-lookup.html',
-    styleUrls: [ './bulk-lookup.css' ],
-    moduleId: module.id
+    templateUrl: 'bulk-lookup.pug',
+    styleUrls: [ 'bulk-lookup.scss' ]
 })
 export class BulkLookupComponent implements OnInit {
     public availableInstitutions: ReadonlyArray<Institution>;

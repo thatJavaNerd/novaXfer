@@ -15,13 +15,10 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';
 
-declare const module: any;
-
 @Component({
     selector: 'simple-preview',
-    moduleId: module.id,
-    templateUrl: './simple-preview.html',
-    styleUrls: [ './simple-preview.css' ],
+    templateUrl: 'simple-preview.pug',
+    styleUrls: [ 'simple-preview.scss' ],
     providers: [ EquivalencyService ]
 })
 export class SimplePreviewComponent implements OnInit {

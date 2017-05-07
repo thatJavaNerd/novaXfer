@@ -4,7 +4,7 @@ import * as merge from 'merge2';
 import { cp, watch } from './util';
 
 export default function() {
-    gulp.task('build:common', () => {
+    gulp.task('common:copy', () => {
         const SOURCE = 'common/**/*.ts';
         return merge(
             cp(SOURCE, 'server/src/common'),
@@ -12,7 +12,7 @@ export default function() {
         );
     });
 
-    gulp.task('watch:common', () => {
+    gulp.task('common:watch', () => {
         watch({
             'common/**/*.ts': 'build:common'
         });
