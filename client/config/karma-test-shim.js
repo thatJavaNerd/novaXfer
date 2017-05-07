@@ -10,7 +10,7 @@ require('zone.js/dist/sync-test');
 require('zone.js/dist/async-test');
 require('zone.js/dist/fake-async-test');
 
-const appContext = require.context('../test', true, /\.spec\.ts/);
+const appContext = require.context('../app', true, /\.spec\.ts/);
 
 appContext.keys().forEach(appContext);
 

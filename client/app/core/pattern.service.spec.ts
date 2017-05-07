@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { PatternHelper, PatternService } from '../app/core/pattern.service';
+import { PatternHelper, PatternService } from './pattern.service';
 
 describe('PatternService', () => {
     let pattern: PatternService;
