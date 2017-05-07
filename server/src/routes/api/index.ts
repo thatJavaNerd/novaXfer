@@ -21,7 +21,7 @@ export default function(): Router {
     }
 
     router.get('/', (req: Request, res: Response) => {
-        res.redirect('https://github.com/thatJavaNerd/novaXfer/blob/master/docs/api.md');
+        res.redirect('/docs/api');
     });
 
     return router;
