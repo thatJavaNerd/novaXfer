@@ -6,19 +6,14 @@
 
 $button-padding: 8px 10px;
 
-ul {
-  list-style-type: none;
+nav {
   text-transform: uppercase;
   padding: 0;
   margin: 0;
-}
-
-ul > li {
-  display: inline-block;
-  zoom: 1;
-
-  /* Fix for IE7 and below */
-  *display: inline;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .md-overlay {
