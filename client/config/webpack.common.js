@@ -42,6 +42,9 @@ module.exports = {
     plugins: [
         new webpack.optimize.CommonsChunkPlugin({
             names: ['app', 'vendor', 'polyfills'],
+        }),
+        new webpack.DefinePlugin({
+            PRODUCTION: process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'production'
         })
     ]
 };
