@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NAVIGATION_MAIN } from './constants';
 
 /**
@@ -7,11 +7,12 @@ import { NAVIGATION_MAIN } from './constants';
  * header
  */
 @Component({
-    selector: 'small-header',
-    templateUrl: 'header.pug',
-    styleUrls: [ 'header.scss' ],
+    selector: 'site-header',
+    templateUrl: 'site-header.pug',
+    styleUrls: [ 'site-header.scss' ],
 })
-export class SmallHeaderComponent {
+export class SiteHeaderComponent {
     public hrefLinks = NAVIGATION_MAIN.hrefLinks;
     public routerLinks = NAVIGATION_MAIN.routerLinks;
+    @Input() public large = false;
 }
