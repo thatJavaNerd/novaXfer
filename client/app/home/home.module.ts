@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
-import CoreModule from '../core/core.module';
+import { CoreModule } from '../core/core.module';
 
-import HomeRoutingModule from './home-routing.module';
-import HomeComponent from './home.component';
-import SimplePreviewComponent from './simple-preview.component';
+import { HomeRoutingModule } from './home-routing.module';
+import { HomeComponent } from './home.component';
+import { SimplePreviewComponent } from './simple-preview.component';
 
 @NgModule({
     imports: [
@@ -20,4 +20,4 @@ import SimplePreviewComponent from './simple-preview.component';
         SimplePreviewComponent,
     ]
 })
-export default class HomeModule {}
+export class HomeModule {}

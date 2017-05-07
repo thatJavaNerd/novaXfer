@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import NotFoundComponent from './not-found.component';
+import { NotFoundComponent } from './not-found.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -16,4 +16,4 @@ const routes: Routes = [
         RouterModule
     ]
 })
-export default class AppRoutingModule {}
+export class AppRoutingModule {}

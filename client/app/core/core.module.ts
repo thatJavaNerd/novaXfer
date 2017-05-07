@@ -4,13 +4,12 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
-import CapitalizePipe from './capitalize.pipe';
+import { CapitalizePipe } from './capitalize.pipe';
 import { EquivalencyService } from './equivalency.service';
-import LargeHeaderComponent from './large-header.component';
 import { NavigationComponent } from './navigation.component';
 import { PatternService } from './pattern.service';
-import SmallHeaderComponent from './small-header.component';
-import SummarizePipe from './summarize.pipe';
+import { SiteHeaderComponent } from './site-header.component';
+import { SummarizePipe } from './summarize.pipe';
 
 @NgModule({
     imports: [
@@ -22,15 +21,13 @@ import SummarizePipe from './summarize.pipe';
     ],
     declarations: [
         CapitalizePipe,
-        LargeHeaderComponent,
         NavigationComponent,
-        SmallHeaderComponent,
+        SiteHeaderComponent,
         SummarizePipe
     ],
     exports: [
         CapitalizePipe,
-        LargeHeaderComponent,
-        SmallHeaderComponent,
+        SiteHeaderComponent,
         SummarizePipe
     ],
     providers: [
@@ -38,5 +35,5 @@ import SummarizePipe from './summarize.pipe';
         PatternService
     ]
 })
-export default class CoreModule {}
+export class CoreModule {}
 

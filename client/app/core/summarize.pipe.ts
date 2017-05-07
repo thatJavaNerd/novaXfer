@@ -138,7 +138,7 @@ class SuccinctFormatter extends EquivalencyFormatter {
 @Pipe({
     name: 'summarize'
 })
-export default class SummarizePipe implements PipeTransform {
+export class SummarizePipe implements PipeTransform {
     private static formatters: EquivalencyFormatter[] = [
         new InformalFormatter(),
         new SuccinctFormatter()

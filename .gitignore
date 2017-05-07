@@ -1,15 +1,26 @@
-.nyc_output/
-coverage/
-node_modules/
-npm-debug.log
-todo.txt
-.cache/
-build/
-dist/
+# IDE files
 .idea
-/server/src/views
-jspm_packages/
-yarn-error.log
+
+# Code coverage
+/.nyc_output/
+/coverage/
+
+# Temporary directories
+/dist/
+/node_modules/
+
+# Client
 /client/app/common
-/server/src/common
+
+# Server
 /server/src/about.json
+/server/src/common
+/server/src/indexers/.cache
+/server/src/views/**/*.html
+
+# Package manager error logs
+yarn-error.log
+npm-debug.log
+
+# Other
+todo.txt

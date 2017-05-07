@@ -4,4 +4,4 @@ import { Component } from '@angular/core';
     selector: 'novaxfer',
     template: '<router-outlet></router-outlet>'
 })
-export default class AppComponent {}
+export class AppComponent {}

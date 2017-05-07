@@ -24,11 +24,11 @@ describe('routes', () => {
     });
 
     describe('GET /api', () => {
-        it('should redirect to the docs on GitHub', () =>
+        it('should redirect to the docs', () =>
             request(app)
                 .get('/api')
                 .expect(302)
-                .expect('Location', /github\.com/)
+                .expect('Location', /\/docs\/api/)
         );
     });
 

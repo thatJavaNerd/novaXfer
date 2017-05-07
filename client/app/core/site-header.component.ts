@@ -1,7 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NAVIGATION_MAIN } from './constants';
-
-declare const module: any;
 
 /**
  * The only difference between this component and LargeHeaderComponent is that
@@ -9,12 +7,12 @@ declare const module: any;
  * header
  */
 @Component({
-    selector: 'small-header',
-    templateUrl: './header.html',
-    styleUrls: [ './header.css' ],
-    moduleId: module.id
+    selector: 'site-header',
+    templateUrl: 'site-header.pug',
+    styleUrls: [ 'site-header.scss' ],
 })
-export default class SmallHeaderComponent {
+export class SiteHeaderComponent {
     public hrefLinks = NAVIGATION_MAIN.hrefLinks;
     public routerLinks = NAVIGATION_MAIN.routerLinks;
+    @Input() public large = false;
 }

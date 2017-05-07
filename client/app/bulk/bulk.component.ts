@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 
 @Component({
     template: `
-        <small-header></small-header>
+        <site-header></site-header>
         <main>
             <bulk-lookup></bulk-lookup>
         </main>
     `
 })
-export default class HomeComponent {}
+export class BulkComponent {}

@@ -8,10 +8,10 @@ novaXfer is a tool to help students at the Northern Virginia Community College p
 
 For a list of supported colleges, see [here](https://github.com/thatJavaNerd/novaXfer/tree/master/server/src/indexers).
 
-novaXfer is built with Node.js, MongoDB, Express, TypeScript, Angular, Gulp, JSPM/SystemJS, and several other buzzwords.
+novaXfer is built with Node.js, MongoDB, Express, TypeScript, Angular, Gulp, Webpack, and several other buzzwords.
 
 Getting started is simple. Run MongoDB on the default port and execute
 
 ```shell
-$ yarn install && jspm install && gulp
+$ yarn install && gulp
 ```

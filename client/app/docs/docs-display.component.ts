@@ -4,7 +4,7 @@ import { DocsService } from './docs.service';
 
 @Component({
     template: `
-        <small-header></small-header>
+        <site-header></site-header>
         <main>
             <div class="container" [innerHtml]="content"></div>
         </main>
