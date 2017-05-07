@@ -73,8 +73,8 @@ export default function(gulp) {
 
     gulp.task('server:watch', () => {
         watch({
-            'server/src/**/*.ts': 'compile:server',
-            'views/**/*.pug': 'views:server'
+            'server/src/**/*.ts': 'server:compile',
+            'server/src/views/**/*.pug': 'server:views:templates'
         });
     });
 }

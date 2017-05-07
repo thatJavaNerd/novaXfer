@@ -14,7 +14,7 @@ export default function() {
 
     gulp.task('common:watch', () => {
         watch({
-            'common/**/*.ts': 'build:common'
+            'common/**/*.ts': 'common:copy'
         });
     });
 }
