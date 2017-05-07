@@ -20,7 +20,7 @@ describe('NavigationComponent', () => {
 
         fixture = TestBed.createComponent(NavigationComponent);
         comp = fixture.componentInstance;
-        el = fixture.debugElement.query(By.css('ul'));
+        el = fixture.debugElement.query(By.css('nav'));
     });
 
     it('should have no children when no links are given', () => {
