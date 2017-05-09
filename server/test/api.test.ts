@@ -4,13 +4,14 @@ import * as _ from 'lodash';
 import * as request from 'supertest';
 import {
     CourseEntry, CourseEquivalencyDocument, InstitutionFocusedEquivalency,
-    KeyCourse
+    KeyCourse, TransferPlan
 } from '../src/common/api-models';
 import { Database, Mode } from '../src/Database';
 import { findIndexers } from '../src/indexers/index';
 import EquivalencyDao from '../src/queries/EquivalencyDao';
 import { ErrorData } from '../src/routes/api/v1/util';
 import { createServer, doFullIndex } from '../src/server';
+import { PlanDao } from '../src/queries/PlanDao';
 
 describe('API v1', () => {
     let app: Application;
@@ -367,6 +368,33 @@ describe('API v1', () => {
         });
     });
 
+    describe('GET /api/v1/plan/:id', () => {
+        let plan: TransferPlan;
+        let dao: PlanDao;
+
+        before('insert plan', async () => {
+            dao = new PlanDao();
+            plan = await dao.update(mockPlan);
+        });
+
+        it('should fetch the plan data when the ID is specified', async () =>
+            apiRequest('/plan/' + plan._id, 200, (p: TransferPlan) => {
+                expect(plan).to.deep.equal(p);
+            })
+        );
+
+        it('should 404 when given a non-existent ID', () =>
+            apiRequest('/plan/foo', 404, (error: ErrorData) => {
+                expect(error.input).to.deep.equal({ id: 'foo' });
+            })
+        );
+
+        // There isn't a dao.delete() so drop the entire collection
+        after('delete plan', async () =>
+            Database.get().dropIfExists(PlanDao.COLLECTION)
+        );
+    });
+
     after('disconnect from database', () => Database.get().disconnect());
 });
 
@@ -383,4 +411,36 @@ const verifyResponse = (response: any, expectedStatus: number) => {
         expect(response.data, 'data existed on unsuccessful response').to.not.exist;
         expect(response.error, 'erorr did not exist on unsuccessful response').to.exist;
     }
+};
+
+const mockPlan: TransferPlan = {
+    institutions: ['UVA', 'VCU'],
+    semesters: [
+        {
+            name: 'Fall 2016',
+            courses: [
+                {
+                    subject: 'CSC',
+                    number: '202'
+                },
+                {
+                    subject: 'ACC',
+                    number: '211'
+                }
+            ]
+        },
+        {
+            name: 'Spring 2016',
+            courses: [
+                {
+                    subject: 'ENG',
+                    number: '111'
+                },
+                {
+                    subject: 'CSC',
+                    number: '205'
+                }
+            ]
+        }
+    ]
 };

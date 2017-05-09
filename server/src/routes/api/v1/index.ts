@@ -4,13 +4,15 @@ import { ErrorResponse } from '../../../common/responses';
 import RouteModule from '../../RouteModule';
 import course from './course';
 import institution from './institution';
+import plan from './plan';
 
 export default function(): RouteModule {
     const router = Router();
 
     const modules: Array<() => RouteModule> = [
         institution,
-        course
+        course,
+        plan
     ];
 
     for (const m of modules) {
