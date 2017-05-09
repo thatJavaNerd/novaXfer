@@ -9,7 +9,7 @@ interface MetadataDoc {
 const DATASET_VERSION = 0;
 export const META_COLL = '__meta__';
 
-export default class MetaDao extends Dao<MetadataDoc, MetadataDoc> {
+export default class MetaDao extends Dao<ObjectID, MetadataDoc, MetadataDoc> {
     public static readonly META_DOC_ID = 'metadata';
 
     constructor(public datasetVersion: number = DATASET_VERSION) {
@@ -37,6 +37,10 @@ export default class MetaDao extends Dao<MetadataDoc, MetadataDoc> {
         if (meta === null) return true;
         if (meta.datasetVersion === undefined) return true;
         return meta.datasetVersion !== this.datasetVersion;
+    }
+
+    protected resolveId(id: string): ObjectID {
+        return new ObjectID(id);
     }
 
     protected _put(data: MetadataDoc[]): Promise<ObjectID[]> {

@@ -151,6 +151,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
+"@types/shortid@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@types/shortid/-/shortid-0.0.29.tgz#8093ee0416a6e2bf2aa6338109114b3fbffa0e9b"
+
 "@types/superagent@*":
   version "2.0.36"
   resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-2.0.36.tgz#e8eec10771d9dbc0f7ec47b8f9993476e4a501c1"
@@ -5599,6 +5603,10 @@ shallow-clone@^0.1.2:
     kind-of "^2.0.1"
     lazy-cache "^0.2.3"
     mixin-object "^2.0.1"
+
+shortid@^2.2.8:
+  version "2.2.8"
+  resolved "https://registry.yarnpkg.com/shortid/-/shortid-2.2.8.tgz#033b117d6a2e975804f6f0969dbe7d3d0b355131"
 
 sigmund@~1.0.0:
   version "1.0.1"

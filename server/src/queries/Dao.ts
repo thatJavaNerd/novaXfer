@@ -1,8 +1,13 @@
-import { ObjectID } from 'bson';
 import { Collection, Db } from 'mongodb';
 import { Database } from '../Database';
+import { QueryError, QueryErrorType } from './errors';
 
-abstract class Dao<G, P> {
+/**
+ * @template {I} ID type (ObjectID, string, etc.)
+ * @template {G} Data type pulled out of the database (get())
+ * @template {P} Data type put into the database (put())
+ */
+abstract class Dao<I, G, P> {
     /** Reference to a mongodb.Db */
     protected db: Db;
 
@@ -10,17 +15,21 @@ abstract class Dao<G, P> {
         this.db = Database.get().mongo();
     }
 
-    public get(id: ObjectID | string): Promise<G> {
-        return this._get(Dao.resolveId(id));
+    public get(id: I | string): Promise<G> {
+        let actualId = id;
+        if (typeof actualId === 'string') {
+            actualId = this.resolveId(id as string);
+        }
+        return this._get(actualId);
     }
 
-    public async put(data: P[] | P): Promise<ObjectID[]> {
+    public async put(data: P[] | P): Promise<I[]> {
         // Ensure data is an array
         const x = Array.isArray(data) ? data : [data];
         const ids = await this._put(x);
 
         // ids is a "fake" array (no length property), convert it to a real array
-        const realArray: ObjectID[] = [];
+        const realArray: I[] = [];
         for (const i in ids) {
             if (ids.hasOwnProperty(i)) realArray[i] = ids[i];
         }
@@ -33,23 +42,23 @@ abstract class Dao<G, P> {
      * @param id
      * @private
      */
-    protected _get(id: ObjectID): Promise<G> {
-        return this.coll().findOne({_id: id});
+    protected async _get(id: I): Promise<G> {
+        const doc = await this.coll().findOne({_id: id});
+        if (doc === null)
+            throw new QueryError(QueryErrorType.MISSING, `Could not find document with ID "${id}"`);
+        return doc;
     }
 
-    protected abstract _put(data: P[]): Promise<ObjectID[]>;
+    protected abstract _put(data: P[]): Promise<I[]>;
+
+    protected abstract resolveId(id: string): I;
 
     /**
      * Returns the collection that this DAO is working on. Equivalent to
-     * `this.db.collection(this.collection)`.
+     * `this.db.collection(this.collectionName)`.
      */
     protected coll(): Collection {
         return this.db.collection(this.collectionName);
-    }
-
-    /** Ensures that the input is an ObjectID */
-    private static resolveId(id: ObjectID|string): ObjectID {
-        return id instanceof ObjectID ? id : new ObjectID(id);
     }
 }
 

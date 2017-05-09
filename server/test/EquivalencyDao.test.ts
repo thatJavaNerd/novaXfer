@@ -1,20 +1,14 @@
-
 import { AssertionError, expect } from 'chai';
+
+import { CourseEquivalencyDocument, EquivType, KeyCourse } from '../src/common/api-models';
 import { Database, Mode } from '../src/Database';
-import {
-    CourseEquivalency, EquivalencyContext
-} from '../src/indexers/models';
+import { CourseEquivalency, EquivalencyContext } from '../src/indexers/models';
 import EquivalencyDao from '../src/queries/EquivalencyDao';
-import { QueryError, QueryErrorType } from '../src/queries/errors';
-import {
-    courseSubjectRegex
-} from '../src/routes/api/v1/validation';
+import { courseSubjectRegex } from '../src/routes/api/v1/validation';
 import { doFullIndex } from '../src/server';
+
+import { expectQueryError } from './util';
 import { validateCourseArray } from './validation';
-import {
-    CourseEquivalencyDocument, EquivType,
-    KeyCourse
-} from '../src/common/api-models';
 
 describe('EquivalencyDao', () => {
     let dao: EquivalencyDao;
@@ -26,22 +20,6 @@ describe('EquivalencyDao', () => {
     });
 
     describe('queries and aggregations', () => {
-        const expectQueryError = async (fn: () => Promise<any>, type: QueryErrorType = QueryErrorType.MISSING) => {
-            try {
-                await fn();
-                expect(true, 'should have thrown QueryError').to.be.false;
-            } catch (ex) {
-                if (ex instanceof AssertionError) {
-                    // In case we accidentally catch the AssertionError thrown
-                    // by the expect() in the try block
-                    throw ex;
-                }
-
-                expect(ex).to.be.instanceof(QueryError);
-                expect(ex.type).to.equal(type);
-            }
-        };
-
         before('insert equivalencies', async function() {
             // Allow plenty of time for the Indexers to do their thing
             this.timeout(30000);

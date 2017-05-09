@@ -5,7 +5,7 @@ import { Database } from '../Database';
 import Dao from './Dao';
 import { QueryError, QueryErrorType } from './errors';
 
-export default class InstitutionDao extends Dao<Institution, Institution> {
+export default class InstitutionDao extends Dao<ObjectID, Institution, Institution> {
     public static readonly COLLECTION = 'institutions';
 
     constructor() {
@@ -25,6 +25,10 @@ export default class InstitutionDao extends Dao<Institution, Institution> {
             .find()
             .sort({ acronym: 1 })
             .toArray();
+    }
+
+    protected resolveId(id: string): ObjectID {
+        return new ObjectID(id);
     }
 
     protected async _put(data: Institution[]): Promise<ObjectID[]> {

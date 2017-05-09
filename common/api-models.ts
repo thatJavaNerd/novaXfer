@@ -55,3 +55,20 @@ export enum EquivType {
     /** Does not trasnfer at all */
     NONE
 }
+
+/**
+ * Represents one semester in a TransferPlan
+ */
+export interface Semester {
+    name: string;
+    courses: KeyCourse[];
+}
+
+/**
+ * Represents a student's plan to transfer to one or more institutions
+ */
+export interface TransferPlan {
+    _id?: string;
+    institutions: string[];
+    semesters: Semester[];
+}

@@ -1,12 +1,14 @@
 import { expect } from 'chai';
 
 import * as _ from 'lodash';
+
+import { expectQueryError } from './util';
+import { validateInstitution } from './validation';
+
 import { Institution } from '../src/common/api-models';
 import { Database, Mode } from '../src/Database';
 import { findIndexers } from '../src/indexers/index';
-import { QueryError, QueryErrorType } from '../src/queries/errors';
 import InstitutionDao from '../src/queries/InstitutionDao';
-import { validateInstitution } from './validation';
 
 describe('InstitutionDao', () => {
     let dao: InstitutionDao;
@@ -40,17 +42,9 @@ describe('InstitutionDao', () => {
                 expect(institution!.acronym).to.equal(acronym);
             });
 
-            it('should reject for a non-existent institution', async () => {
-                try {
-                    await dao.getByAcronym('non-existent');
-
-                    // If we got here something went wrong
-                    expect(true, 'should have rejected').to.be.false;
-                } catch (ex) {
-                    expect(ex).is.an.instanceof(QueryError);
-                    expect((ex as QueryError).type).to.equal(QueryErrorType.MISSING);
-                }
-            });
+            it('should reject for a non-existent institution', async () =>
+                expectQueryError(() => dao.getByAcronym('non-existent'))
+            );
         });
 
         after('drop collection', () => Database.get().dropIfExists(dao.collectionName));

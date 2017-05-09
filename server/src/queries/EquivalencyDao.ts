@@ -6,13 +6,14 @@ import {
     KeyCourse
 } from '../common/api-models';
 import {
-    EquivalencyContext,
+    EquivalencyContext
 } from '../indexers/models';
 import Dao from './Dao';
 import { QueryError, QueryErrorType } from './errors';
 import InstitutionDao from './InstitutionDao';
 
-export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext> {
+export default class EquivalencyDao extends Dao<ObjectID, CourseEntry, EquivalencyContext> {
+
     public static readonly COLLECTION = 'courses';
 
     constructor() {
@@ -198,9 +199,9 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
             },
             {
                 $project: {
-                    "_id": false,
+                    '_id': false,
                     // Remove all institution references because it's a root value
-                    "institution": true,
+                    'institution': true,
                     'courses.number': true,
                     'courses.subject': true,
                     'courses._id': true,
@@ -224,6 +225,9 @@ export default class EquivalencyDao extends Dao<CourseEntry, EquivalencyContext>
         }
 
         return docs[0];
+    }
+    protected resolveId(id: string): ObjectID {
+        return new ObjectID(id);
     }
 
     /** @inheritDoc */
