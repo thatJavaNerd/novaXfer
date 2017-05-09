@@ -9,25 +9,66 @@ import {
 import { Database, Mode } from '../src/Database';
 import { findIndexers } from '../src/indexers/index';
 import EquivalencyDao from '../src/queries/EquivalencyDao';
+import { PlanDao } from '../src/queries/PlanDao';
 import { ErrorData } from '../src/routes/api/v1/util';
 import { createServer, doFullIndex } from '../src/server';
-import { PlanDao } from '../src/queries/PlanDao';
+
+interface ApiRequest {
+    /** HTTP request method */
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'HEAD' | 'OPTIONS' | 'DELETE';
+    /** Path relative to "/api/v1" */
+    relPath: string;
+    /** Expected HTTP status code (200, 404, etc.) */
+    expectedStatus: number;
+    /**
+     * Validate the content of the API response. Passes the `error` property if
+     * expectedStatus isn't 2XX, otherwise passes the `data` property.
+     */
+    validate?: (dataOrError: any) => void;
+    /** Parameters for the query string */
+    query?: { [value: string]: string };
+    /** Data to be sent in the request body */
+    data?: any;
+}
 
 describe('API v1', () => {
     let app: Application;
-    const apiRequest = (relPath: string,
-                        expectedStatus: number,
-                        validate?: (dataOrError: any) => void) => {
-        return request(app)
-            .get('/api/v1' + relPath)
-            .expect('Content-Type', /json/)
-            .expect(expectedStatus)
-            .then((res) => {
-                verifyResponse(res.body, expectedStatus);
 
-                if (validate !== undefined)
-                    validate(expectedStatus >= 200 && expectedStatus < 300 ? res.body.data : res.body.error);
+    /** Performs an API request. Expects a JSON response. */
+    const apiRequest = (conf: ApiRequest) =>
+        request(app)
+            // get(path), post(path), put(path), etc.
+            [conf.method.toLowerCase()]('/api/v1' + conf.relPath)
+            // Add a query string if applicable
+            .query(conf.query)
+            // Let the server we want JSON
+            .set('Accept', /application\/json/)
+            // Send our data, if applicable
+            .send(conf.data)
+            // Expect a JSON response
+            .expect('Content-Type', /json/)
+            // Make sure the server returned the expected status
+            .expect(conf.expectedStatus)
+            .then((res) => {
+                // Verify the shape of the response as well as its
+                verifyResponse(res.body, conf.expectedStatus);
+                if (conf.validate)
+                    // Validate data if expected status is 2XX, otherwise validate
+                    // error
+                    conf.validate(conf.expectedStatus >= 200 && conf.expectedStatus < 300 ?
+                        res.body.data : res.body.error);
             });
+
+    /** Uses apiRequest() to perform a basic GET API request */
+    const basicApiRequest = (relPath: string,
+                             expectedStatus: number,
+                             validate?: (dataOrError: any) => void) => {
+        return apiRequest({
+            method: 'GET',
+            relPath,
+            expectedStatus,
+            validate
+        });
     };
 
     before('connect to and reset database', async function() {
@@ -40,7 +81,7 @@ describe('API v1', () => {
 
     describe('GET /api/v1/*', () => {
         it('should 404 with JSON data', () => {
-            return apiRequest('/foobar', 404, (error) => {
+            return basicApiRequest('/foobar', 404, (error) => {
                 expect(error.message).to.exist;
                 expect(error.input).to.deep.equal({});
             });
@@ -49,7 +90,7 @@ describe('API v1', () => {
 
     describe('GET /api/v1/institution', () => {
         it('should return all institutions', async () => {
-            return apiRequest('/institution', 200, (data: any) => {
+            return basicApiRequest('/institution', 200, (data: any) => {
                 expect(data).to.have.lengthOf(findIndexers().length);
             });
         });
@@ -61,7 +102,7 @@ describe('API v1', () => {
 
             // Query every institution directly to make sure we can
             for (const institution of institutions) {
-                await apiRequest(`/institution/${institution.acronym}`, 200, (data: any) => {
+                await basicApiRequest(`/institution/${institution.acronym}`, 200, (data: any) => {
                     expect(data.acronym).to.equal(institution.acronym);
                     expect(data.fullName).to.equal(institution.fullName);
                     expect(data.location).to.equal(institution.location);
@@ -78,21 +119,21 @@ describe('API v1', () => {
             ];
 
             for (const name of badNames) {
-                await apiRequest('/institution/' + name, 400, (error: any) => {
+                await basicApiRequest('/institution/' + name, 400, (error: any) => {
                     expect(error.input).to.deep.equal({ acronym: name });
                 });
             }
         });
 
         it('should return an error when given a valid, but non-existent institution', async () => {
-            return apiRequest('/institution/ABC', 404, (error: any) => {
+            return basicApiRequest('/institution/ABC', 404, (error: any) => {
                 expect(error.input).to.deep.equal({ acronym: 'ABC' });
             });
         });
 
         it('should allow case-insensitive input', () => {
             const inst = findIndexers()[0].institution.acronym.toLowerCase();
-            return apiRequest('/institution/' + inst, 200, undefined);
+            return basicApiRequest('/institution/' + inst, 200, undefined);
         });
     });
 
@@ -101,7 +142,7 @@ describe('API v1', () => {
         const institution = 'GMU';
 
         it('should return an InstitutionFocusedEquivalency', () => {
-            return apiRequest(`/institution/${institution}/CSC:202`, 200,
+            return basicApiRequest(`/institution/${institution}/CSC:202`, 200,
                 (data: InstitutionFocusedEquivalency) => {
 
                 expect(data.institution).to.equal(institution);
@@ -120,7 +161,7 @@ describe('API v1', () => {
         });
 
         it('should 404 when given a non-existent institution', () => {
-            return apiRequest('/institution/FOO/CSC:202', 404, (error: ErrorData) => {
+            return basicApiRequest('/institution/FOO/CSC:202', 404, (error: ErrorData) => {
                 expect(error.input).to.deep.equal({
                     acronym: 'FOO',
                     courses: [{
@@ -132,7 +173,7 @@ describe('API v1', () => {
         });
 
         it('should return a skeleton when the courses don\'t exist', () => {
-            return apiRequest(`/institution/${institution}/FOO:BAR`, 200,
+            return basicApiRequest(`/institution/${institution}/FOO:BAR`, 200,
                 (data: InstitutionFocusedEquivalency) => {
 
                 expect(data.institution).to.equal(institution);
@@ -145,14 +186,14 @@ describe('API v1', () => {
             const route = `/institution/${institution}/CSC:202`;
             let responseData: InstitutionFocusedEquivalency;
 
-            await apiRequest(route, 200, (data: InstitutionFocusedEquivalency) => {
+            await basicApiRequest(route, 200, (data: InstitutionFocusedEquivalency) => {
                 // If we don't get any courses returned it's probably because we
                 // choose a bad institution/course to test against
                 expect(data.courses).to.have.length.above(0);
                 responseData = data;
             });
 
-            return apiRequest(route.toLowerCase(), 200, (data) => {
+            return basicApiRequest(route.toLowerCase(), 200, (data) => {
                 // Just make sure the response we got sending parameters in
                 // lowercase is the same is the 'normal' response data
                 expect(data).to.deep.equal(responseData);
@@ -162,7 +203,7 @@ describe('API v1', () => {
 
     describe('GET /api/v1/course', () => {
         it('should return object mapping a subject to the amount of courses in that subject', () => {
-            return apiRequest('/course', 200, (data) => {
+            return basicApiRequest('/course', 200, (data) => {
                 expect(data).to.be.an('object');
 
                 for (const subj of Object.keys(data)) {
@@ -193,19 +234,19 @@ describe('API v1', () => {
         it('should return an object mapping course numbers to the amount of ' +
             'institutions that have equivalencies', () => {
 
-            return apiRequest('/course/MTH', 200, (data: any) => {
+            return basicApiRequest('/course/MTH', 200, (data: any) => {
                 verifyData(data);
             });
         });
 
         it('should return 404 when given a non-existent subject', () => {
-            return apiRequest('/course/FOO', 404, (error: any) => {
+            return basicApiRequest('/course/FOO', 404, (error: any) => {
                 expect(error.input).to.deep.equal({ subject: 'FOO' });
             });
         });
 
         it('should\'t care about case', () => {
-            return apiRequest('/course/mth', 200, (data) => {
+            return basicApiRequest('/course/mth', 200, (data) => {
                 verifyData(data);
             });
         });
@@ -229,7 +270,7 @@ describe('API v1', () => {
         });
 
         it('should return a single course entry', () => {
-            return apiRequest(`/course/${course.subject}/${course.number}`, 200, (data: any) => {
+            return basicApiRequest(`/course/${course.subject}/${course.number}`, 200, (data: any) => {
                 expect(data.subject).to.equal(course.subject);
                 expect(data.number).to.equal(course.number);
             });
@@ -243,7 +284,7 @@ describe('API v1', () => {
             ];
 
             for (const param of matrix) {
-                await apiRequest(`/course/${param[0]}/${param[1]}`, 200, (data: any) => {
+                await basicApiRequest(`/course/${param[0]}/${param[1]}`, 200, (data: any) => {
                     expect(data.subject).to.equal(param[0].toUpperCase());
                     expect(data.number).to.equal(param[1].toUpperCase());
                 });
@@ -251,7 +292,7 @@ describe('API v1', () => {
         });
 
         it('should 404 when given a non-existent course', () => {
-            return apiRequest('/course/FOO/BAR', 404, (error: ErrorData) => {
+            return basicApiRequest('/course/FOO/BAR', 404, (error: ErrorData) => {
                 expect(error.input).to.deep.equal({
                     subject: 'FOO',
                     number: 'BAR'
@@ -265,7 +306,7 @@ describe('API v1', () => {
         const makeRequest = (institutions: string,
                              code: number,
                              validate?: (data: CourseEquivalencyDocument[]) => void) =>
-            apiRequest(
+            basicApiRequest(
                 // relative path
                 `/course/${course.subject}/${course.number}/${institutions}`,
                 // expected HTTP status code
@@ -358,7 +399,7 @@ describe('API v1', () => {
         });
 
         it('should 404 when given a non-existent course', () => {
-            return apiRequest('/course/foo/bar/uva', 404, (error: ErrorData) => {
+            return basicApiRequest('/course/foo/bar/uva', 404, (error: ErrorData) => {
                 expect(error.input).to.deep.equal({
                     subject: 'FOO',
                     number: 'BAR',
@@ -378,13 +419,13 @@ describe('API v1', () => {
         });
 
         it('should fetch the plan data when the ID is specified', async () =>
-            apiRequest('/plan/' + plan._id, 200, (p: TransferPlan) => {
+            basicApiRequest('/plan/' + plan._id, 200, (p: TransferPlan) => {
                 expect(plan).to.deep.equal(p);
             })
         );
 
         it('should 404 when given a non-existent ID', () =>
-            apiRequest('/plan/foo', 404, (error: ErrorData) => {
+            basicApiRequest('/plan/foo', 404, (error: ErrorData) => {
                 expect(error.input).to.deep.equal({ id: 'foo' });
             })
         );
@@ -409,7 +450,7 @@ const verifyResponse = (response: any, expectedStatus: number) => {
     } else {
         // Fail
         expect(response.data, 'data existed on unsuccessful response').to.not.exist;
-        expect(response.error, 'erorr did not exist on unsuccessful response').to.exist;
+        expect(response.error, 'error did not exist on unsuccessful response').to.exist;
     }
 };
 

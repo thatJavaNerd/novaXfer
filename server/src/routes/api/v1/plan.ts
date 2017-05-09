@@ -4,7 +4,6 @@ import { runQuery } from './util';
 
 import { Request, Response, Router } from 'express';
 import Parameter = require('pinput');
-import * as shortid from 'shortid';
 
 export default function(): RouteModule {
     const dao = new PlanDao();
