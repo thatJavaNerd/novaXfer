@@ -415,7 +415,7 @@ describe('API v1', () => {
 
         before('insert plan', async () => {
             dao = new PlanDao();
-            plan = await dao.update(mockPlan);
+            plan = await dao.update(mockPlan());
         });
 
         it('should fetch the plan data when the ID is specified', async () =>
@@ -429,10 +429,19 @@ describe('API v1', () => {
                 expect(error.input).to.deep.equal({ id: 'foo' });
             })
         );
+    });
 
-        // There isn't a dao.delete() so drop the entire collection
-        after('delete plan', async () =>
-            Database.get().dropIfExists(PlanDao.COLLECTION)
+    describe('POST /api/v1/plan', () => {
+        it('should return the new plan when successful', () =>
+            apiRequest({
+                method: 'POST',
+                relPath: '/plan',
+                expectedStatus: 200,
+                data: mockPlan(),
+                validate: (data: TransferPlan) => {
+                    expect(data).to.be.a('string');
+                }
+            })
         );
     });
 
@@ -454,7 +463,7 @@ const verifyResponse = (response: any, expectedStatus: number) => {
     }
 };
 
-const mockPlan: TransferPlan = {
+const mockPlan = (): TransferPlan => ({
     institutions: ['UVA', 'VCU'],
     semesters: [
         {
@@ -484,4 +493,4 @@ const mockPlan: TransferPlan = {
             ]
         }
     ]
-};
+});
