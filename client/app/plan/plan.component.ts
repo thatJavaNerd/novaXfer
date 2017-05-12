@@ -4,8 +4,8 @@ import { Component } from '@angular/core';
     template: `
         <site-header></site-header>
         <main>
-            <bulk-lookup></bulk-lookup>
+            <plan-lookup></plan-lookup>
         </main>
     `
 })
-export class BulkComponent {}
+export class PlanComponent {}

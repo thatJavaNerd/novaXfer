@@ -4,7 +4,7 @@ export const PLACEHOLDER_COURSE = 'ENG 111';
 export const NAVIGATION_MAIN: Readonly<{ routerLinks: NavigationLink[], hrefLinks: NavigationLink[] }> = Object.freeze({
     routerLinks: [
         { href: '/home', title: 'Home' },
-        { href: '/bulk', title: 'Bulk' },
+        { href: '/plan', title: 'Plan' },
         { href: '/docs/api', title: 'API' }
     ],
     hrefLinks: [

@@ -4,20 +4,20 @@ import { FormsModule } from '@angular/forms';
 
 import { CoreModule } from '../core/core.module';
 
-import { BulkLookupComponent } from './bulk-lookup.component';
-import { BulkRoutingModule } from './bulk-routing.module';
-import { BulkComponent } from './bulk.component';
+import { PlanLookupComponent } from './plan-lookup.component';
+import { PlanRoutingModule } from './plan-routing.module';
+import { PlanComponent } from './plan.component';
 
 @NgModule({
     imports: [
         CommonModule,
         CoreModule,
         FormsModule,
-        BulkRoutingModule
+        PlanRoutingModule
     ],
     declarations: [
-        BulkComponent,
-        BulkLookupComponent
+        PlanComponent,
+        PlanLookupComponent
     ]
 })
-export class BulkModule {}
+export class PlanModule {}

@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { BulkComponent } from './bulk.component';
+import { PlanComponent } from './plan.component';
 
 const routes: Routes = [
-    { path: 'bulk', component: BulkComponent }
+    { path: 'plan', component: PlanComponent }
 ];
 
 @NgModule({
@@ -15,4 +15,4 @@ const routes: Routes = [
         RouterModule
     ]
 })
-export class BulkRoutingModule {}
+export class PlanRoutingModule {}
