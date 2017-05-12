@@ -4,18 +4,25 @@ import { runQuery } from './util';
 
 import { Request, Response, Router } from 'express';
 import Parameter = require('pinput');
+import { SuccessResponse } from '../../../common/responses';
 
 export default function(): RouteModule {
     const dao = new PlanDao();
     const r = Router();
 
     r.post('/', (req: Request, res: Response) => {
-        return runQuery(
-            [createTransferPlanParam(req)],
-            // Workaround until pinput supports non-string inputs
-            async (plan) => (await dao.put(req.body))[0],
-            res
-        );
+        return runQuery({
+            parameters: [createTransferPlanParam(req)],
+            query: async (plan) => (await dao.put(req.body))[0],
+            res,
+            transferResult: (data: any) => {
+                const status = 201;
+                const response: SuccessResponse = { data: { _id: data }, status };
+                res.header('Location', '/api/v1/plan/' + data)
+                    .status(status)
+                    .json(response);
+            }
+        });
     });
 
     r.get('/:id', (req: Request, res: Response) => {
@@ -27,11 +34,11 @@ export default function(): RouteModule {
             validate: () => true
         });
 
-        return runQuery(
-            [id],
-            (idParam) => dao.get(idParam),
+        return runQuery({
+            parameters: [id],
+            query: (idParam) => dao.get(idParam),
             res
-        );
+        });
     });
 
     return {

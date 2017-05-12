@@ -42,34 +42,29 @@ export default function(): RouteModule {
     });
 
     r.get('/:subject', async (req: Request, res: Response) => {
-        return runQuery(
-            [subjectParam(req)],
-            (subj: string) => dao.numbersForSubject(subj),
+        return runQuery({
+            parameters: [subjectParam(req)],
+            query: (subj: string) => dao.numbersForSubject(subj),
             res
-        );
+        });
     });
 
     r.get('/:subject/:number', async (req: Request, res: Response) => {
-        return runQuery(
-            // parameters
-            [subjectParam(req), numberParam(req)],
-            // query function
-            (subj: string, numb: string) => dao.course(subj, numb),
-            // response
+        return runQuery({
+            parameters: [subjectParam(req), numberParam(req)],
+            query: (subj: string, numb: string) => dao.course(subj, numb),
             res
-        );
+        });
     });
 
     r.get('/:subject/:number/:institutions', async (req: Request, res: Response) => {
-        return runQuery(
-            // parameters
-            [subjectParam(req), numberParam(req), institutionsParam(req)],
-            // query function
-            (subj: string, num: string, institutions: string[]) =>
+        return runQuery({
+            parameters: [subjectParam(req), numberParam(req), institutionsParam(req)],
+            query: (subj: string, num: string, institutions: string[]) =>
                 dao.forCourse(subj, num, institutions),
             // response
             res
-        );
+        });
     });
 
     return {

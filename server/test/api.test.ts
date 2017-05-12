@@ -2,6 +2,7 @@ import { AssertionError, expect } from 'chai';
 import { Application } from 'express';
 import * as _ from 'lodash';
 import * as request from 'supertest';
+import { Response } from 'supertest';
 import {
     CourseEntry, CourseEquivalencyDocument, InstitutionFocusedEquivalency,
     KeyCourse, TransferPlan
@@ -29,6 +30,8 @@ interface ApiRequest {
     query?: { [value: string]: string };
     /** Data to be sent in the request body */
     data?: any;
+    /** Validate the raw Supertest/Superagent Response object (headers, etc.) */
+    validateRawResponse?: (res: Response) => void;
 }
 
 describe('API v1', () => {
@@ -49,7 +52,7 @@ describe('API v1', () => {
             .expect('Content-Type', /json/)
             // Make sure the server returned the expected status
             .expect(conf.expectedStatus)
-            .then((res) => {
+            .then((res: Response) => {
                 // Verify the shape of the response as well as its
                 verifyResponse(res.body, conf.expectedStatus);
                 if (conf.validate)
@@ -57,6 +60,9 @@ describe('API v1', () => {
                     // error
                     conf.validate(conf.expectedStatus >= 200 && conf.expectedStatus < 300 ?
                         res.body.data : res.body.error);
+
+                if (conf.validateRawResponse)
+                    conf.validateRawResponse(res);
             });
 
     /** Uses apiRequest() to perform a basic GET API request */
@@ -436,10 +442,15 @@ describe('API v1', () => {
             apiRequest({
                 method: 'POST',
                 relPath: '/plan',
-                expectedStatus: 200,
+                expectedStatus: 201,
                 data: mockPlan(),
-                validate: (data: TransferPlan) => {
-                    expect(data).to.be.a('string');
+                validate: (data: any) => {
+                    expect(data._id).to.exist;
+                    expect(data._id).to.be.a('string');
+                },
+                validateRawResponse: (res) => {
+                    expect(res.header.location).to.exist;
+                    expect(res.header.location).to.match(/api\/v1\/plan\/[A-Za-z0-9-_]+$/);
                 }
             })
         );

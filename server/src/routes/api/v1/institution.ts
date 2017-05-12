@@ -39,11 +39,11 @@ export default function(): RouteModule {
     });
 
     r.get('/:acronym', (req: Request, res: Response) => {
-        return runQuery(
-            [acronymParam(req)],
-            (acronym: string) => dao.getByAcronym(acronym),
+        return runQuery({
+            parameters: [acronymParam(req)],
+            query: (acronym: string) => dao.getByAcronym(acronym),
             res
-        );
+        });
     });
 
     r.get('/:acronym/:courses', (req: Request, res: Response) => {
@@ -68,11 +68,11 @@ export default function(): RouteModule {
             }
         });
 
-        return runQuery(
-            [acronymParam(req), coursesParam],
-            (acronym: string, courses: KeyCourse[]) => equivDao.forInstitution(acronym, courses),
+        return runQuery({
+            parameters: [acronymParam(req), coursesParam],
+            query: (acronym: string, courses: KeyCourse[]) => equivDao.forInstitution(acronym, courses),
             res
-        );
+        });
     });
 
     return {

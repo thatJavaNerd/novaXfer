@@ -9,50 +9,68 @@ import {
 } from '../../../common/responses';
 import { QueryError, QueryErrorType } from '../../../queries/errors';
 
+export interface QueryRequest {
+    /** Called with the values of each Parameter if all are valid */
+    query: (... args: any[]) => any;
+    /** Any Parameters to the query */
+    parameters: Parameter[];
+    /** Express Response object */
+    res: Response;
+
+    /** Sends the result of the query to the client */
+    transferResult?: (data: any) => void;
+    /**
+     * Any bindings between one or more Parameters that must be satisfied for
+     * the query to execute successfully
+     */
+    contracts?: Contract[];
+}
+
 /**
- * Runs a query and sends the result as JSON to the response. Takes input
- * Parameters and if all are valid, passes values to queryFn
- *
- * @param  {Parameter[]}     parameters An array of Parameters
- * @param  {function}  queryFn    Query function to execute
- * @param  {object}    res        Express Response object
- * @param contracts
+ * Executes a query. If at least one Parameter is invalid or at least one
+ * Contract is broken, a non-successful status-code will be returned to the
+ * consumer (configurable via the Parameter/Contract constructor). The query
+ * function is called with the value of each Parameter in the order they appear
+ * in the array. If there query function throws an Error, runQuery() tries its
+ * best to handle it by returning the most accurate status code available,
+ * falling back to 500 Internal Server Error. The
+ * @param request
  */
-export async function runQuery(parameters: Parameter[],
-                               queryFn: (...args: any[]) => any,
-                               res: Response,
-                               contracts: Contract[] = []): Promise<void> {
+export async function runQuery(request: QueryRequest): Promise<void> {
     // If any parameter is invalid, reject
-    for (const p of parameters) {
+    for (const p of request.parameters) {
         if (p.valid === false) {
             const errData: ErrorData = {
                 message: p.error.message,
                 input: p.error.data
             };
-            return handleError(res, errData, p.error.code);
+            return handleError(request.res, errData, p.error.code);
         }
     }
 
-    for (const contract of contracts) {
-        contract.check(parameters);
-        if (contract.valid === false) {
-            const errData: ErrorData = {
-                message: contract.error.message,
-                input: contract.error.data
-            };
-            return handleError(res, errData, contract.error.code);
+    if (request.contracts) {
+        for (const contract of request.contracts) {
+            contract.check(request.parameters);
+            if (contract.valid === false) {
+                const errData: ErrorData = {
+                    message: contract.error.message,
+                    input: contract.error.data
+                };
+                return handleError(request.res, errData, contract.error.code);
+            }
         }
     }
 
+    let result;
     try {
-        // Call queryFn with the parameter values
-        return handleSuccess(res, await queryFn.apply(null, _.map(parameters, (p) => p.value)));
+        // Call query() with the Parameter values
+        result = await request.query.apply(null, _.map(request.parameters, (p) => p.value));
     } catch (ex) {
         const errorData: ErrorData = {
             message: 'Could not process request',
             input: _.zipObject(
-                _.map(parameters, (p) => p.name),
-                _.map(parameters, (p) => p.value)
+                _.map(request.parameters, (p) => p.name),
+                _.map(request.parameters, (p) => p.value)
             )
         };
 
@@ -70,8 +88,12 @@ export async function runQuery(parameters: Parameter[],
         if (code === 500)
             console.error(ex);
 
-        return handleError(res, errorData, code);
+        return handleError(request.res, errorData, code);
     }
+
+    if (request.transferResult)
+        return request.transferResult(result);
+    return handleSuccess(request.res, result);
 }
 
 export interface ErrorData {
