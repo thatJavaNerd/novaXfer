@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {
+    Component, Input, OnChanges, OnInit,
+    SimpleChanges
+} from '@angular/core';
 import { Response } from '@angular/http';
 
 import { PLACEHOLDER_COURSE } from '../core/constants';
@@ -8,7 +11,7 @@ import { PatternHelper, PatternService } from '../core/pattern.service';
 import {
     CourseEntry, CourseEquivalencyDocument, Institution,
     InstitutionFocusedEquivalency,
-    KeyCourse
+    KeyCourse, Semester
 } from '../common/api-models';
 
 import * as _ from 'lodash';
@@ -18,11 +21,13 @@ import * as _ from 'lodash';
     templateUrl: 'semester.pug',
     styleUrls: [ 'semester.scss' ]
 })
-export class SemesterComponent implements OnInit {
+export class SemesterComponent implements OnInit, OnChanges {
+    @Input() public model: Semester;
+    @Input() public institutions: string[] = [];
+
     public availableInstitutions: ReadonlyArray<Institution>;
 
-    public readonly institutions: string[] = [];
-    public readonly courses: string[] = [''];
+    public courses: string[] = [''];
 
     public placeholderCourse: string;
     private courseHelper: PatternHelper<KeyCourse>;
@@ -31,7 +36,7 @@ export class SemesterComponent implements OnInit {
 
     /**
      * Keeps track of which courses are valid. The validity of a course at
-     * this.institutions[i] can be found at this.courseValidities[i].
+     * this.courses[i] can be found at this.courseValidities[i].
      */
     private courseValidities: boolean[];
 
@@ -52,8 +57,8 @@ export class SemesterComponent implements OnInit {
 
     public ngOnInit(): void {
         this.courseHelper = this.pattern.get('course');
-        // Initialize to an empty array
-        this.parsedCourses = [];
+        this.parsedCourses = _.clone(this.model.courses);
+        this.courses = _.map(this.model.courses, (c) => c.subject + ' ' + c.number);
         // Assume all courses are valid by default
         this.courseValidities = _.fill(Array(this.courses.length), true);
         this.placeholderCourse = PLACEHOLDER_COURSE;
@@ -61,8 +66,16 @@ export class SemesterComponent implements OnInit {
         this.equiv.institutions().then((data: Institution[]) => {
             this.availableInstitutions = Object.freeze(data);
             // Add the first institution
-            this.addInstitution();
+            // this.addInstitution();
         });
+    }
+
+    public ngOnChanges(changes: SimpleChanges): void {
+        if (changes.institutions && !changes.institutions.firstChange) {
+            for (let i = 0; i < this.institutions.length; i++) {
+                this.onChangeInstitution(i, this.institutions[i]);
+            }
+        }
     }
 
     public onChangeInstitution(instIndex: number, acronym: string) {

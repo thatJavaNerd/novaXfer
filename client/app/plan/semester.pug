@@ -1,3 +1,5 @@
+div.container
+    h1 {{ model.name }}
 div.container.table-responsive
     table.table.table-striped
         tr
@@ -22,7 +24,8 @@ div.container.table-responsive
                     [(ngModel)]='courses[i]',
                     (keyup)='onChangeCourse(i, $event.target.value)',
                     [placeholder]='placeholderCourse',
-                    (change)='updateValidity(i)'
+                    (change)='updateValidity(i)',
+                    spellcheck='false'
                 )
 
             td.equiv-cell(*ngFor='let courseEquivs of matrix[i]')
