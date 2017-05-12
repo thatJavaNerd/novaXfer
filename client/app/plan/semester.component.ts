@@ -14,11 +14,11 @@ import {
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'plan-lookup',
-    templateUrl: 'plan-lookup.pug',
-    styleUrls: [ 'plan-lookup.scss' ]
+    selector: 'semester',
+    templateUrl: 'semester.pug',
+    styleUrls: [ 'semester.scss' ]
 })
-export class PlanLookupComponent implements OnInit {
+export class SemesterComponent implements OnInit {
     public availableInstitutions: ReadonlyArray<Institution>;
 
     public readonly institutions: string[] = [];

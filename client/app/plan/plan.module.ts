@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { CoreModule } from '../core/core.module';
 
-import { PlanLookupComponent } from './plan-lookup.component';
 import { PlanRoutingModule } from './plan-routing.module';
 import { PlanComponent } from './plan.component';
+import { SemesterComponent } from './semester.component';
 
 @NgModule({
     imports: [
@@ -17,7 +17,7 @@ import { PlanComponent } from './plan.component';
     ],
     declarations: [
         PlanComponent,
-        PlanLookupComponent
+        SemesterComponent
     ]
 })
 export class PlanModule {}

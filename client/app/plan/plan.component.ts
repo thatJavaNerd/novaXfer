@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     template: `
         <site-header></site-header>
         <main>
-            <plan-lookup></plan-lookup>
+            <semester></semester>
         </main>
     `
 })
