@@ -5,6 +5,8 @@
   "main": "dist",
   "scripts": {
     "test": "gulp testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts && karma start client/config/karma.conf.js",
+    "test:server": "gulp server:testPrep && TS_NODE_PROJECT=server/tsconfig.json nyc mocha --opts server/test/mocha.opts",
+    "test:client": "gulp testPrep && karma start client/config/karma.conf.js",
     "start": "node --use-strict dist",
     "heroku-postbuild": "gulp build"
   },
