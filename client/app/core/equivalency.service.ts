@@ -12,6 +12,9 @@ import * as _ from 'lodash';
 
 @Injectable()
 export class EquivalencyService {
+    // Cache for GET /api/v1/institution
+    private static availableInstitutions: Promise<Institution[]> = null;
+
     public constructor(@Inject(Http) private http: Http) {}
 
     public entry(course: KeyCourse, institution?: string): Promise<CourseEntry> {
@@ -23,7 +26,8 @@ export class EquivalencyService {
     }
 
     public async institutions(): Promise<Institution[]> {
-        return this.get<Institution[]>('/api/v1/institution');
+        if (EquivalencyService.availableInstitutions !== null) return EquivalencyService.availableInstitutions;
+        return EquivalencyService.availableInstitutions = this.get<Institution[]>('/api/v1/institution');
     }
 
     public async forInstitution(institution: string, courses: KeyCourse[]) {
