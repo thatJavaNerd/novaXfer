@@ -5,7 +5,7 @@ import * as requestLib from 'request';
 import { Institution } from '../common/api-models';
 import { Database, Mode } from '../Database';
 
-export default async (requestData: any, institution: Institution, useCache = true) => {
+export default async (requestData: any, institution: Institution, useCache = true): Promise<Buffer> => {
     if (institution === undefined)
         throw new Error('expecting an institution');
 

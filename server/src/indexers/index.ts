@@ -14,15 +14,31 @@ export abstract class Indexer<T> {
     public abstract institution: Institution;
 
     public async findAll(): Promise<EquivalencyContext> {
-        const [equivalencies, unparseable] = this.parseEquivalencies(
-            await this.parseBody(
-                await request(this.prepareRequest(), this.institution)));
+        let body: Buffer;
+        try {
+            body = await request(this.prepareRequest(), this.institution);
+        } catch (err) {
+            console.error(`Unable to execute request for ${this.constructor.name}: ${err.message}`);
+            const httpRequest = this.prepareRequest();
+            // request() assumes that a string means a GET request to that URL,
+            // show that here
+            console.error(typeof httpRequest === 'string' ? `> GET ${httpRequest}` : httpRequest);
+            return {
+                institution: this.institution,
+                equivalencies: [],
+                unparseable: 0,
+                parseSuccessRate: 0
+            };
+        }
+
+        const [equivalencies, unparseable] = this.parseEquivalencies(await this.parseBody(body));
 
         return {
             institution: this.institution,
             equivalencies,
             unparseable,
-            parseSuccessRate: (equivalencies.length - unparseable) / equivalencies.length
+            parseSuccessRate: equivalencies.length !== 0 ?
+                (equivalencies.length - unparseable) / equivalencies.length : -1
         };
     }
 
@@ -37,8 +53,8 @@ export abstract class Indexer<T> {
     /**
      * Parses the response body into something usable by parseEquivalencies()
      *
-     * @data A buffer of the data from the network request sent with the
-     *       configuration created by prepareRequest()
+     * @param data A buffer of the data from the network request sent with the
+     *             configuration created by prepareRequest()
      */
     protected abstract parseBody(data: Buffer): Promise<T>;
 
@@ -92,8 +108,7 @@ export interface IndexReport {
 }
 
 /**
- * Finds the names of all the built in university indexers (JS files in
- * <root>/app/indexers/).
+ * Returns all known Indexers
  */
 export function findIndexers(): Array<Indexer<any>> {
     return [
