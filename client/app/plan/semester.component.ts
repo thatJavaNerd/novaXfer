@@ -1,5 +1,5 @@
 import {
-    Component, Input, OnInit
+    Component, Input, OnDestroy, OnInit
 } from '@angular/core';
 import { Response } from '@angular/http';
 
@@ -15,13 +15,14 @@ import {
 
 import * as _ from 'lodash';
 import { InstitutionSyncService } from './institution-sync.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'semester',
     templateUrl: 'semester.pug',
     styleUrls: [ 'semester.scss' ]
 })
-export class SemesterComponent implements OnInit {
+export class SemesterComponent implements OnInit, OnDestroy {
     @Input() public model: Semester;
     @Input() public institutions: string[] = [];
 
@@ -33,6 +34,8 @@ export class SemesterComponent implements OnInit {
     private courseHelper: PatternHelper<KeyCourse>;
 
     private parsedCourses: KeyCourse[] = [];
+
+    private instSyncSubscription: Subscription;
 
     /**
      * Keeps track of which courses are valid. The validity of a course at
@@ -68,9 +71,14 @@ export class SemesterComponent implements OnInit {
             this.availableInstitutions = Object.freeze(data);
         });
 
-        this.instSync.observable.subscribe((data: [string, number]) => {
+        this.instSyncSubscription = this.instSync.observable.subscribe((data: [string, number]) => {
             this.updateInstitution(data[1], data[0]);
         });
+    }
+
+    public ngOnDestroy(): void {
+        // Prevent memory leak when component is destroyed
+        this.instSyncSubscription.unsubscribe();
     }
 
     public updateInstitution(instIndex: number, acronym: string) {
