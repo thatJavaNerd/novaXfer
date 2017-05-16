@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { CoreModule } from '../core/core.module';
 
+import { InstitutionSyncService } from './institution-sync-service';
 import { PlanRoutingModule } from './plan-routing.module';
 import { PlanComponent } from './plan.component';
 import { SemesterComponent } from './semester.component';
@@ -18,6 +19,9 @@ import { SemesterComponent } from './semester.component';
     declarations: [
         PlanComponent,
         SemesterComponent
+    ],
+    providers: [
+        InstitutionSyncService
     ]
 })
 export class PlanModule {}

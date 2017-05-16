@@ -3,13 +3,14 @@ import { Institution, Semester } from '../common/api-models';
 import { EquivalencyService } from '../core/equivalency.service';
 
 import * as _ from 'lodash';
+import { InstitutionSyncService } from './institution-sync-service';
 
 @Component({
     template: `
         <site-header></site-header>
         <main>
             <div *ngFor="let semester of semesters">
-                <semester [model]="semester" [institutions]="institutions"></semester>
+                <semester [model]="semester"></semester>
             </div>
         </main>
     `
@@ -36,12 +37,16 @@ export class PlanComponent implements OnInit {
     public institutions: string[] = [];
 
     public constructor(
-        private equiv: EquivalencyService
+        private equiv: EquivalencyService,
+        private instSync: InstitutionSyncService
     ) {}
 
     public ngOnInit(): void {
         this.equiv.institutions().then((data: Institution[]) => {
             this.institutions = _.slice(_.map(data, (i) => i.acronym), 0, 3);
+            for (let i = 0; i < this.institutions.length; i++) {
+                this.instSync.onChangeInstitution(this.institutions[i], i);
+            }
         });
     }
 }

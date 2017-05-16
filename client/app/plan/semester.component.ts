@@ -1,6 +1,5 @@
 import {
-    Component, Input, OnChanges, OnInit,
-    SimpleChanges
+    Component, Input, OnChanges, OnInit, SimpleChanges
 } from '@angular/core';
 import { Response } from '@angular/http';
 
@@ -15,13 +14,14 @@ import {
 } from '../common/api-models';
 
 import * as _ from 'lodash';
+import { InstitutionSyncService } from './institution-sync-service';
 
 @Component({
     selector: 'semester',
     templateUrl: 'semester.pug',
     styleUrls: [ 'semester.scss' ]
 })
-export class SemesterComponent implements OnInit, OnChanges {
+export class SemesterComponent implements OnInit {
     @Input() public model: Semester;
     @Input() public institutions: string[] = [];
 
@@ -52,7 +52,8 @@ export class SemesterComponent implements OnInit, OnChanges {
 
     public constructor(
         private equiv: EquivalencyService,
-        private pattern: PatternService
+        private pattern: PatternService,
+        private instSync: InstitutionSyncService
     ) {}
 
     public ngOnInit(): void {
@@ -65,20 +66,17 @@ export class SemesterComponent implements OnInit, OnChanges {
 
         this.equiv.institutions().then((data: Institution[]) => {
             this.availableInstitutions = Object.freeze(data);
-            // Add the first institution
-            // this.addInstitution();
+        });
+
+        this.instSync.observable.subscribe((data: [string, number]) => {
+            this.updateInstitution(data[1], data[0]);
         });
     }
 
-    public ngOnChanges(changes: SimpleChanges): void {
-        if (changes.institutions && !changes.institutions.firstChange) {
-            for (let i = 0; i < this.institutions.length; i++) {
-                this.onChangeInstitution(i, this.institutions[i]);
-            }
-        }
-    }
+    public updateInstitution(instIndex: number, acronym: string) {
+        if (this.institutions[instIndex] !== acronym)
+            this.institutions[instIndex] = acronym;
 
-    public onChangeInstitution(instIndex: number, acronym: string) {
         this.equiv.forInstitution(acronym, this.parsedCourses).then((data: InstitutionFocusedEquivalency) => {
             for (let i = 0; i < this.parsedCourses.length; i++) {
                 const findFn = (c: CourseEntry): boolean =>
@@ -96,6 +94,11 @@ export class SemesterComponent implements OnInit, OnChanges {
                 }
             }
         });
+    }
+
+    public onChangeInstitution(instIndex: number, acronym: string) {
+        this.updateInstitution(instIndex, acronym);
+        this.instSync.onChangeInstitution(acronym, instIndex);
     }
 
     public onChangeCourse(courseIndex: number, course: string) {
@@ -212,7 +215,7 @@ export class SemesterComponent implements OnInit, OnChanges {
                 institution.acronym : this.availableInstitutions[0].acronym);
 
         const index = this.institutions.length - 1;
-        this.onChangeInstitution(index, this.institutions[index]);
+        this.updateInstitution(index, this.institutions[index]);
 
         const courseIndex = this.courses.length - 1;
         if (this.matrix[courseIndex] === undefined)
