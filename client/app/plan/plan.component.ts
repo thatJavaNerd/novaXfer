@@ -3,7 +3,7 @@ import { Institution, Semester } from '../common/api-models';
 import { EquivalencyService } from '../core/equivalency.service';
 
 import * as _ from 'lodash';
-import { InstitutionSyncService } from './institution-sync-service';
+import { InstitutionSyncService } from './institution-sync.service';
 
 @Component({
     template: `

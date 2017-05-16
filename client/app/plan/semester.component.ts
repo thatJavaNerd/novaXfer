@@ -1,5 +1,5 @@
 import {
-    Component, Input, OnChanges, OnInit, SimpleChanges
+    Component, Input, OnInit
 } from '@angular/core';
 import { Response } from '@angular/http';
 
@@ -14,7 +14,7 @@ import {
 } from '../common/api-models';
 
 import * as _ from 'lodash';
-import { InstitutionSyncService } from './institution-sync-service';
+import { InstitutionSyncService } from './institution-sync.service';
 
 @Component({
     selector: 'semester',
