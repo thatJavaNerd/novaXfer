@@ -1,13 +1,11 @@
 import * as del from 'del';
 import * as favicon from 'gulp-favicons';
-import * as webpack from 'webpack';
 
 import {
-    distDir, sass, version, watch
+    distDir, env, NodeEnv, sass, version, watch, webpackCompiler
 } from './util';
 
 const publicDir = (rel: string = '') => distDir('public/' + rel);
-const webpackConfig = require('../client/webpack.config');
 
 export default function(gulp) {
     gulp.task('client:build', [
@@ -16,22 +14,10 @@ export default function(gulp) {
         'client:styles'
     ]);
 
-    gulp.task('client:bundle', (callback) => {
-        const conf = Object.create(webpackConfig);
-        const compiler = webpack(conf);
-        // Show progress like we used "webpack --progress"
-        compiler.apply(new webpack.ProgressPlugin({}));
-
-        compiler.run((err, stats) => {
-            if (err) {
-                console.error(err.stack || err);
-                if (err.details)
-                    console.error(err.details);
-                return;
-            }
-
-            process.stdout.write(stats.toString({ colors: true }) + '\n');
-            callback();
+    gulp.task('client:bundle', (callback: () => void) => {
+        webpackCompiler({
+            gulpCallback: callback,
+            watch: env() === NodeEnv.DEV
         });
     });
 

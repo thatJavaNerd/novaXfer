@@ -6,6 +6,9 @@ import * as pug from 'gulp-pug';
 import * as sassBuild from 'gulp-sass';
 import * as tsc from 'gulp-typescript';
 import * as path from 'path';
+import * as webpack from 'webpack';
+
+const webpackConfig = require('../client/webpack.config');
 
 /** Generic options for a Gulp task that works with files. */
 export interface IOTaskOptions {
@@ -27,6 +30,16 @@ export interface CompileTypescriptOptions extends IOTaskOptions {
  */
 export interface WatchConfig {
     [fileGlob: string]: string[] | string;
+}
+
+export interface WebpackCompilerConfig {
+    gulpCallback: () => void;
+    watch: boolean;
+}
+
+export enum NodeEnv {
+    PROD,
+    DEV
 }
 
 /** Compiles a TypeScript project */
@@ -70,6 +83,42 @@ export function watch(conf: WatchConfig) {
         // Ensure the tasks are an array
         const tasks = Array.isArray(conf[src]) ? conf[src] : [conf[src]];
         gulp.watch(src, tasks);
+    }
+}
+
+export function webpackCompiler(opts: WebpackCompilerConfig) {
+    const conf = Object.create(webpackConfig);
+    const compiler = webpack(conf);
+    let callbackCalled = false;
+
+    // Show progress like we used "webpack --progress"
+    compiler.apply(new webpack.ProgressPlugin({}));
+    const callback = (err, stats) => {
+        if (err) {
+            console.error(err.stack || err);
+            if (err.details)
+                console.error(err.details);
+            return;
+        }
+
+        process.stdout.write(stats.toString({ colors: true }) + '\n');
+
+        if (!callbackCalled) {
+            opts.gulpCallback();
+            callbackCalled = true;
+        }
+    };
+
+    compiler[opts.watch ? 'watch' : 'run'](conf, callback);
+}
+
+export function env(): NodeEnv {
+    switch (process.env.NODE_ENV) {
+        case 'prod':
+        case 'production':
+            return NodeEnv.PROD;
+        default:
+            return NodeEnv.DEV;
     }
 }
 

@@ -26,9 +26,7 @@ gulp.task('start', () => {
     nodemon(config);
 });
 
-gulp.task('testPrep', ['build'], (cb) => {
-    runSequence('server:testPrep', cb);
-});
+gulp.task('testPrep', ['server:testPrep']);
 
 gulp.task('coveralls', () => {
     return gulp.src('coverage/lcov.info').pipe(coveralls());
