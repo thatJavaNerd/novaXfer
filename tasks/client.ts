@@ -18,8 +18,19 @@ export default function(gulp) {
 
     gulp.task('client:bundle', (callback) => {
         const conf = Object.create(webpackConfig);
-        webpack(conf, (err) => {
-            if (err) throw err;
+        const compiler = webpack(conf);
+        // Show progress like we used "webpack --progress"
+        compiler.apply(new webpack.ProgressPlugin({}));
+
+        compiler.run((err, stats) => {
+            if (err) {
+                console.error(err.stack || err);
+                if (err.details)
+                    console.error(err.details);
+                return;
+            }
+
+            process.stdout.write(stats.toString({ colors: true }) + '\n');
             callback();
         });
     });
