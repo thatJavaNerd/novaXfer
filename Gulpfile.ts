@@ -16,7 +16,7 @@ gulp.task('default', ['build'], (cb) => {
 });
 
 gulp.task('build', ['clean'], (cb) => {
-    runSequence('common:copy', 'server:build', 'client:build', cb);
+    runSequence('common:build', 'server:build', 'client:build', cb);
 });
 
 gulp.task('start', () => {
@@ -26,7 +26,7 @@ gulp.task('start', () => {
     nodemon(config);
 });
 
-gulp.task('testPrep', ['server:testPrep']);
+gulp.task('testPrep', ['common:build', 'server:testPrep']);
 
 gulp.task('coveralls', () => {
     return gulp.src('coverage/lcov.info').pipe(coveralls());
