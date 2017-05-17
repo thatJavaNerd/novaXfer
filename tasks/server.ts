@@ -2,7 +2,10 @@ import * as del from 'del';
 import * as about from 'gulp-about';
 import * as merge from 'merge2';
 
-import { distDir, renderMarkdown, renderPug, typescript, watch } from './util';
+import {
+    cp, distDir, renderMarkdown, renderPug, typescript,
+    watch
+} from './util';
 
 export default function(gulp) {
     gulp.task('server:build', [
@@ -28,10 +31,7 @@ export default function(gulp) {
     gulp.task('server:views', ['server:views:templates', 'server:views:docs']);
 
     gulp.task('server:views:templates', () =>
-        renderPug({
-            src: 'server/src/views/**/*.pug',
-            dest: distDir('views')
-        })
+        cp('server/src/views/**/*.html', distDir('views'))
     );
 
     gulp.task('server:views:docs', () =>
@@ -41,27 +41,13 @@ export default function(gulp) {
         })
     );
 
-    gulp.task('server:testPrep', ['server:testPrep:views', 'server:testPrep:docs']);
-
-    gulp.task('server:testPrep:views', () =>
-        renderPug({
-            src: 'server/src/views/**/*.pug',
-            dest: 'server/src/views'
-        })
-    );
-
-    gulp.task('server:testPrep:docs', () =>
-        renderMarkdown(({
-            src: 'docs/**/*.md',
-            dest: 'server/src/views/docs'
-        }))
-    );
+    gulp.task('server:testPrep', ['server:views']);
 
     gulp.task('server:clean', () =>
         del([
             'server/src/common',
             'server/src/indexers/.cache',
-            'server/src/views/**/*.html'
+            'server/src/views/docs/*.html'
         ])
     );
 

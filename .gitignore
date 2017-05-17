@@ -16,7 +16,7 @@
 /server/src/about.json
 /server/src/common
 /server/src/indexers/.cache
-/server/src/views/**/*.html
+/server/src/views/docs/*.html
 
 # Package manager error logs
 yarn-error.log
