@@ -109,7 +109,11 @@ export function webpackCompiler(opts: WebpackCompilerConfig) {
         }
     };
 
-    compiler[opts.watch ? 'watch' : 'run'](conf, callback);
+    if (opts.watch) {
+        compiler.watch(undefined, callback);
+    } else {
+        compiler.run(callback);
+    }
 }
 
 export function env(): NodeEnv {
