@@ -3,6 +3,8 @@ import {
 } from '@angular/core';
 import { Response } from '@angular/http';
 
+import { Subscription } from 'rxjs/Subscription';
+
 import { PLACEHOLDER_COURSE } from '../core/constants';
 import { EquivalencyService } from '../core/equivalency.service';
 import { PatternHelper, PatternService } from '../core/pattern.service';
@@ -15,7 +17,6 @@ import {
 
 import * as _ from 'lodash';
 import { InstitutionSyncService } from './institution-sync.service';
-import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'semester',

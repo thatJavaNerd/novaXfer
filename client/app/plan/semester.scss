@@ -1,9 +1,5 @@
 @import '../../assets/palette';
 
-input {
-  text-transform: uppercase;
-}
-
 th {
   vertical-align: middle !important;
   text-align: center;
@@ -18,12 +14,20 @@ div.header-wrapper {
   }
 }
 
+.semester-header {
+  input {
+    font-size: 36px;
+    height: 56px;
+  }
+}
+
 .course-input {
   width: 8em;
   
   input {
     text-align: center;
     width: 7em;
+    text-transform: uppercase;
   }
 }
 
