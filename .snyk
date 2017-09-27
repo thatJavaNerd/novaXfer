@@ -1,0 +1,14 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.7.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:debug:20170905':
+    - helmet > connect > debug:
+        patched: '2017-09-27T05:11:06.597Z'
+    - helmet > connect > finalhandler > debug:
+        patched: '2017-09-27T05:11:06.597Z'
+    - gulp-favicons > favicons > node-rest-client > debug:
+        patched: '2017-09-27T05:11:06.597Z'
+    - gulp-favicons > favicons > svg2png > phantomjs-prebuilt > extract-zip > debug:
+        patched: '2017-09-27T05:11:06.597Z'
