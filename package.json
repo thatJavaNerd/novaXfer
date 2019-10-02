@@ -31,7 +31,7 @@
     "express-list-endpoints": "^3.0.0",
     "fs-extra-promise": "^1.0.1",
     "gulp-favicons": "^2.2.7",
-    "helmet": "^3.5.0",
+    "helmet": "^3.21.1",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.25",
     "morgan": "^1.8.1",
